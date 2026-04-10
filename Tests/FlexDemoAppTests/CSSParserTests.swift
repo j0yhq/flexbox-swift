@@ -124,4 +124,65 @@ final class CSSParserTests: XCTestCase {
         XCTAssertEqual(parsed.items.count, 2)
         XCTAssertTrue(parsed.items.allSatisfy { $0.display == .flex })
     }
+
+    func testParsesAllSupportedContainerAndItemProperties() throws {
+        let css = """
+        .root {
+          display: flex;
+          flex-direction: row-reverse;
+          flex-wrap: wrap-reverse;
+          justify-content: space-around;
+          align-items: flex-end;
+          gap: 12px 8px;
+          padding: 1px 2px 3px 4px;
+          overflow: clip;
+        }
+
+        .root > .item {
+          flex-grow: 2;
+          flex-shrink: 0;
+          flex-basis: 25%;
+          order: 3;
+          width: min-content;
+          height: 40px;
+          overflow: scroll;
+          z-index: 7;
+          position: absolute;
+          top: 4px;
+          bottom: 6px;
+          left: 8px;
+          right: 10px;
+        }
+        """
+
+        let parsed = CSSParser.parse(css)
+
+        XCTAssertEqual(parsed.container.direction, .rowReverse)
+        XCTAssertEqual(parsed.container.wrap, .wrapReverse)
+        XCTAssertEqual(parsed.container.justifyContent, .spaceAround)
+        XCTAssertEqual(parsed.container.alignItems, .flexEnd)
+        XCTAssertEqual(parsed.container.rowGap, 12)
+        XCTAssertEqual(parsed.container.columnGap, 8)
+        XCTAssertEqual(parsed.container.padding.top, 1)
+        XCTAssertEqual(parsed.container.padding.trailing, 2)
+        XCTAssertEqual(parsed.container.padding.bottom, 3)
+        XCTAssertEqual(parsed.container.padding.leading, 4)
+        XCTAssertEqual(parsed.container.overflow, .clip)
+
+        XCTAssertEqual(parsed.items.count, 1)
+        let item = try XCTUnwrap(parsed.items.first)
+        XCTAssertEqual(item.grow, 2)
+        XCTAssertEqual(item.shrink, 0)
+        XCTAssertEqual(item.basis, .fraction(0.25))
+        XCTAssertEqual(item.order, 3)
+        XCTAssertEqual(item.width, .minContent)
+        XCTAssertEqual(item.height, .points(40))
+        XCTAssertEqual(item.overflow, .scroll)
+        XCTAssertEqual(item.zIndex, 7)
+        XCTAssertEqual(item.position, .absolute)
+        XCTAssertEqual(item.top, 4)
+        XCTAssertEqual(item.bottom, 6)
+        XCTAssertEqual(item.leading, 8)
+        XCTAssertEqual(item.trailing, 10)
+    }
 }
