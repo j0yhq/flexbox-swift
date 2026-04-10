@@ -104,4 +104,24 @@ final class CSSParserTests: XCTestCase {
         XCTAssertEqual(firstPlan.width, .auto)
         XCTAssertEqual(firstPlan.basis, .points(280))
     }
+
+    func testDisplayBlockAndInlineAreBlockifiedForFlexItemPlacement() {
+        let css = """
+        .container {
+          display: flex;
+        }
+
+        .container > .block-item {
+          display: block;
+        }
+
+        .container > .inline-item {
+          display: inline;
+        }
+        """
+
+        let parsed = CSSParser.parse(css)
+        XCTAssertEqual(parsed.items.count, 2)
+        XCTAssertTrue(parsed.items.allSatisfy { $0.display == .flex })
+    }
 }

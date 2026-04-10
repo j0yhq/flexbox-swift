@@ -128,7 +128,8 @@ public extension View {
 ///
 /// - `.visible`: no clipping (default)
 /// - `.hidden`, `.clip`: clips content to the view's bounds
-/// - `.scroll`, `.auto`: wraps in a ScrollView and clips
+/// - `.scroll`: always scrollable
+/// - `.auto`: uses normal layout when content fits, scroll container when needed
 public struct FlexOverflowModifier: ViewModifier {
     public let overflow: FlexOverflow
 
@@ -142,8 +143,13 @@ public struct FlexOverflowModifier: ViewModifier {
             content
         case .hidden, .clip:
             content.clipped()
-        case .scroll, .auto:
+        case .scroll:
             ScrollView([.horizontal, .vertical]) { content }.clipped()
+        case .auto:
+            ViewThatFits(in: [.horizontal, .vertical]) {
+                content.clipped()
+                ScrollView([.horizontal, .vertical]) { content }.clipped()
+            }
         }
     }
 }

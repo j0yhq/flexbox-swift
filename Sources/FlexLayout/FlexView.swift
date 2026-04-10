@@ -75,8 +75,13 @@ public struct FlexBox<Content: View>: View {
             layout
         case .hidden, .clip:
             layout.clipped()
-        case .scroll, .auto:
+        case .scroll:
             ScrollView([.horizontal, .vertical]) { layout }.clipped()
+        case .auto:
+            ViewThatFits(in: [.horizontal, .vertical]) {
+                layout.clipped()
+                ScrollView([.horizontal, .vertical]) { layout }.clipped()
+            }
         }
     }
 }
