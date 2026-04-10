@@ -8,7 +8,7 @@ public enum FlexOverflow: Equatable {
     case hidden     // content clipped, no scroll
     case clip       // same as hidden (suppresses programmatic scroll in browsers)
     case scroll     // content clipped, scrollable
-    case auto       // clipped only when content overflows (approximated as hidden in SwiftUI)
+    case auto       // clipped only when content overflows; otherwise behaves like visible
 }
 
 /// CSS `position` — controls whether an item participates in normal flex flow.
@@ -27,9 +27,9 @@ public enum FlexSize: Equatable {
 
 /// CSS `display` property — controls how an item participates in layout.
 public enum FlexDisplay: Equatable {
-    case flex       // default: participates in flex sizing normally
-    case block      // takes full cross-axis width; forces its own line
-    case inline     // uses min-content sizing; does not grow
+    case flex       // default: participates in flex sizing
+    case block      // accepted for parsing/API parity; flex-item placement is blockified by spec
+    case inline     // accepted for parsing/API parity; flex-item placement is blockified by spec
 }
 
 // MARK: - Container Properties

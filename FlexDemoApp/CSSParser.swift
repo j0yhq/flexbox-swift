@@ -171,6 +171,9 @@ struct CSSParser {
                     repeatCounts[selector] = repeatCount
                 }
 
+            // `display:block` / `display:inline` rules still enter this branch so
+            // elements are registered as flex items even without other item props.
+            // In a flex formatting context, those display values are blockified.
             } else if isDisplayBlock || isDisplayInline || hasItem || props["--repeat"] != nil {
                 // Item-like rule:
                 // 1) if it targets a known nested container selector, merge into that
@@ -178,15 +181,15 @@ struct CSSParser {
                 // 2) otherwise merge into a normal item definition map by selector
                 if selector != rootSelector, nestedConfigs[selector] != nil {
                     var selfItem = nestedSelfItem[selector] ?? ParsedItem(selector: selector)
-                    if isDisplayBlock { selfItem.display = .block }
-                    if isDisplayInline { selfItem.display = .inline }
+                    // In a flex formatting context, flex items are blockified for
+                    // outer layout participation. Keep flex-item behavior unchanged.
                     if hasItem { applyItemProps(props, to: &selfItem, errors: &result.errors) }
                     nestedSelfItem[selector] = selfItem
                     if repeatCount > 1 { repeatCounts[selector] = repeatCount }
                 } else {
                     var item = itemDefs[selector] ?? ParsedItem(selector: selector)
-                    if isDisplayBlock { item.display = .block }
-                    if isDisplayInline { item.display = .inline }
+                    // In a flex formatting context, flex items are blockified for
+                    // outer layout participation. Keep flex-item behavior unchanged.
                     if hasItem { applyItemProps(props, to: &item, errors: &result.errors) }
                     itemDefs[selector] = item
                     if !itemOrder.contains(selector) {

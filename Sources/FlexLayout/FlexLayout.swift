@@ -131,7 +131,7 @@ public struct FlexLayout: Layout {
             height: max(0, bounds.height - pad.top - pad.bottom)
         )
 
-        // ── Place in-flow items (sorted by zIndex ascending = painted last on top) ──
+        // ── Place in-flow items (sorted by z-index, then DOM/tree order) ──
         // Flatten all items across lines while preserving their line cross offsets.
         struct PlaceEntry {
             var item: ComputedItem
@@ -143,7 +143,12 @@ public struct FlexLayout: Layout {
                 entries.append(PlaceEntry(item: item, lineCrossOffset: line.crossOffset))
             }
         }
-        entries.sort { $0.item.zIndex < $1.item.zIndex }
+        entries.sort {
+            if $0.item.zIndex == $1.item.zIndex {
+                return $0.item.subviewIndex < $1.item.subviewIndex
+            }
+            return $0.item.zIndex < $1.item.zIndex
+        }
 
         for entry in entries {
             let item = entry.item
@@ -167,8 +172,13 @@ public struct FlexLayout: Layout {
             )
         }
 
-        // ── Place absolutely-positioned items (sorted by zIndex) ──
-        let sortedAbsolute = absoluteItems.sorted { $0.zIndex < $1.zIndex }
+        // ── Place absolutely-positioned items (sorted by z-index, then DOM/tree order) ──
+        let sortedAbsolute = absoluteItems.sorted {
+            if $0.zIndex == $1.zIndex {
+                return $0.subviewIndex < $1.subviewIndex
+            }
+            return $0.zIndex < $1.zIndex
+        }
         for absItem in sortedAbsolute {
             let sv = subviews[absItem.subviewIndex]
 
@@ -219,6 +229,19 @@ public struct FlexLayout: Layout {
 
     // MARK: - Core Flex Algorithm
 
+    /// CSS single-line flex containers are specifically `flex-wrap: nowrap`.
+    /// `wrap` containers that happen to produce one line should not force
+    /// the line cross size up to the full cross constraint.
+    func applySingleLineCrossConstraint(
+        _ lineCrossSize: CGFloat,
+        crossConstraint: CGFloat?
+    ) -> CGFloat {
+        guard config.wrap == .nowrap, let cc = crossConstraint else {
+            return lineCrossSize
+        }
+        return max(lineCrossSize, cc)
+    }
+
     /// Intermediate representation of a flex item before sizing is resolved.
     private struct RawItem {
         var subviewIndex:       Int
@@ -228,7 +251,6 @@ public struct FlexLayout: Layout {
         var effectiveAlignSelf: AlignSelf
         var explicitCrossSize:  CGFloat?   // resolved explicit size on the cross axis
         var position:           FlexPosition
-        var display:            FlexDisplay
         var zIndex:             Int
         var top:                CGFloat?
         var bottom:             CGFloat?
@@ -320,9 +342,8 @@ public struct FlexLayout: Layout {
         // ── Step 2: Resolve flex-basis for every IN-FLOW item ────────────────
         let rawItems: [RawItem] = flowIndices.map { idx in
             let sv   = subviews[idx]
-            var grow = sv[FlexGrowKey.self]
+            let grow = sv[FlexGrowKey.self]
             let shrink = sv[FlexShrinkKey.self]
-            let display = sv[FlexDisplayKey.self]
             let rawAlignSelf = sv[AlignSelfKey.self]
             let effectiveAlignSelf = rawAlignSelf == .auto
                 ? AlignSelf(from: config.alignItems)
@@ -342,14 +363,6 @@ public struct FlexLayout: Layout {
             case .auto:           crossExplicit = nil
             }
 
-            // ── Display mode overrides ──
-            // block: fills the cross axis; inline: uses min-content, never grows
-            if display == .block {
-                crossExplicit = crossExplicit ?? crossConstraint
-            } else if display == .inline {
-                grow = 0
-            }
-
             // Measuring the natural main-axis size with `.unspecified` causes
             // nested wrapping containers to report a stale single-line size.
             // When we know the cross axis, include it in the measurement so
@@ -362,9 +375,6 @@ public struct FlexLayout: Layout {
             let basisMain: CGFloat
             // min-content on the main axis always wins (even over flex-basis)
             if case .minContent = mainResolved {
-                basisMain = minContentSize(subview: sv, axis: isRow ? .horizontal : .vertical)
-            } else if display == .inline {
-                // inline items use min-content sizing
                 basisMain = minContentSize(subview: sv, axis: isRow ? .horizontal : .vertical)
             } else {
                 switch sv[FlexBasisKey.self] {
@@ -393,7 +403,6 @@ public struct FlexLayout: Layout {
                 effectiveAlignSelf: effectiveAlignSelf,
                 explicitCrossSize:  crossExplicit,
                 position:           .relative,
-                display:            display,
                 zIndex:             sv[FlexZIndexKey.self],
                 top:                sv[FlexTopKey.self],
                 bottom:             sv[FlexBottomKey.self],
@@ -413,16 +422,8 @@ public struct FlexLayout: Layout {
             var usedMain: CGFloat = 0
 
             for i in rawItems.indices {
-                let isBlock = rawItems[i].display == .block
                 let itemMain = rawItems[i].basisMain
                 let gapBefore: CGFloat = (i > lineStart) ? mainGap : 0
-
-                // Block items force a line break before themselves.
-                if isBlock && i > lineStart {
-                    lineGroups.append(Array(lineStart..<i))
-                    lineStart = i
-                    usedMain = 0
-                }
 
                 if i > lineStart && usedMain + gapBefore + itemMain > cm + 0.001 {
                     lineGroups.append(Array(lineStart..<i))
@@ -430,13 +431,6 @@ public struct FlexLayout: Layout {
                     usedMain = itemMain
                 } else {
                     usedMain += gapBefore + itemMain
-                }
-
-                // Block items also force a line break after themselves.
-                if isBlock {
-                    lineGroups.append(Array(lineStart...i))
-                    lineStart = i + 1
-                    usedMain = 0
                 }
             }
             if lineStart < rawItems.count {
@@ -506,11 +500,10 @@ public struct FlexLayout: Layout {
                     lineCrossSize = max(lineCrossSize, crossSizes[i])
                 }
             }
-            // For a single-line container with a cross constraint, the line
-            // fills the full cross axis (CSS spec §9.4: single-line cross = container cross).
-            if lineGroups.count == 1, let cc = crossConstraint {
-                lineCrossSize = max(lineCrossSize, cc)
-            }
+            lineCrossSize = applySingleLineCrossConstraint(
+                lineCrossSize,
+                crossConstraint: crossConstraint
+            )
 
             // ── 4c. Final cross sizes + cross offsets per item ─────────────
             var computedItems: [ComputedItem] = []

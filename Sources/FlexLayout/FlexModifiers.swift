@@ -69,6 +69,9 @@ public extension View {
     ///   - bottom:    Distance from container's bottom edge (absolute only). CSS `bottom`.
     ///   - leading:   Distance from container's leading edge (absolute only). CSS `left`.
     ///   - trailing:  Distance from container's trailing edge (absolute only). CSS `right`.
+    ///   - display:   CSS `display` value accepted for parsing/API parity.
+    ///                In a flex formatting context, `block`/`inline` are blockified
+    ///                for flex-item placement, so they do not change outer flex layout.
     func flexItem(
         grow:      CGFloat      = 0,
         shrink:    CGFloat      = 1,
@@ -128,7 +131,8 @@ public extension View {
 ///
 /// - `.visible`: no clipping (default)
 /// - `.hidden`, `.clip`: clips content to the view's bounds
-/// - `.scroll`, `.auto`: wraps in a ScrollView and clips
+/// - `.scroll`: always scrollable
+/// - `.auto`: uses normal layout when content fits, scroll container when needed
 public struct FlexOverflowModifier: ViewModifier {
     public let overflow: FlexOverflow
 
@@ -142,8 +146,13 @@ public struct FlexOverflowModifier: ViewModifier {
             content
         case .hidden, .clip:
             content.clipped()
-        case .scroll, .auto:
+        case .scroll:
             ScrollView([.horizontal, .vertical]) { content }.clipped()
+        case .auto:
+            ViewThatFits(in: [.horizontal, .vertical]) {
+                content.clipped()
+                ScrollView([.horizontal, .vertical]) { content }.clipped()
+            }
         }
     }
 }
