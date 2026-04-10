@@ -171,6 +171,9 @@ struct CSSParser {
                     repeatCounts[selector] = repeatCount
                 }
 
+            // `display:block` / `display:inline` rules still enter this branch so
+            // elements are registered as flex items even without other item props.
+            // In a flex formatting context, those display values are blockified.
             } else if isDisplayBlock || isDisplayInline || hasItem || props["--repeat"] != nil {
                 // Item-like rule:
                 // 1) if it targets a known nested container selector, merge into that

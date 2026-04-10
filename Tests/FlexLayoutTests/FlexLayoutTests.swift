@@ -55,4 +55,23 @@ final class FlexLayoutTests: XCTestCase {
         XCTAssertEqual(FlexBasis.fraction(0.5), .fraction(0.5))
         XCTAssertNotEqual(FlexBasis.auto, .points(0))
     }
+
+    // MARK: - Single-line cross-size rule
+
+    func testSingleLineCrossConstraintAppliesOnlyForNowrap() {
+        let nowrap = FlexLayout(.init(wrap: .nowrap))
+        let wrap = FlexLayout(.init(wrap: .wrap))
+
+        XCTAssertEqual(
+            nowrap.applySingleLineCrossConstraint(42, crossConstraint: 120),
+            120,
+            "nowrap containers should expand single-line cross size to container cross constraint"
+        )
+
+        XCTAssertEqual(
+            wrap.applySingleLineCrossConstraint(42, crossConstraint: 120),
+            42,
+            "wrap containers that happen to have one line should keep natural line cross size"
+        )
+    }
 }

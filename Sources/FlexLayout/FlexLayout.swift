@@ -131,24 +131,21 @@ public struct FlexLayout: Layout {
             height: max(0, bounds.height - pad.top - pad.bottom)
         )
 
-        // ── Place in-flow items (sorted by z-index, then source order) ──
+        // ── Place in-flow items (sorted by z-index, then DOM/tree order) ──
         // Flatten all items across lines while preserving their line cross offsets.
         struct PlaceEntry {
             var item: ComputedItem
             var lineCrossOffset: CGFloat
-            var sourceOrder: Int
         }
         var entries: [PlaceEntry] = []
-        var sourceOrder = 0
         for line in lines {
             for item in line.items {
-                entries.append(PlaceEntry(item: item, lineCrossOffset: line.crossOffset, sourceOrder: sourceOrder))
-                sourceOrder += 1
+                entries.append(PlaceEntry(item: item, lineCrossOffset: line.crossOffset))
             }
         }
         entries.sort {
             if $0.item.zIndex == $1.item.zIndex {
-                return $0.sourceOrder < $1.sourceOrder
+                return $0.item.subviewIndex < $1.item.subviewIndex
             }
             return $0.item.zIndex < $1.item.zIndex
         }
@@ -175,13 +172,13 @@ public struct FlexLayout: Layout {
             )
         }
 
-        // ── Place absolutely-positioned items (sorted by z-index, then source order) ──
-        let sortedAbsolute = absoluteItems.enumerated().sorted {
-            if $0.element.zIndex == $1.element.zIndex {
-                return $0.offset < $1.offset
+        // ── Place absolutely-positioned items (sorted by z-index, then DOM/tree order) ──
+        let sortedAbsolute = absoluteItems.sorted {
+            if $0.zIndex == $1.zIndex {
+                return $0.subviewIndex < $1.subviewIndex
             }
-            return $0.element.zIndex < $1.element.zIndex
-        }.map(\.element)
+            return $0.zIndex < $1.zIndex
+        }
         for absItem in sortedAbsolute {
             let sv = subviews[absItem.subviewIndex]
 
@@ -231,6 +228,19 @@ public struct FlexLayout: Layout {
     }
 
     // MARK: - Core Flex Algorithm
+
+    /// CSS single-line flex containers are specifically `flex-wrap: nowrap`.
+    /// `wrap` containers that happen to produce one line should not force
+    /// the line cross size up to the full cross constraint.
+    func applySingleLineCrossConstraint(
+        _ lineCrossSize: CGFloat,
+        crossConstraint: CGFloat?
+    ) -> CGFloat {
+        guard config.wrap == .nowrap, let cc = crossConstraint else {
+            return lineCrossSize
+        }
+        return max(lineCrossSize, cc)
+    }
 
     /// Intermediate representation of a flex item before sizing is resolved.
     private struct RawItem {
@@ -490,11 +500,10 @@ public struct FlexLayout: Layout {
                     lineCrossSize = max(lineCrossSize, crossSizes[i])
                 }
             }
-            // CSS single-line flex containers are specifically `flex-wrap: nowrap`.
-            // `wrap` containers that happen to produce one line should not use this rule.
-            if config.wrap == .nowrap, let cc = crossConstraint {
-                lineCrossSize = max(lineCrossSize, cc)
-            }
+            lineCrossSize = applySingleLineCrossConstraint(
+                lineCrossSize,
+                crossConstraint: crossConstraint
+            )
 
             // ── 4c. Final cross sizes + cross offsets per item ─────────────
             var computedItems: [ComputedItem] = []

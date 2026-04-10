@@ -69,6 +69,9 @@ public extension View {
     ///   - bottom:    Distance from container's bottom edge (absolute only). CSS `bottom`.
     ///   - leading:   Distance from container's leading edge (absolute only). CSS `left`.
     ///   - trailing:  Distance from container's trailing edge (absolute only). CSS `right`.
+    ///   - display:   CSS `display` value accepted for parsing/API parity.
+    ///                In a flex formatting context, `block`/`inline` are blockified
+    ///                for flex-item placement, so they do not change outer flex layout.
     func flexItem(
         grow:      CGFloat      = 0,
         shrink:    CGFloat      = 1,

@@ -70,18 +70,6 @@ public struct FlexBox<Content: View>: View {
     @ViewBuilder
     public var body: some View {
         let layout = FlexLayout(config) { content }
-        switch config.overflow {
-        case .visible:
-            layout
-        case .hidden, .clip:
-            layout.clipped()
-        case .scroll:
-            ScrollView([.horizontal, .vertical]) { layout }.clipped()
-        case .auto:
-            ViewThatFits(in: [.horizontal, .vertical]) {
-                layout.clipped()
-                ScrollView([.horizontal, .vertical]) { layout }.clipped()
-            }
-        }
+        layout.flexOverflow(config.overflow)
     }
 }
