@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutTests.build/master.swiftdeps"
+  },
+  "/Users/vishnudutt/layout-test/Tests/FlexLayoutTests/FlexLayoutTests.swift": {
+    "dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutTests.build/FlexLayoutTests.d",
+    "object": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutTests.build/FlexLayoutTests.swift.o",
+    "swiftmodule": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutTests.build/FlexLayoutTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutTests.build/FlexLayoutTests.swiftdeps",
+    "diagnostics": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutTests.build/FlexLayoutTests.dia"
+  }
+}

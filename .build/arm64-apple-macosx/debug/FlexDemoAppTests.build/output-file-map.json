@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoAppTests.build/master.swiftdeps"
+  },
+  "/Users/vishnudutt/layout-test/Tests/FlexDemoAppTests/CSSParserTests.swift": {
+    "dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoAppTests.build/CSSParserTests.d",
+    "object": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoAppTests.build/CSSParserTests.swift.o",
+    "swiftmodule": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoAppTests.build/CSSParserTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoAppTests.build/CSSParserTests.swiftdeps",
+    "diagnostics": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoAppTests.build/CSSParserTests.dia"
+  }
+}

@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlexLayout Samples — Web Test Harness</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 13px;
+      background: #f0f0f5;
+      color: #1c1c1e;
+    }
+
+    /* ── Page shell ─────────────────────────────────────────── */
+    .harness {
+      display: flex;
+      flex-direction: row;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── Sidebar: sample picker ─────────────────────────────── */
+    .sample-list {
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      flex-basis: 220px;
+      overflow: scroll;
+      background: #fff;
+      border-right: 1px solid #e0e0e0;
+      padding: 12px 8px;
+      gap: 2px;
+    }
+
+    .sample-list h2 {
+      font-size: 11px;
+      font-weight: 600;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      padding: 4px 8px 8px;
+    }
+
+    .sample-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      padding: 7px 10px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      color: #333;
+      font-family: inherit;
+    }
+    .sample-btn:hover { background: #f0f0f5; }
+    .sample-btn.active { background: #007aff18; color: #007aff; font-weight: 600; }
+
+    /* ── Right side ─────────────────────────────────────────── */
+    .right {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      overflow: hidden;
+    }
+
+    /* ── Toolbar ─────────────────────────────────────────────── */
+    .toolbar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+      height: 48px;
+      padding: 0 16px;
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .toolbar span { font-size: 12px; color: #888; }
+
+    .width-presets {
+      display: flex;
+      gap: 6px;
+    }
+
+    .wp-btn {
+      background: #f0f0f5;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 11px;
+      cursor: pointer;
+      font-family: monospace;
+    }
+    .wp-btn:hover { background: #e0e0ea; }
+    .wp-btn.active { background: #007aff; color: #fff; border-color: #007aff; }
+
+    .toolbar-btn {
+      background: #f0f0f5;
+      border: 1px solid #d0d0da;
+      border-radius: 6px;
+      padding: 5px 14px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      color: #333;
+      transition: background .15s, color .15s, border-color .15s;
+    }
+    .toolbar-btn:hover { background: #e0e0ea; }
+    .toolbar-btn.success { background: #30d158; color: #fff; border-color: #30d158; }
+    .toolbar-btn.primary { background: #007aff; color: #fff; border-color: #007aff; }
+    .toolbar-btn.primary:hover { background: #0066dd; }
+    .toolbar-btns { margin-left: auto; display: flex; gap: 6px; }
+
+    /* ── CSS Editor overlay ──────────────────────────────── */
+    .css-editor-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.4);
+      align-items: center;
+      justify-content: center;
+    }
+    .css-editor-overlay.open { display: flex; }
+    .css-editor-panel {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+      width: 600px;
+      max-width: 90vw;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .css-editor-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .css-editor-header h3 { margin: 0; font-size: 14px; flex-grow: 1; }
+    .css-editor-textarea {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 14px;
+      font-family: 'SF Mono', 'Menlo', monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      resize: none;
+      min-height: 300px;
+    }
+    .css-editor-footer {
+      display: flex;
+      gap: 8px;
+      padding: 10px 16px;
+      border-top: 1px solid #e0e0e0;
+      justify-content: flex-end;
+    }
+
+    /* ── Canvas area ─────────────────────────────────────────── */
+    .canvas-wrap {
+      flex-grow: 1;
+      overflow: auto;
+      padding: 24px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+    }
+
+    .canvas-frame {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.10);
+      overflow: hidden;
+      transition: width .2s ease;
+      min-height: 200px;
+    }
+
+    /* ── Placeholder colors for demo blocks ──────────────────── */
+    .demo-block {
+      background: #d0e8ff;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-family: monospace;
+      color: #005aaa;
+      font-weight: 600;
+      padding: 4px;
+      text-align: center;
+      min-height: 24px;
+      overflow: hidden;
+    }
+
+    .demo-block:nth-child(odd)  { background: #fde8c8; color: #a05000; }
+    .demo-block:nth-child(even) { background: #d4f0d4; color: #006600; }
+    .demo-block:nth-child(3n)   { background: #ede0ff; color: #6600cc; }
+  </style>
+</head>
+<body>
+
+<div class="harness">
+
+  <!-- Sidebar -->
+  <nav class="sample-list">
+    <h2>Samples</h2>
+    <button class="sample-btn active" data-sample="navbar">01 · Navbar</button>
+    <button class="sample-btn" data-sample="sidebar">02 · Sidebar Layout</button>
+    <button class="sample-btn" data-sample="cardgrid">03 · Card Grid</button>
+    <button class="sample-btn" data-sample="holygrail">04 · Holy Grail</button>
+    <button class="sample-btn" data-sample="dashboard">05 · Dashboard</button>
+    <button class="sample-btn" data-sample="absolute">06 · Absolute + Z-Index</button>
+    <button class="sample-btn" data-sample="chat">07 · Chat UI</button>
+    <button class="sample-btn" data-sample="pricing">08 · Pricing Table</button>
+    <button class="sample-btn" data-sample="feed">09 · Media Feed</button>
+    <button class="sample-btn" data-sample="product">10 · E-commerce Product</button>
+    <button class="sample-btn" data-sample="settings">11 · Settings Page</button>
+    <button class="sample-btn" data-sample="overflow">12 · Overflow & Scroll</button>
+  </nav>
+
+  <!-- Right -->
+  <div class="right">
+    <div class="toolbar">
+      <span>Canvas width:</span>
+      <div class="width-presets">
+        <button class="wp-btn active" data-width="100%">Full</button>
+        <button class="wp-btn" data-width="1280px">1280</button>
+        <button class="wp-btn" data-width="1024px">1024</button>
+        <button class="wp-btn" data-width="768px">768</button>
+        <button class="wp-btn" data-width="375px">375</button>
+      </div>
+      <div class="toolbar-btns">
+        <button class="toolbar-btn" id="copyCssBtn">Copy CSS</button>
+        <button class="toolbar-btn" id="pasteCssBtn">Paste CSS</button>
+        <button class="toolbar-btn primary" id="editCssBtn">Edit CSS</button>
+      </div>
+    </div>
+
+    <div class="canvas-wrap">
+      <div class="canvas-frame" id="canvas" style="width:100%">
+        <!-- Sample HTML injected here by JS -->
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- CSS Editor Overlay -->
+<div class="css-editor-overlay" id="cssEditorOverlay">
+  <div class="css-editor-panel">
+    <div class="css-editor-header">
+      <h3>Edit CSS</h3>
+      <button class="toolbar-btn" id="editorCopyBtn">Copy</button>
+      <button class="toolbar-btn" id="editorPasteBtn">Paste</button>
+    </div>
+    <textarea class="css-editor-textarea" id="cssEditorTextarea" spellcheck="false"></textarea>
+    <div class="css-editor-footer">
+      <button class="toolbar-btn" id="editorCancelBtn">Cancel</button>
+      <button class="toolbar-btn primary" id="editorApplyBtn">Apply & Preview</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Sample HTML definitions (inline so this file is self-contained) ────────
+
+const SAMPLES = {
+
+  navbar: {
+    css: `
+      .navbar { display:flex; flex-wrap:nowrap; justify-content:space-between;
+        align-items:center; gap:16px; padding:0 24px; height:56px; overflow:hidden; }
+      .navbar > .brand { flex-basis:140px; flex-shrink:0; flex-grow:0; height:32px; }
+      .navbar > .nav-links { display:flex; align-items:center; gap:24px;
+        flex-grow:1; justify-content:center; }
+      .nav-links > .link { flex-shrink:0; height:32px; width:80px; --repeat:4; }
+      .navbar > .actions { display:flex; align-items:center; gap:8px;
+        flex-basis:140px; flex-shrink:0; flex-grow:0; justify-content:flex-end; }
+      .actions > .btn { flex-shrink:0; height:32px; width:72px; --repeat:2; }
+    `,
+    html: `
+      <div class="navbar">
+        <div class="navbar brand demo-block">Brand</div>
+        <div class="navbar nav-links">
+          <div class="demo-block" style="flex-shrink:0;padding:0 12px;height:32px;">Home</div>
+          <div class="demo-block" style="flex-shrink:0;padding:0 12px;height:32px;">Products</div>
+          <div class="demo-block" style="flex-shrink:0;padding:0 12px;height:32px;">Pricing</div>
+          <div class="demo-block" style="flex-shrink:0;padding:0 12px;height:32px;">Blog</div>
+        </div>
+        <div class="navbar actions">
+          <div class="demo-block" style="flex-shrink:0;padding:0 12px;height:32px;">Login</div>
+          <div class="demo-block" style="flex-shrink:0;padding:0 14px;height:32px;">Sign Up</div>
+        </div>
+      </div>`
+  },
+
+  sidebar: {
+    css: `
+      .app { display:flex; flex-direction:row; align-items:stretch;
+        height:500px; overflow:hidden; }
+      .app > .sidebar { display:flex; flex-direction:column; flex-grow:0;
+        flex-shrink:0; flex-basis:240px; overflow:hidden; padding:16px 0; gap:4px;
+        background:#f7f7fa; border-right:1px solid #e0e0e0; }
+      .app > .sidebar > .sidebar-header { flex-shrink:0; height:48px; padding:0 16px;
+        display:flex; align-items:center; }
+      .app > .sidebar > .nav-items { display:flex; flex-direction:column; flex-grow:1;
+        overflow:scroll; gap:2px; padding:0 8px; }
+      .app > .sidebar > .nav-items > .nav-item { flex-shrink:0; height:36px;
+        display:flex; align-items:center; padding:0 10px; --repeat:7; }
+      .app > .sidebar > .sidebar-footer { flex-shrink:0; height:56px; padding:0 16px;
+        display:flex; align-items:center; border-top:1px solid #e0e0e0; }
+      .app > .content { display:flex; flex-direction:column; flex-grow:1; overflow:hidden; }
+      .app > .content > .content-header { flex-shrink:0; height:56px; padding:0 24px;
+        display:flex; align-items:center; border-bottom:1px solid #e0e0e0; }
+      .app > .content > .content-body { flex-grow:1; overflow:scroll; padding:24px; }
+    `,
+    html: `
+      <div class="app">
+        <div class="sidebar">
+          <div class="sidebar-header demo-block">App Logo</div>
+          <div class="nav-items">
+            <div class="nav-item demo-block">Dashboard</div>
+            <div class="nav-item demo-block">Analytics</div>
+            <div class="nav-item demo-block">Projects</div>
+            <div class="nav-item demo-block">Team</div>
+            <div class="nav-item demo-block">Calendar</div>
+            <div class="nav-item demo-block">Documents</div>
+            <div class="nav-item demo-block">Settings</div>
+          </div>
+          <div class="sidebar-footer demo-block">User Profile</div>
+        </div>
+        <div class="content">
+          <div class="content-header demo-block">Page Title — Breadcrumb</div>
+          <div class="content-body demo-block" style="min-height:200px;">Main content area</div>
+        </div>
+      </div>`
+  },
+
+  cardgrid: {
+    css: `
+      .card-grid { display:flex; flex-wrap:wrap; gap:20px; padding:24px;
+        align-items:flex-start; justify-content:flex-start; }
+      .card-grid > .card { flex-grow:0; flex-shrink:0; flex-basis:300px;
+        display:flex; flex-direction:column; overflow:hidden;
+        border:1px solid #e0e0e0; border-radius:10px; --repeat:6; }
+      .card > .card-image { flex-shrink:0; height:160px; overflow:hidden; }
+      .card > .card-body { flex-grow:1; padding:16px; display:flex;
+        flex-direction:column; gap:8px; }
+      .card-body > .card-title { flex-shrink:0; height:22px; }
+      .card-body > .card-desc { flex-grow:1; height:48px; }
+      .card > .card-footer { flex-shrink:0; height:52px; padding:0 16px;
+        display:flex; align-items:center; justify-content:space-between;
+        border-top:1px solid #f0f0f0; }
+      .card-footer > .price { flex-shrink:0; height:28px; width:60px; }
+      .card-footer > .buy-btn { flex-shrink:0; height:32px; width:60px; }
+    `,
+    html: `
+      <div class="card-grid">
+        ${[1,2,3,4,5,6].map(i => `
+          <div class="card">
+            <div class="card-image demo-block">Image ${i}</div>
+            <div class="card-body">
+              <div class="card-title demo-block">Card Title ${i}</div>
+              <div class="card-desc demo-block">Description text for card ${i}</div>
+            </div>
+            <div class="card-footer">
+              <div class="price demo-block">$49</div>
+              <div class="buy-btn demo-block">Buy</div>
+            </div>
+          </div>`).join('')}
+      </div>`
+  },
+
+  holygrail: {
+    css: `
+      .page { display:flex; flex-direction:column; height:500px; overflow:hidden; }
+      .page > .page-header { display:flex; align-items:center;
+        justify-content:space-between; flex-shrink:0; height:56px;
+        padding:0 24px; gap:16px; }
+      .page-header > .logo { flex-shrink:0; width:120px; height:32px; }
+      .page-header > .search { flex-grow:1; height:32px; }
+      .page-header > .user { flex-shrink:0; width:80px; height:32px; }
+      .page > .page-body { display:flex; flex-direction:row; flex-grow:1;
+        overflow:hidden; }
+      .page-body > .left-rail { display:flex; flex-direction:column; gap:4px;
+        flex-grow:0; flex-shrink:0; flex-basis:180px;
+        overflow:scroll; padding:16px 12px; }
+      .left-rail > .nav-link { flex-shrink:0; height:32px; --repeat:6; }
+      .page-body > .main-content { flex-grow:1; overflow:scroll; padding:24px; }
+      .main-content > .article { flex-grow:1; height:180px; }
+      .page-body > .right-rail { display:flex; flex-direction:column; gap:12px;
+        flex-grow:0; flex-shrink:0; flex-basis:240px;
+        overflow:scroll; padding:16px 12px; }
+      .right-rail > .widget { flex-shrink:0; height:100px; --repeat:3; }
+      .page > .page-footer { display:flex; align-items:center;
+        justify-content:space-between; flex-shrink:0; height:40px;
+        padding:0 24px; }
+      .page-footer > .copyright { flex-shrink:0; width:160px; height:24px; }
+      .page-footer > .links { flex-shrink:0; width:200px; height:24px; }
+    `,
+    html: `
+      <div class="page">
+        <div class="page-header">
+          <div class="logo demo-block">Logo</div>
+          <div class="search demo-block">Search</div>
+          <div class="user demo-block">User</div>
+        </div>
+        <div class="page-body">
+          <div class="left-rail">
+            ${['Home','Articles','Videos','Podcasts','Events','About'].map(t =>
+              `<div class="nav-link demo-block">${t}</div>`).join('')}
+          </div>
+          <div class="main-content">
+            <div class="article demo-block">Main Article Content</div>
+          </div>
+          <div class="right-rail">
+            <div class="widget demo-block">Widget 1</div>
+            <div class="widget demo-block">Widget 2</div>
+            <div class="widget demo-block">Widget 3</div>
+          </div>
+        </div>
+        <div class="page-footer">
+          <div class="copyright demo-block">© 2026 Company</div>
+          <div class="links demo-block">Terms · Privacy · Contact</div>
+        </div>
+      </div>`
+  },
+
+  dashboard: {
+    css: `
+      .dashboard { display:flex; flex-direction:column; height:560px; overflow:hidden; }
+      .dashboard > .topbar { display:flex; align-items:center; justify-content:space-between;
+        gap:12px; flex-shrink:0; height:52px; padding:0 24px; }
+      .dashboard > .topbar > .logo { flex-shrink:0; width:110px; height:32px; }
+      .dashboard > .topbar > .search { flex-grow:1; height:32px; }
+      .dashboard > .topbar > .bell { flex-shrink:0; width:32px; height:32px; }
+      .dashboard > .topbar > .avatar { flex-shrink:0; width:32px; height:32px; }
+      .dashboard > .metrics { display:flex; flex-direction:row; gap:12px;
+        flex-shrink:0; padding:16px 24px 0; }
+      .dashboard > .metrics > .metric-card { display:flex; flex-direction:column;
+        flex-grow:1; flex-shrink:1; flex-basis:0; gap:4px; padding:16px;
+        height:84px; overflow:hidden; --repeat:4; }
+      .metric-card > .label { flex-shrink:0; height:14px; }
+      .metric-card > .value { flex-grow:1; }
+      .dashboard > .panels { display:flex; flex-direction:row; flex-grow:1;
+        gap:16px; padding:16px 24px; overflow:hidden; }
+      .dashboard > .panels > .chart-panel { display:flex; flex-direction:column;
+        flex-grow:2; flex-shrink:1; flex-basis:0; gap:12px; padding:16px;
+        overflow:hidden; }
+      .chart-panel > .title { flex-shrink:0; height:28px; }
+      .chart-panel > .chart-area { flex-grow:1; overflow:hidden; }
+      .dashboard > .panels > .list-panel { display:flex; flex-direction:column;
+        flex-grow:1; flex-shrink:0; flex-basis:260px; padding:16px;
+        overflow:hidden; }
+      .list-panel > .title { flex-shrink:0; height:28px; }
+      .list-panel > .list-items { display:flex; flex-direction:column;
+        flex-grow:1; overflow:scroll; gap:1px; }
+      .list-panel > .list-items > .list-row { display:flex; align-items:center;
+        gap:10px; flex-shrink:0; height:44px; --repeat:5; }
+      .list-row > .num { flex-shrink:0; width:32px; height:32px; }
+      .list-row > .event { flex-grow:1; height:20px; }
+      .list-row > .amount { flex-shrink:0; width:52px; height:20px; }
+    `,
+    html: `
+      <div class="dashboard">
+        <div class="topbar">
+          <div class="logo demo-block">Dashboard</div>
+          <div class="search demo-block">Search...</div>
+          <div class="bell demo-block">B</div>
+          <div class="avatar demo-block">A</div>
+        </div>
+        <div class="metrics">
+          ${['Revenue','Users','Orders','Churn'].map(m =>
+            `<div class="metric-card">
+              <div class="label demo-block">${m}</div>
+              <div class="value demo-block">$12,400</div>
+            </div>`).join('')}
+        </div>
+        <div class="panels">
+          <div class="chart-panel">
+            <div class="title demo-block">Revenue Over Time</div>
+            <div class="chart-area demo-block">Chart Area</div>
+          </div>
+          <div class="list-panel">
+            <div class="title demo-block" style="margin-bottom:8px;">Recent Activity</div>
+            <div class="list-items">
+              ${[1,2,3,4,5].map(i =>
+                `<div class="list-row">
+                  <div class="num demo-block">${i}</div>
+                  <div class="event demo-block">Event ${i}</div>
+                  <div class="amount demo-block">+$${i*10}</div>
+                </div>`).join('')}
+            </div>
+          </div>
+        </div>
+      </div>`
+  },
+
+  absolute: {
+    css: `
+      .abs-demo { display:flex; flex-direction:row; gap:24px; padding:24px; flex-wrap:wrap; }
+      .abs-demo > .product-card { display:flex; flex-direction:column; position:relative;
+        width:280px; overflow:hidden; --repeat:3; }
+      .product-card > .product-image { flex-shrink:0; height:200px; overflow:hidden; }
+      .product-card > .product-body { flex-grow:1; padding:16px; display:flex;
+        flex-direction:column; gap:8px; }
+      .product-body > .prod-name { flex-shrink:0; height:20px; }
+      .product-body > .prod-desc { flex-grow:1; height:40px; }
+      .product-card > .ribbon { position:absolute; top:12px; left:-4px;
+        width:72px; height:28px; z-index:20; overflow:hidden; }
+      .product-card > .price-badge { position:absolute; bottom:80px; right:12px;
+        width:56px; height:56px; z-index:15; overflow:hidden; }
+    `,
+    html: `
+      <div class="abs-demo">
+        ${[1,2,3].map(i => `
+          <div class="product-card">
+            <div class="product-image demo-block">Product Image ${i}</div>
+            <div class="ribbon demo-block" style="background:#ff3b30;color:#fff;">SALE</div>
+            <div class="price-badge demo-block" style="background:#ff9500;color:#fff;">$${i*10}</div>
+            <div class="product-body">
+              <div class="prod-name demo-block">Product Name ${i}</div>
+              <div class="prod-desc demo-block">Description text here</div>
+            </div>
+          </div>`).join('')}
+      </div>`
+  },
+
+  chat: {
+    css: `
+      .chat-window { display:flex; flex-direction:column; height:480px; overflow:hidden; }
+      .chat-window > .chat-header { display:flex; align-items:center; gap:12px;
+        flex-shrink:0; height:56px; padding:0 16px; }
+      .chat-header > .avatar { flex-shrink:0; width:36px; height:36px; }
+      .chat-header > .name { flex-grow:1; height:32px; }
+      .chat-header > .action { flex-shrink:0; width:32px; height:32px; --repeat:2; }
+      .chat-window > .message-list { display:flex; flex-direction:column;
+        flex-grow:1; overflow:scroll; gap:8px; padding:16px; }
+      .message-list > .msg-inbound { display:flex; align-items:flex-end;
+        gap:8px; justify-content:flex-start; flex-shrink:0; --repeat:3; }
+      .msg-inbound > .bubble-avatar { flex-shrink:0; width:32px; height:32px; }
+      .msg-inbound > .bubble { flex-grow:1; height:40px; }
+      .message-list > .msg-outbound { display:flex; align-items:flex-end;
+        gap:8px; justify-content:flex-end; flex-shrink:0; --repeat:2; }
+      .msg-outbound > .bubble { flex-grow:1; height:40px; }
+      .chat-window > .input-bar { display:flex; align-items:center; gap:8px;
+        flex-shrink:0; padding:12px 16px; }
+      .input-bar > .attach { flex-shrink:0; width:36px; height:36px; }
+      .input-bar > .text-input { flex-grow:1; height:36px; }
+      .input-bar > .send { flex-shrink:0; width:36px; height:36px; }
+    `,
+    html: `
+      <div class="chat-window">
+        <div class="chat-header">
+          <div class="avatar demo-block">A</div>
+          <div class="name demo-block">Alice Johnson</div>
+          <div class="action demo-block">Call</div>
+          <div class="action demo-block">Video</div>
+        </div>
+        <div class="message-list">
+          <div class="msg-inbound"><div class="bubble-avatar demo-block">A</div><div class="bubble demo-block">Hey! Are you free?</div></div>
+          <div class="msg-outbound"><div class="bubble demo-block">Yes! What time?</div></div>
+          <div class="msg-inbound"><div class="bubble-avatar demo-block">A</div><div class="bubble demo-block">How about 3pm?</div></div>
+          <div class="msg-outbound"><div class="bubble demo-block">Perfect!</div></div>
+          <div class="msg-inbound"><div class="bubble-avatar demo-block">A</div><div class="bubble demo-block">See you then!</div></div>
+        </div>
+        <div class="input-bar">
+          <div class="attach demo-block">+</div>
+          <div class="text-input demo-block">Type a message...</div>
+          <div class="send demo-block">Go</div>
+        </div>
+      </div>`
+  },
+
+  pricing: {
+    css: `
+      .pricing { display:flex; flex-direction:column; align-items:center;
+        gap:32px; padding:40px 24px; overflow:hidden; }
+      .pricing > .plans { display:flex; flex-direction:row; flex-wrap:wrap;
+        gap:20px; justify-content:center; align-items:flex-start; width:100%; }
+      .pricing > .plans > .plan { display:flex; flex-direction:column;
+        flex-grow:0; flex-shrink:0; flex-basis:280px;
+        overflow:hidden; position:relative;
+        border:1px solid #e0e0e0; border-radius:12px; --repeat:3; }
+      .plan > .plan-header { display:flex; flex-direction:column;
+        gap:8px; padding:28px 20px 16px; flex-shrink:0; }
+      .plan-header > .plan-name { flex-shrink:0; height:24px; }
+      .plan-header > .plan-price { flex-shrink:0; height:44px; }
+      .plan-header > .plan-desc { flex-shrink:0; height:32px; }
+      .plan > .feature-list { display:flex; flex-direction:column;
+        gap:10px; padding:16px 20px; flex-grow:1; }
+      .feature-list > .feature { flex-shrink:0; height:22px; --repeat:4; }
+      .plan > .plan-cta { flex-shrink:0; padding:16px 20px 20px; height:72px; }
+    `,
+    html: `
+      <div class="pricing">
+        <div class="demo-block" style="height:40px;width:300px;">Choose Your Plan</div>
+        <div class="plans">
+          ${[['Starter','$9','Basic features'],
+             ['Pro','$29','For growing teams'],
+             ['Enterprise','$99','For large orgs']].map(([name,price,desc], i) => `
+            <div class="plan">
+              <div class="plan-header">
+                <div class="plan-name demo-block">${name}</div>
+                <div class="plan-price demo-block">${price}/mo</div>
+                <div class="plan-desc demo-block">${desc}</div>
+              </div>
+              <div class="feature-list">
+                ${['Feature one','Feature two','Feature three','Feature four'].map(f =>
+                  `<div class="feature demo-block">✓ ${f}</div>`).join('')}
+              </div>
+              <div class="plan-cta demo-block">Get Started</div>
+            </div>`).join('')}
+        </div>
+      </div>`
+  },
+
+  feed: {
+    css: `
+      .feed { display:flex; flex-direction:column; gap:0; overflow:scroll;
+        height:500px; max-width:600px; margin:0 auto; }
+      .feed > .post { display:flex; flex-direction:column; flex-shrink:0;
+        padding:16px 16px 0; --repeat:3; }
+      .post > .post-header { display:flex; align-items:center; gap:10px;
+        flex-shrink:0; height:48px; }
+      .post-header > .user-avatar { flex-shrink:0; width:40px; height:40px; }
+      .post-header > .user-name { flex-grow:1; height:20px; }
+      .post-header > .more-btn { flex-shrink:0; width:28px; height:28px; }
+      .post > .post-text { flex-shrink:0; height:48px; padding:10px 0; }
+      .post > .post-media { flex-shrink:0; height:240px; overflow:hidden; }
+      .post > .post-actions { display:flex; justify-content:space-between;
+        flex-shrink:0; height:44px; }
+      .post-actions > .action { display:flex; align-items:center; justify-content:center;
+        gap:6px; flex-grow:1; flex-basis:0; --repeat:3; }
+    `,
+    html: `
+      <div class="feed">
+        ${[1,2,3].map(i => `
+          <div class="post">
+            <div class="post-header">
+              <div class="user-avatar demo-block">U${i}</div>
+              <div class="user-name demo-block">User ${i}</div>
+              <div class="more-btn demo-block">...</div>
+            </div>
+            <div class="post-text demo-block">Post content ${i}</div>
+            <div class="post-media demo-block">Media ${i}</div>
+            <div class="post-actions">
+              <div class="action demo-block">Like</div>
+              <div class="action demo-block">Comment</div>
+              <div class="action demo-block">Share</div>
+            </div>
+          </div>`).join('')}
+      </div>`
+  },
+
+  product: {
+    css: `
+      .product-page { display:flex; flex-direction:row; align-items:flex-start;
+        gap:40px; padding:32px; overflow:hidden; }
+      .product-page > .gallery { display:flex; flex-direction:column;
+        flex-grow:0; flex-shrink:0; flex-basis:460px; gap:12px;
+        position:relative; overflow:hidden; }
+      .gallery > .main-image { flex-shrink:0; height:380px; overflow:hidden;
+        position:relative; border-radius:10px; }
+      .gallery > .main-image > .new-label { position:absolute; top:12px; left:12px;
+        width:52px; height:28px; z-index:10; overflow:hidden;
+        background:#30d158; color:#fff; border-radius:6px;
+        display:flex; align-items:center; justify-content:center;
+        font-size:11px; font-weight:700; }
+      .gallery > .thumbnails { display:flex; flex-direction:row; gap:8px; flex-shrink:0; }
+      .gallery > .thumbnails > .thumb { flex-grow:0; flex-shrink:0;
+        width:72px; height:72px; overflow:hidden; border-radius:6px; --repeat:5; }
+      .product-page > .info { display:flex; flex-direction:column;
+        flex-grow:1; gap:16px; overflow:hidden; }
+      .info > .prod-title { flex-shrink:0; height:28px; }
+      .info > .prod-rating { flex-shrink:0; height:24px; }
+      .info > .prod-price { flex-shrink:0; height:44px; }
+      .info > .prod-desc { flex-shrink:0; height:60px; }
+      .info > .actions { display:flex; flex-direction:row; gap:12px;
+        flex-shrink:0; height:48px; }
+      .info > .actions > .btn-cart { flex-grow:1; overflow:hidden; }
+      .info > .actions > .btn-wishlist { flex-shrink:0; width:48px; }
+    `,
+    html: `
+      <div class="product-page">
+        <div class="gallery">
+          <div class="main-image demo-block">
+            <div class="new-label">NEW</div>
+            Main Product Image
+          </div>
+          <div class="thumbnails">
+            ${[1,2,3,4,5].map(i =>
+              `<div class="thumb demo-block">Img ${i}</div>`).join('')}
+          </div>
+        </div>
+        <div class="info">
+          <div class="prod-title demo-block">Premium Wireless Headphones</div>
+          <div class="prod-rating demo-block">★★★★☆ (2,847 reviews)</div>
+          <div class="prod-price demo-block">$299.00</div>
+          <div class="prod-desc demo-block">Premium build quality and exceptional performance.</div>
+          <div class="actions">
+            <div class="btn-cart demo-block">Add to Cart</div>
+            <div class="btn-wishlist demo-block">♡</div>
+          </div>
+        </div>
+      </div>`
+  },
+
+  settings: {
+    css: `
+      .settings { display:flex; flex-direction:row; height:500px; overflow:hidden; }
+      .settings > .settings-nav { display:flex; flex-direction:column; flex-grow:0;
+        flex-shrink:0; flex-basis:200px; overflow:scroll; padding:16px 8px; gap:2px;
+        background:#f7f7fa; border-right:1px solid #e0e0e0; }
+      .settings-nav > .nav-item { display:flex; align-items:center; gap:10px;
+        flex-shrink:0; height:36px; padding:0 10px; border-radius:6px; --repeat:7; }
+      .settings > .settings-content { display:flex; flex-direction:column;
+        flex-grow:1; overflow:scroll; padding:24px; gap:24px; }
+      .settings-content > .settings-section { display:flex; flex-direction:column;
+        gap:0; flex-shrink:0; border:1px solid #e0e0e0; border-radius:10px; overflow:hidden; }
+      .settings-section > .section-header { display:flex; align-items:center;
+        justify-content:space-between; flex-shrink:0; height:44px;
+        padding:0 16px; border-bottom:1px solid #f0f0f0; background:#f9f9f9; }
+      .settings-section > .setting-row { display:flex; align-items:center; gap:16px;
+        flex-shrink:0; height:52px; padding:12px 16px; --repeat:4; }
+      .setting-row > .setting-info { display:flex; flex-direction:column;
+        gap:2px; flex-grow:1; overflow:hidden; }
+      .setting-info > .setting-label { flex-shrink:0; height:16px; }
+      .setting-info > .setting-desc { flex-shrink:0; height:12px; }
+      .setting-row > .setting-value { flex-shrink:0; width:120px; height:30px; }
+    `,
+    html: `
+      <div class="settings">
+        <nav class="settings-nav">
+          ${['General','Appearance','Notifications','Privacy','Security','Integrations','Billing'].map((item, i) =>
+            `<div class="nav-item demo-block" style="${i===0 ? 'background:#007aff18;color:#007aff;' : ''}">${item}</div>`).join('')}
+        </nav>
+        <div class="settings-content">
+          <div class="settings-section">
+            <div class="section-header">
+              <div class="demo-block" style="height:18px;width:100px;">General</div>
+            </div>
+            ${[['Display Name','Your public display name'],
+               ['Email Address','Used for login and notifications'],
+               ['Language','Interface language'],
+               ['Timezone','Used for dates and times']].map(([l,d]) => `
+              <div class="setting-row">
+                <div class="setting-info">
+                  <div class="setting-label demo-block">${l}</div>
+                  <div class="setting-desc demo-block">${d}</div>
+                </div>
+                <div class="setting-value demo-block">Value</div>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>`
+  },
+
+  overflow: {
+    css: `
+      .overflow-demo { display:flex; flex-direction:column; gap:24px; padding:24px; }
+      .scroll-tabs { display:flex; flex-direction:row; flex-wrap:nowrap; gap:8px;
+        padding:8px 16px; overflow:scroll; align-items:center; height:52px;
+        border:1px solid #e0e0e0; border-radius:8px; }
+      .scroll-tabs > .tab { flex-shrink:0; height:32px; width:80px;
+        --repeat:10; }
+      .scroll-list { display:flex; flex-direction:column; height:200px;
+        overflow:scroll; }
+      .scroll-list > .list-item { display:flex; align-items:center; gap:12px;
+        flex-shrink:0; height:48px; padding:0 16px; --repeat:8; }
+      .list-item > .item-avatar { flex-shrink:0; width:32px; height:32px; }
+      .list-item > .item-label { flex-grow:1; height:20px; }
+      .list-item > .item-detail { flex-shrink:0; width:60px; height:20px; }
+      .clipped-gallery { display:flex; flex-direction:row; flex-wrap:wrap;
+        gap:4px; overflow:hidden; height:128px; }
+      .clipped-gallery > .gallery-cell { flex-grow:0; flex-shrink:0;
+        width:24%; height:60px; overflow:hidden; --repeat:8; }
+    `,
+    html: `
+      <div class="overflow-demo">
+        <div>
+          <div class="demo-block" style="height:20px;margin-bottom:8px;width:200px;">Horizontal scroll tabs (overflow: scroll)</div>
+          <div class="scroll-tabs">
+            ${['All','Design','Engineering','Marketing','Product','Sales','HR','Finance','Legal','Operations'].map(t =>
+              `<div class="tab demo-block">${t}</div>`).join('')}
+          </div>
+        </div>
+        <div>
+          <div class="demo-block" style="height:20px;margin-bottom:8px;width:200px;">Scrollable list (overflow: scroll)</div>
+          <div class="scroll-list">
+            ${[1,2,3,4,5,6,7,8].map(i =>
+              `<div class="list-item">
+                <div class="item-avatar demo-block">${i}</div>
+                <div class="item-label demo-block">List Item ${i}</div>
+                <div class="item-detail demo-block">Detail</div>
+              </div>`).join('')}
+          </div>
+        </div>
+        <div>
+          <div class="demo-block" style="height:20px;margin-bottom:8px;width:200px;">Clipped gallery (overflow: hidden)</div>
+          <div class="clipped-gallery">
+            ${[1,2,3,4,5,6,7,8].map(i =>
+              `<div class="gallery-cell demo-block">Img ${i}</div>`).join('')}
+          </div>
+        </div>
+      </div>`
+  },
+
+};
+
+// ── Harness logic ──────────────────────────────────────────────────────────
+
+let currentStyle = null;
+let currentKey = 'navbar';
+
+function loadSample(key) {
+  currentKey = key;
+  liveCSS = '';  // reset custom CSS when switching samples
+  const sample = SAMPLES[key];
+  if (!sample) return;
+
+  // Remove previous injected style
+  if (currentStyle) currentStyle.remove();
+
+  // Inject CSS
+  currentStyle = document.createElement('style');
+  currentStyle.textContent = sample.css;
+  document.head.appendChild(currentStyle);
+
+  // Inject HTML
+  document.getElementById('canvas').innerHTML = sample.html;
+
+  // Update active button
+  document.querySelectorAll('.sample-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.sample === key);
+  });
+}
+
+function setWidth(w) {
+  document.getElementById('canvas').style.width = w;
+  document.querySelectorAll('.wp-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.width === w);
+  });
+}
+
+// Wire up buttons
+document.querySelectorAll('.sample-btn').forEach(b => {
+  b.addEventListener('click', () => loadSample(b.dataset.sample));
+});
+
+document.querySelectorAll('.wp-btn').forEach(b => {
+  b.addEventListener('click', () => setWidth(b.dataset.width));
+});
+
+// ── Current live CSS (may differ from SAMPLES if user edited) ──
+let liveCSS = '';
+
+function getCurrentCSS() {
+  return liveCSS || (SAMPLES[currentKey]?.css ?? '').trim();
+}
+
+function applyCustomCSS(css) {
+  liveCSS = css;
+  if (currentStyle) currentStyle.remove();
+  currentStyle = document.createElement('style');
+  currentStyle.textContent = css;
+  document.head.appendChild(currentStyle);
+}
+
+function flashBtn(btn, text, cls) {
+  const orig = btn.textContent;
+  btn.textContent = text;
+  btn.classList.add(cls);
+  setTimeout(() => { btn.textContent = orig; btn.classList.remove(cls); }, 1500);
+}
+
+// ── Copy CSS button ──
+document.getElementById('copyCssBtn').addEventListener('click', () => {
+  navigator.clipboard.writeText(getCurrentCSS()).then(() => {
+    flashBtn(document.getElementById('copyCssBtn'), 'Copied!', 'success');
+  });
+});
+
+// ── Paste CSS button ──
+document.getElementById('pasteCssBtn').addEventListener('click', () => {
+  navigator.clipboard.readText().then(text => {
+    if (!text.trim()) return;
+    liveCSS = text.trim();
+    applyCustomCSS(liveCSS);
+    // Deselect sample buttons since we're using custom CSS
+    document.querySelectorAll('.sample-btn').forEach(b => b.classList.remove('active'));
+    flashBtn(document.getElementById('pasteCssBtn'), 'Pasted!', 'success');
+  });
+});
+
+// ── Edit CSS button (opens editor overlay) ──
+const overlay = document.getElementById('cssEditorOverlay');
+const textarea = document.getElementById('cssEditorTextarea');
+
+document.getElementById('editCssBtn').addEventListener('click', () => {
+  textarea.value = getCurrentCSS();
+  overlay.classList.add('open');
+  setTimeout(() => textarea.focus(), 100);
+});
+
+// Close overlay on backdrop click
+overlay.addEventListener('click', (e) => {
+  if (e.target === overlay) overlay.classList.remove('open');
+});
+
+document.getElementById('editorCancelBtn').addEventListener('click', () => {
+  overlay.classList.remove('open');
+});
+
+document.getElementById('editorApplyBtn').addEventListener('click', () => {
+  const css = textarea.value.trim();
+  if (css) {
+    applyCustomCSS(css);
+    document.querySelectorAll('.sample-btn').forEach(b => b.classList.remove('active'));
+  }
+  overlay.classList.remove('open');
+});
+
+document.getElementById('editorCopyBtn').addEventListener('click', () => {
+  navigator.clipboard.writeText(textarea.value);
+  flashBtn(document.getElementById('editorCopyBtn'), 'Copied!', 'success');
+});
+
+document.getElementById('editorPasteBtn').addEventListener('click', () => {
+  navigator.clipboard.readText().then(text => {
+    textarea.value = text;
+    flashBtn(document.getElementById('editorPasteBtn'), 'Pasted!', 'success');
+  });
+});
+
+// Override loadSample to reset liveCSS
+const _origLoadSample = loadSample;
+// (already defined above — we just need to hook into it)
+
+// Load first sample
+loadSample('navbar');
+</script>
+</body>
+</html>

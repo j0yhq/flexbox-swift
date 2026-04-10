@@ -1,0 +1,155 @@
+/* ============================================================
+   07 — Chat / Messaging UI
+   Properties: display, flex-direction, flex-grow, flex-shrink,
+               flex-basis, align-items, justify-content,
+               gap, padding, height, width, overflow
+   ============================================================ */
+
+.chat-window {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  gap: 0;
+}
+
+/* Top: contact / channel header */
+.chat-window > .chat-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  height: 56px;
+  padding: 0 16px;
+}
+
+.chat-window > .chat-header > .contact-avatar {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+}
+
+.chat-window > .chat-header > .contact-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.chat-window > .chat-header > .contact-info > .contact-name {
+  flex-shrink: 0;
+  height: 18px;
+}
+
+.chat-window > .chat-header > .contact-info > .contact-status {
+  flex-shrink: 0;
+  height: 14px;
+}
+
+.chat-window > .chat-header > .header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.chat-window > .chat-header > .header-actions > .action {
+  width: 32px;
+  height: 32px;
+}
+
+/* Middle: scrollable message list */
+.chat-window > .message-list {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: scroll;
+  gap: 8px;
+  padding: 16px;
+}
+
+/* Inbound message bubble */
+.chat-window > .message-list > .msg-inbound {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 8px;
+  justify-content: flex-start;
+  flex-shrink: 0;
+}
+
+.chat-window > .message-list > .msg-inbound > .msg-avatar {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+}
+
+.chat-window > .message-list > .msg-inbound > .bubble {
+  flex-shrink: 1;
+  flex-grow: 0;
+  flex-basis: auto;
+  max-width: 70%;
+  padding: 10px 14px;
+  overflow: hidden;
+}
+
+/* Outbound message bubble — aligned to the right */
+.chat-window > .message-list > .msg-outbound {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.chat-window > .message-list > .msg-outbound > .bubble {
+  flex-shrink: 1;
+  flex-grow: 0;
+  flex-basis: auto;
+  max-width: 70%;
+  padding: 10px 14px;
+  overflow: hidden;
+}
+
+/* Date / system message separator */
+.chat-window > .message-list > .date-sep {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  height: 20px;
+  justify-content: center;
+}
+
+/* Bottom: input bar */
+.chat-window > .input-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 12px 16px;
+}
+
+.chat-window > .input-bar > .attach-btn {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+}
+
+.chat-window > .input-bar > .text-input {
+  flex-grow: 1;
+  flex-shrink: 1;
+  overflow: hidden;
+  padding: 8px 12px;
+}
+
+.chat-window > .input-bar > .send-btn {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+}

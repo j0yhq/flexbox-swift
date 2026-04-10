@@ -1,0 +1,244 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AAA00001 /* PreviewApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00010; };
+		AAA00002 /* FlexPlayground.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00011; };
+		AAA00003 /* FlexLayout in Frameworks */ = {isa = PBXBuildFile; productRef = AAA00030; };
+		AAA00004 /* CSSParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00012; };
+		AAA00005 /* CSSRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00013; };
+		AAA00006 /* PricingPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA00014; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		AAA00010 /* PreviewApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewApp.swift; sourceTree = "<group>"; };
+		AAA00011 /* FlexPlayground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlexPlayground.swift; sourceTree = "<group>"; };
+		AAA00012 /* CSSParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSSParser.swift; sourceTree = "<group>"; };
+		AAA00013 /* CSSRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSSRenderer.swift; sourceTree = "<group>"; };
+		AAA00014 /* PricingPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PricingPage.swift; sourceTree = "<group>"; };
+		AAA00020 /* PreviewApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PreviewApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AAA00040 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AAA00003 /* FlexLayout in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AAA00050 /* Root */ = {
+			isa = PBXGroup;
+			children = (
+				AAA00051 /* PreviewApp */,
+				AAA00052 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AAA00051 /* PreviewApp */ = {
+			isa = PBXGroup;
+			children = (
+				AAA00010 /* PreviewApp.swift */,
+				AAA00011 /* FlexPlayground.swift */,
+				AAA00012 /* CSSParser.swift */,
+				AAA00013 /* CSSRenderer.swift */,
+				AAA00014 /* PricingPage.swift */,
+			);
+			path = PreviewApp;
+			sourceTree = "<group>";
+		};
+		AAA00052 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AAA00020 /* PreviewApp.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AAA00060 /* PreviewApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AAA00080;
+			buildPhases = (
+				AAA00061 /* Sources */,
+				AAA00040 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PreviewApp;
+			packageProductDependencies = (
+				AAA00030 /* FlexLayout */,
+			);
+			productName = PreviewApp;
+			productReference = AAA00020 /* PreviewApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AAA00070 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1540;
+				LastUpgradeCheck = 1540;
+			};
+			buildConfigurationList = AAA00090;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = AAA00050;
+			packageReferences = (
+				AAA00031 /* FlexLayout */,
+			);
+			productRefGroup = AAA00052 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AAA00060 /* PreviewApp */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AAA00061 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AAA00001 /* PreviewApp.swift in Sources */,
+				AAA00002 /* FlexPlayground.swift in Sources */,
+				AAA00004 /* CSSParser.swift in Sources */,
+				AAA00005 /* CSSRenderer.swift in Sources */,
+				AAA00006 /* PricingPage.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		AAA00081 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.test.PreviewApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		AAA00082 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.test.PreviewApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		AAA00091 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		AAA00092 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AAA00080 /* Build configuration list for PBXNativeTarget "PreviewApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AAA00081 /* Debug */,
+				AAA00082 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AAA00090 /* Build configuration list for PBXProject "PreviewApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AAA00091 /* Debug */,
+				AAA00092 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		AAA00031 /* FlexLayout */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ..;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AAA00030 /* FlexLayout */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FlexLayout;
+		};
+/* End XCSwiftPackageProductDependency section */
+
+	};
+	rootObject = AAA00070 /* Project object */;
+}

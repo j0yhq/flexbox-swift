@@ -1,0 +1,162 @@
+/* ============================================================
+   12 — Overflow & Scroll Patterns
+   Properties: overflow (all 5 values), height, width,
+               flex-grow, flex-shrink, flex-basis,
+               display, flex-direction, padding, gap
+   ============================================================ */
+
+/* ── Pattern A: Horizontal scrolling tabs / chips ─────────── */
+.scroll-tabs {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 8px;
+  padding: 8px 16px;
+  overflow: scroll;
+  align-items: center;
+  height: 52px;
+  width: 100%;
+}
+
+.scroll-tabs > .tab {
+  flex-shrink: 0;
+  flex-grow: 0;
+  height: 32px;
+  padding: 0 16px;
+  overflow: hidden;
+}
+
+/* ── Pattern B: Fixed-height scrollable list ──────────────── */
+.scroll-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  height: 320px;
+  overflow: scroll;
+  padding: 0;
+}
+
+.scroll-list > .list-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  height: 56px;
+  padding: 0 16px;
+  overflow: hidden;
+}
+
+.scroll-list > .list-item > .item-icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  overflow: hidden;
+}
+
+.scroll-list > .list-item > .item-content {
+  flex-grow: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.scroll-list > .list-item > .item-content > .item-title {
+  flex-shrink: 0;
+  height: 18px;
+  overflow: hidden;
+}
+
+.scroll-list > .list-item > .item-content > .item-subtitle {
+  flex-shrink: 0;
+  height: 14px;
+  overflow: hidden;
+}
+
+.scroll-list > .list-item > .item-trailing {
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* ── Pattern C: Clipped image gallery with hidden overflow ── */
+.clipped-gallery {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 0;
+  overflow: hidden;
+  width: 100%;
+}
+
+.clipped-gallery > .gallery-cell {
+  flex-grow: 0;
+  flex-shrink: 0;
+  width: 25%;
+  height: 120px;
+  overflow: hidden;
+}
+
+/* ── Pattern D: Scrollable code block ────────────────────── */
+.code-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: scroll;
+  height: 200px;
+  padding: 16px;
+  width: 100%;
+}
+
+.code-block > .code-line {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  flex-shrink: 0;
+  height: 20px;
+  align-items: center;
+}
+
+.code-block > .code-line > .line-number {
+  flex-shrink: 0;
+  width: 32px;
+  overflow: visible;
+}
+
+.code-block > .code-line > .line-content {
+  flex-grow: 1;
+  overflow: visible;
+}
+
+/* ── Pattern E: Overflowing text with clip ───────────────── */
+.text-clip-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  height: 48px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.text-clip-row > .icon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+}
+
+.text-clip-row > .text {
+  flex-grow: 1;
+  flex-shrink: 1;
+  overflow: hidden;
+  height: 24px;
+}
+
+.text-clip-row > .action {
+  flex-shrink: 0;
+  overflow: hidden;
+  width: 60px;
+  height: 28px;
+}

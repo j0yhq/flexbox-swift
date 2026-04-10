@@ -1,0 +1,1377 @@
+{
+  "builtTestProducts" : [
+    {
+      "binaryPath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutPackageTests.xctest/Contents/MacOS/FlexLayoutPackageTests",
+      "packagePath" : "/Users/vishnudutt/layout-test",
+      "productName" : "FlexLayoutPackageTests"
+    }
+  ],
+  "copyCommands" : {
+
+  },
+  "explicitTargetDependencyImportCheckingMode" : {
+    "none" : {
+
+    }
+  },
+  "generatedSourceTargetSet" : [
+
+  ],
+  "pluginDescriptions" : [
+
+  ],
+  "swiftCommands" : {
+    "C.FlexDemoApp-arm64-apple-macosx26.0-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/sources",
+      "importPath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/FlexDemoApp/CSSParser.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/FlexDemoApp/CSSPasteDemo.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/FlexDemoApp/CSSRenderer.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/FlexDemoApp/ContentView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/FlexDemoApp/FlexDemoApp.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/FlexDemoApp/FlexPlayground.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/FlexDemoApp/FlexSamples.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/FlexDemoApp/NativePricingPage.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/FlexDemoApp/PricingCardUI.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/FlexDemoApp/PricingPage.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/FlexDemoApp/ResponsivePreview.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/Modules/FlexLayout.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/sources"
+        }
+      ],
+      "isLibrary" : false,
+      "moduleName" : "FlexDemoApp",
+      "moduleOutputPath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/Modules/FlexDemoApp.swiftmodule",
+      "objects" : [
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSParser.swift.o",
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSPasteDemo.swift.o",
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSRenderer.swift.o",
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/ContentView.swift.o",
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexDemoApp.swift.o",
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexPlayground.swift.o",
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexSamples.swift.o",
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/NativePricingPage.swift.o",
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/PricingCardUI.swift.o",
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/PricingPage.swift.o",
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/ResponsivePreview.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx13.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-j10",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-Xfrontend",
+        "-entry-point-function-name",
+        "-Xfrontend",
+        "FlexDemoApp_main",
+        "-swift-version",
+        "5",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "layout_test"
+      ],
+      "outputFileMapPath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSParser.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSPasteDemo.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSRenderer.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/ContentView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexDemoApp.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexPlayground.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexSamples.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/NativePricingPage.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/PricingCardUI.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/PricingPage.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/ResponsivePreview.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/Modules/FlexDemoApp.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/vishnudutt/layout-test/FlexDemoApp/CSSParser.swift",
+        "/Users/vishnudutt/layout-test/FlexDemoApp/CSSPasteDemo.swift",
+        "/Users/vishnudutt/layout-test/FlexDemoApp/CSSRenderer.swift",
+        "/Users/vishnudutt/layout-test/FlexDemoApp/ContentView.swift",
+        "/Users/vishnudutt/layout-test/FlexDemoApp/FlexDemoApp.swift",
+        "/Users/vishnudutt/layout-test/FlexDemoApp/FlexPlayground.swift",
+        "/Users/vishnudutt/layout-test/FlexDemoApp/FlexSamples.swift",
+        "/Users/vishnudutt/layout-test/FlexDemoApp/NativePricingPage.swift",
+        "/Users/vishnudutt/layout-test/FlexDemoApp/PricingCardUI.swift",
+        "/Users/vishnudutt/layout-test/FlexDemoApp/PricingPage.swift",
+        "/Users/vishnudutt/layout-test/FlexDemoApp/ResponsivePreview.swift"
+      ],
+      "tempsPath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.FlexDemoAppTests-arm64-apple-macosx26.0-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoAppTests.build/sources",
+      "importPath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/Tests/FlexDemoAppTests/CSSParserTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/Modules/FlexLayout.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoAppTests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "FlexDemoAppTests",
+      "moduleOutputPath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/Modules/FlexDemoAppTests.swiftmodule",
+      "objects" : [
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoAppTests.build/CSSParserTests.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j10",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-swift-version",
+        "5",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "layout_test"
+      ],
+      "outputFileMapPath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoAppTests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoAppTests.build/CSSParserTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/Modules/FlexDemoAppTests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/vishnudutt/layout-test/Tests/FlexDemoAppTests/CSSParserTests.swift"
+      ],
+      "tempsPath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoAppTests.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.FlexLayout-arm64-apple-macosx26.0-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/sources",
+      "importPath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/Sources/FlexLayout/FlexLayout.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/Sources/FlexLayout/FlexLayoutKeys.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/Sources/FlexLayout/FlexModifiers.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/Sources/FlexLayout/FlexTypes.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/Sources/FlexLayout/FlexView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "FlexLayout",
+      "moduleOutputPath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/Modules/FlexLayout.swiftmodule",
+      "objects" : [
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexLayout.swift.o",
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexLayoutKeys.swift.o",
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexModifiers.swift.o",
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexTypes.swift.o",
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexView.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx13.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-j10",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/include/FlexLayout-Swift.h",
+        "-swift-version",
+        "5",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "layout_test"
+      ],
+      "outputFileMapPath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexLayout.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexLayoutKeys.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexModifiers.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexTypes.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/Modules/FlexLayout.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/vishnudutt/layout-test/Sources/FlexLayout/FlexLayout.swift",
+        "/Users/vishnudutt/layout-test/Sources/FlexLayout/FlexLayoutKeys.swift",
+        "/Users/vishnudutt/layout-test/Sources/FlexLayout/FlexModifiers.swift",
+        "/Users/vishnudutt/layout-test/Sources/FlexLayout/FlexTypes.swift",
+        "/Users/vishnudutt/layout-test/Sources/FlexLayout/FlexView.swift"
+      ],
+      "tempsPath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.FlexLayoutPackageTests-arm64-apple-macosx26.0-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutPackageTests.build/sources",
+      "importPath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutPackageTests.derived/runner.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/Modules/FlexLayoutTests.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/Modules/FlexDemoAppTests.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutPackageTests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "FlexLayoutPackageTests",
+      "moduleOutputPath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/Modules/FlexLayoutPackageTests.swiftmodule",
+      "objects" : [
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutPackageTests.build/runner.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx13.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j10",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutPackageTests.build/include/FlexLayoutPackageTests-Swift.h",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "layout_test"
+      ],
+      "outputFileMapPath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutPackageTests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutPackageTests.build/runner.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/Modules/FlexLayoutPackageTests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutPackageTests.derived/runner.swift"
+      ],
+      "tempsPath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutPackageTests.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.FlexLayoutTests-arm64-apple-macosx26.0-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutTests.build/sources",
+      "importPath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/Tests/FlexLayoutTests/FlexLayoutTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/Modules/FlexLayout.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutTests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "FlexLayoutTests",
+      "moduleOutputPath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/Modules/FlexLayoutTests.swiftmodule",
+      "objects" : [
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutTests.build/FlexLayoutTests.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j10",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-swift-version",
+        "5",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "layout_test"
+      ],
+      "outputFileMapPath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutTests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutTests.build/FlexLayoutTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/Modules/FlexLayoutTests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/vishnudutt/layout-test/Tests/FlexLayoutTests/FlexLayoutTests.swift"
+      ],
+      "tempsPath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutTests.build",
+      "wholeModuleOptimization" : false
+    }
+  },
+  "swiftFrontendCommands" : {
+
+  },
+  "swiftTargetScanArgs" : {
+    "FlexDemoApp" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "FlexDemoApp",
+      "-package-name",
+      "layout_test",
+      "-c",
+      "/Users/vishnudutt/layout-test/FlexDemoApp/CSSParser.swift",
+      "/Users/vishnudutt/layout-test/FlexDemoApp/CSSPasteDemo.swift",
+      "/Users/vishnudutt/layout-test/FlexDemoApp/CSSRenderer.swift",
+      "/Users/vishnudutt/layout-test/FlexDemoApp/ContentView.swift",
+      "/Users/vishnudutt/layout-test/FlexDemoApp/FlexDemoApp.swift",
+      "/Users/vishnudutt/layout-test/FlexDemoApp/FlexPlayground.swift",
+      "/Users/vishnudutt/layout-test/FlexDemoApp/FlexSamples.swift",
+      "/Users/vishnudutt/layout-test/FlexDemoApp/NativePricingPage.swift",
+      "/Users/vishnudutt/layout-test/FlexDemoApp/PricingCardUI.swift",
+      "/Users/vishnudutt/layout-test/FlexDemoApp/PricingPage.swift",
+      "/Users/vishnudutt/layout-test/FlexDemoApp/ResponsivePreview.swift",
+      "-I",
+      "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx13.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-j10",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-Xfrontend",
+      "-entry-point-function-name",
+      "-Xfrontend",
+      "FlexDemoApp_main",
+      "-swift-version",
+      "5",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "layout_test",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "FlexDemoAppTests" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "FlexDemoAppTests",
+      "-package-name",
+      "layout_test",
+      "-c",
+      "/Users/vishnudutt/layout-test/Tests/FlexDemoAppTests/CSSParserTests.swift",
+      "-I",
+      "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j10",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-swift-version",
+      "5",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "layout_test",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "FlexLayout" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "FlexLayout",
+      "-package-name",
+      "layout_test",
+      "-c",
+      "/Users/vishnudutt/layout-test/Sources/FlexLayout/FlexLayout.swift",
+      "/Users/vishnudutt/layout-test/Sources/FlexLayout/FlexLayoutKeys.swift",
+      "/Users/vishnudutt/layout-test/Sources/FlexLayout/FlexModifiers.swift",
+      "/Users/vishnudutt/layout-test/Sources/FlexLayout/FlexTypes.swift",
+      "/Users/vishnudutt/layout-test/Sources/FlexLayout/FlexView.swift",
+      "-I",
+      "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx13.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-j10",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/include/FlexLayout-Swift.h",
+      "-swift-version",
+      "5",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "layout_test",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "FlexLayoutPackageTests" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "FlexLayoutPackageTests",
+      "-package-name",
+      "layout_test",
+      "-c",
+      "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutPackageTests.derived/runner.swift",
+      "-I",
+      "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx13.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j10",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutPackageTests.build/include/FlexLayoutPackageTests-Swift.h",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "layout_test",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "FlexLayoutTests" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "FlexLayoutTests",
+      "-package-name",
+      "layout_test",
+      "-c",
+      "/Users/vishnudutt/layout-test/Tests/FlexLayoutTests/FlexLayoutTests.swift",
+      "-I",
+      "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j10",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-swift-version",
+      "5",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "layout_test",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ]
+  },
+  "targetDependencyMap" : {
+    "FlexDemoApp" : [
+      "FlexLayout"
+    ],
+    "FlexDemoAppTests" : [
+      "FlexDemoApp",
+      "FlexLayout"
+    ],
+    "FlexLayout" : [
+
+    ],
+    "FlexLayoutPackageTests" : [
+      "FlexDemoAppTests",
+      "FlexDemoApp",
+      "FlexLayoutTests",
+      "FlexLayout"
+    ],
+    "FlexLayoutTests" : [
+      "FlexLayout"
+    ]
+  },
+  "testDiscoveryCommands" : {
+
+  },
+  "testEntryPointCommands" : {
+    "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutPackageTests.derived/runner.swift" : {
+      "inputs" : [
+
+      ],
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutPackageTests.derived/runner.swift"
+        }
+      ]
+    }
+  },
+  "traitConfiguration" : {
+    "default" : {
+
+    }
+  },
+  "writeCommands" : {
+    "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp-entitlement.plist" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<entitlement-plist>"
+        },
+        {
+          "kind" : "virtual",
+          "name" : "<com.apple.security.get-task-allow>"
+        }
+      ],
+      "outputFilePath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp-entitlement.plist"
+    },
+    "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/FlexDemoApp/CSSParser.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/FlexDemoApp/CSSPasteDemo.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/FlexDemoApp/CSSRenderer.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/FlexDemoApp/ContentView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/FlexDemoApp/FlexDemoApp.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/FlexDemoApp/FlexPlayground.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/FlexDemoApp/FlexSamples.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/FlexDemoApp/NativePricingPage.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/FlexDemoApp/PricingCardUI.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/FlexDemoApp/PricingPage.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/FlexDemoApp/ResponsivePreview.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/sources"
+    },
+    "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.product/Objects.LinkFileList" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSParser.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSPasteDemo.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSRenderer.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/ContentView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexDemoApp.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexPlayground.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexSamples.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/NativePricingPage.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/PricingCardUI.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/PricingPage.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/ResponsivePreview.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexLayout.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexLayoutKeys.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexModifiers.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexTypes.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexView.swift.o"
+        }
+      ],
+      "outputFilePath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.product/Objects.LinkFileList"
+    },
+    "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoAppTests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/Tests/FlexDemoAppTests/CSSParserTests.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoAppTests.build/sources"
+    },
+    "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/Sources/FlexLayout/FlexLayout.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/Sources/FlexLayout/FlexLayoutKeys.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/Sources/FlexLayout/FlexModifiers.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/Sources/FlexLayout/FlexTypes.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/Sources/FlexLayout/FlexView.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/sources"
+    },
+    "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutPackageTests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutPackageTests.derived/runner.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutPackageTests.build/sources"
+    },
+    "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutPackageTests.product/Objects.LinkFileList" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSParser.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSPasteDemo.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSRenderer.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/ContentView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexDemoApp.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexPlayground.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexSamples.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/NativePricingPage.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/PricingCardUI.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/PricingPage.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/ResponsivePreview.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoAppTests.build/CSSParserTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexLayout.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexLayoutKeys.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexModifiers.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexTypes.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutPackageTests.build/runner.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutTests.build/FlexLayoutTests.swift.o"
+        }
+      ],
+      "outputFilePath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutPackageTests.product/Objects.LinkFileList"
+    },
+    "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutTests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vishnudutt/layout-test/Tests/FlexLayoutTests/FlexLayoutTests.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayoutTests.build/sources"
+    },
+    "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt" : {
+      "alwaysOutOfDate" : true,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<swift-get-version>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+        }
+      ],
+      "outputFilePath" : "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+    }
+  }
+}

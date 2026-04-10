@@ -1,0 +1,82 @@
+{
+  "": {
+    "swift-dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/master.swiftdeps"
+  },
+  "/Users/vishnudutt/layout-test/FlexDemoApp/CSSParser.swift": {
+    "dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSParser.d",
+    "object": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSParser.swift.o",
+    "swiftmodule": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSParser~partial.swiftmodule",
+    "swift-dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSParser.swiftdeps",
+    "diagnostics": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSParser.dia"
+  },
+  "/Users/vishnudutt/layout-test/FlexDemoApp/CSSPasteDemo.swift": {
+    "dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSPasteDemo.d",
+    "object": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSPasteDemo.swift.o",
+    "swiftmodule": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSPasteDemo~partial.swiftmodule",
+    "swift-dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSPasteDemo.swiftdeps",
+    "diagnostics": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSPasteDemo.dia"
+  },
+  "/Users/vishnudutt/layout-test/FlexDemoApp/CSSRenderer.swift": {
+    "dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSRenderer.d",
+    "object": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSRenderer.swift.o",
+    "swiftmodule": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSRenderer~partial.swiftmodule",
+    "swift-dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSRenderer.swiftdeps",
+    "diagnostics": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/CSSRenderer.dia"
+  },
+  "/Users/vishnudutt/layout-test/FlexDemoApp/ContentView.swift": {
+    "dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/ContentView.d",
+    "object": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/ContentView.swift.o",
+    "swiftmodule": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/ContentView~partial.swiftmodule",
+    "swift-dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/ContentView.swiftdeps",
+    "diagnostics": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/ContentView.dia"
+  },
+  "/Users/vishnudutt/layout-test/FlexDemoApp/FlexDemoApp.swift": {
+    "dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexDemoApp.d",
+    "object": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexDemoApp.swift.o",
+    "swiftmodule": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexDemoApp~partial.swiftmodule",
+    "swift-dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexDemoApp.swiftdeps",
+    "diagnostics": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexDemoApp.dia"
+  },
+  "/Users/vishnudutt/layout-test/FlexDemoApp/FlexPlayground.swift": {
+    "dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexPlayground.d",
+    "object": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexPlayground.swift.o",
+    "swiftmodule": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexPlayground~partial.swiftmodule",
+    "swift-dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexPlayground.swiftdeps",
+    "diagnostics": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexPlayground.dia"
+  },
+  "/Users/vishnudutt/layout-test/FlexDemoApp/FlexSamples.swift": {
+    "dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexSamples.d",
+    "object": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexSamples.swift.o",
+    "swiftmodule": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexSamples~partial.swiftmodule",
+    "swift-dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexSamples.swiftdeps",
+    "diagnostics": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/FlexSamples.dia"
+  },
+  "/Users/vishnudutt/layout-test/FlexDemoApp/NativePricingPage.swift": {
+    "dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/NativePricingPage.d",
+    "object": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/NativePricingPage.swift.o",
+    "swiftmodule": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/NativePricingPage~partial.swiftmodule",
+    "swift-dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/NativePricingPage.swiftdeps",
+    "diagnostics": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/NativePricingPage.dia"
+  },
+  "/Users/vishnudutt/layout-test/FlexDemoApp/PricingCardUI.swift": {
+    "dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/PricingCardUI.d",
+    "object": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/PricingCardUI.swift.o",
+    "swiftmodule": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/PricingCardUI~partial.swiftmodule",
+    "swift-dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/PricingCardUI.swiftdeps",
+    "diagnostics": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/PricingCardUI.dia"
+  },
+  "/Users/vishnudutt/layout-test/FlexDemoApp/PricingPage.swift": {
+    "dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/PricingPage.d",
+    "object": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/PricingPage.swift.o",
+    "swiftmodule": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/PricingPage~partial.swiftmodule",
+    "swift-dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/PricingPage.swiftdeps",
+    "diagnostics": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/PricingPage.dia"
+  },
+  "/Users/vishnudutt/layout-test/FlexDemoApp/ResponsivePreview.swift": {
+    "dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/ResponsivePreview.d",
+    "object": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/ResponsivePreview.swift.o",
+    "swiftmodule": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/ResponsivePreview~partial.swiftmodule",
+    "swift-dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/ResponsivePreview.swiftdeps",
+    "diagnostics": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexDemoApp.build/ResponsivePreview.dia"
+  }
+}

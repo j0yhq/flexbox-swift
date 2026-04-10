@@ -1,0 +1,69 @@
+/* ============================================================
+   03 — Responsive Card Grid
+   Properties: display, flex-wrap, gap, padding, flex-basis,
+               flex-grow, flex-shrink, width, height
+   ============================================================ */
+
+.card-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 24px;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+/* Fixed-width cards — 3 per row at 1200px, wrap naturally */
+.card-grid > .card {
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+}
+
+.card-grid > .card > .card-image {
+  flex-shrink: 0;
+  flex-grow: 0;
+  height: 180px;
+  overflow: hidden;
+}
+
+.card-grid > .card > .card-body {
+  flex-grow: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-grid > .card > .card-body > .card-title {
+  flex-shrink: 0;
+  height: 24px;
+}
+
+.card-grid > .card > .card-body > .card-description {
+  flex-grow: 1;
+}
+
+.card-grid > .card > .card-footer {
+  flex-shrink: 0;
+  height: 52px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.card-grid > .card > .card-footer > .price {
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.card-grid > .card > .card-footer > .btn {
+  flex-grow: 0;
+  flex-shrink: 0;
+}

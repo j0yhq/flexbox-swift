@@ -1,0 +1,56 @@
+/* ============================================================
+   01 — Navigation Bar
+   Properties: display, flex-wrap, justify-content, align-items,
+               gap, padding, width, height
+   ============================================================ */
+
+.navbar {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 0 24px;
+  height: 56px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.navbar > .brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-basis: 140px;
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+
+.navbar > .nav-links {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-grow: 1;
+  justify-content: center;
+}
+
+.navbar > .nav-links > .link {
+  flex-shrink: 0;
+}
+
+.navbar > .actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-basis: 140px;
+  flex-shrink: 0;
+  flex-grow: 0;
+  justify-content: flex-end;
+}
+
+.navbar > .actions > .btn-secondary {
+  flex-shrink: 0;
+}
+
+.navbar > .actions > .btn-primary {
+  flex-shrink: 0;
+}

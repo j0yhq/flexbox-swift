@@ -1,0 +1,242 @@
+/* ============================================================
+   10 — E-commerce Product Page  (3-level nesting)
+   Properties: all spec properties
+   Level 1: product-page (row)
+   Level 2: gallery(column) + info(column)
+   Level 3: thumbnails(row) + meta-row(row) + actions(row)
+   ============================================================ */
+
+/* ── Level 1: Two-column product layout ──────────────────── */
+.product-page {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 40px;
+  padding: 32px;
+  overflow: hidden;
+}
+
+/* ── Level 2: Image gallery (left) ──────────────────────── */
+.product-page > .gallery {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: 480px;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.product-page > .gallery > .main-image {
+  flex-shrink: 0;
+  height: 400px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* "New" label — absolute overlay on main image */
+.product-page > .gallery > .main-image > .new-label {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 52px;
+  height: 28px;
+  z-index: 10;
+  overflow: hidden;
+}
+
+/* ── Level 3: Thumbnail strip ────────────────────────────── */
+.product-page > .gallery > .thumbnails {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.product-page > .gallery > .thumbnails > .thumb {
+  flex-grow: 0;
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  overflow: hidden;
+}
+
+/* ── Level 2: Product info (right) ──────────────────────── */
+.product-page > .info {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  flex-shrink: 1;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.product-page > .info > .product-title {
+  flex-shrink: 0;
+}
+
+/* ── Level 3: Rating row ─────────────────────────────────── */
+.product-page > .info > .rating-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  height: 24px;
+}
+
+.product-page > .info > .rating-row > .stars {
+  flex-shrink: 0;
+  width: 100px;
+}
+
+.product-page > .info > .rating-row > .review-count {
+  flex-grow: 0;
+}
+
+.product-page > .info > .rating-row > .separator {
+  flex-shrink: 0;
+  width: 1px;
+  height: 14px;
+}
+
+.product-page > .info > .rating-row > .in-stock {
+  flex-grow: 1;
+}
+
+/* Price section */
+.product-page > .info > .price-section {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 8px;
+  flex-shrink: 0;
+  height: 40px;
+}
+
+.product-page > .info > .price-section > .price-current {
+  flex-shrink: 0;
+}
+
+.product-page > .info > .price-section > .price-original {
+  flex-shrink: 0;
+}
+
+.product-page > .info > .price-section > .price-savings {
+  flex-shrink: 0;
+}
+
+/* Variant selectors */
+.product-page > .info > .variants {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.product-page > .info > .variants > .variant-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.product-page > .info > .variants > .variant-group > .variant-label {
+  flex-shrink: 0;
+  height: 18px;
+}
+
+.product-page > .info > .variants > .variant-group > .variant-options {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.product-page > .info > .variants > .variant-group > .variant-options > .option {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+}
+
+/* Quantity selector */
+.product-page > .info > .quantity-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  height: 44px;
+}
+
+.product-page > .info > .quantity-row > .qty-label {
+  flex-shrink: 0;
+}
+
+.product-page > .info > .quantity-row > .qty-control {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.product-page > .info > .quantity-row > .qty-control > .qty-minus {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.product-page > .info > .quantity-row > .qty-control > .qty-value {
+  width: 48px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.product-page > .info > .quantity-row > .qty-control > .qty-plus {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+/* ── Level 3: Action buttons ─────────────────────────────── */
+.product-page > .info > .actions {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  flex-shrink: 0;
+  height: 48px;
+}
+
+.product-page > .info > .actions > .btn-cart {
+  flex-grow: 1;
+  flex-shrink: 1;
+  overflow: hidden;
+}
+
+.product-page > .info > .actions > .btn-wishlist {
+  flex-grow: 0;
+  flex-shrink: 0;
+  width: 48px;
+  overflow: hidden;
+}
+
+/* Shipping / trust badges */
+.product-page > .info > .trust-badges {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.product-page > .info > .trust-badges > .badge {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}

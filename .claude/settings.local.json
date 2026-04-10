@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Claude_Preview__preview_start",
+      "Bash(npx --version)",
+      "Bash(swift build:*)",
+      "Bash(swift test:*)",
+      "Bash(open /Users/vishnudutt/layout-test/FlexLayoutDemo.xcworkspace)",
+      "Bash(for f:*)",
+      "Bash(do sed:*)",
+      "Bash(done)",
+      "Bash(open /Users/vishnudutt/layout-test/FlexLayoutDemo.playground)",
+      "Bash(open /Users/vishnudutt/layout-test/Package.swift)",
+      "Bash(swiftc -typecheck /Users/vishnudutt/layout-test/FlexDemoApp/CSSPasteDemo.swift -I /Users/vishnudutt/layout-test/.build/debug)",
+      "Bash(swift run:*)",
+      "Bash(kill %1)",
+      "Bash(grep -n \"PLACEHOLDER\\\\|gap: $\" /Users/vishnudutt/layout-test/FlexDemoApp/FlexSamples.swift)",
+      "Bash(defaults write:*)",
+      "Bash(open /Users/vishnudutt/layout-test/PreviewApp/PreviewApp.xcodeproj)",
+      "Bash(xcodebuild build:*)"
+    ]
+  }
+}

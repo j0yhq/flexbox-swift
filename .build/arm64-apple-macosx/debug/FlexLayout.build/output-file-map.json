@@ -1,0 +1,40 @@
+{
+  "": {
+    "swift-dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/master.swiftdeps"
+  },
+  "/Users/vishnudutt/layout-test/Sources/FlexLayout/FlexLayout.swift": {
+    "dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexLayout.d",
+    "object": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexLayout.swift.o",
+    "swiftmodule": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexLayout~partial.swiftmodule",
+    "swift-dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexLayout.swiftdeps",
+    "diagnostics": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexLayout.dia"
+  },
+  "/Users/vishnudutt/layout-test/Sources/FlexLayout/FlexLayoutKeys.swift": {
+    "dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexLayoutKeys.d",
+    "object": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexLayoutKeys.swift.o",
+    "swiftmodule": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexLayoutKeys~partial.swiftmodule",
+    "swift-dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexLayoutKeys.swiftdeps",
+    "diagnostics": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexLayoutKeys.dia"
+  },
+  "/Users/vishnudutt/layout-test/Sources/FlexLayout/FlexModifiers.swift": {
+    "dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexModifiers.d",
+    "object": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexModifiers.swift.o",
+    "swiftmodule": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexModifiers~partial.swiftmodule",
+    "swift-dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexModifiers.swiftdeps",
+    "diagnostics": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexModifiers.dia"
+  },
+  "/Users/vishnudutt/layout-test/Sources/FlexLayout/FlexTypes.swift": {
+    "dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexTypes.d",
+    "object": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexTypes.swift.o",
+    "swiftmodule": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexTypes~partial.swiftmodule",
+    "swift-dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexTypes.swiftdeps",
+    "diagnostics": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexTypes.dia"
+  },
+  "/Users/vishnudutt/layout-test/Sources/FlexLayout/FlexView.swift": {
+    "dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexView.d",
+    "object": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexView.swift.o",
+    "swiftmodule": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexView~partial.swiftmodule",
+    "swift-dependencies": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexView.swiftdeps",
+    "diagnostics": "/Users/vishnudutt/layout-test/.build/arm64-apple-macosx/debug/FlexLayout.build/FlexView.dia"
+  }
+}

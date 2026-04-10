@@ -1,0 +1,88 @@
+/* ============================================================
+   02 — Sidebar + Content Layout
+   Properties: display, flex-direction, flex-grow, flex-shrink,
+               flex-basis, height, width, overflow, gap, padding
+   ============================================================ */
+
+.app {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  height: 100%;
+  overflow: hidden;
+}
+
+.app > .sidebar {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: 240px;
+  height: 100%;
+  overflow: hidden;
+  padding: 16px 0;
+  gap: 4px;
+}
+
+.app > .sidebar > .sidebar-header {
+  flex-shrink: 0;
+  flex-grow: 0;
+  height: 48px;
+  padding: 0 16px;
+}
+
+.app > .sidebar > .nav-section {
+  flex-shrink: 0;
+  flex-grow: 0;
+  padding: 8px 16px;
+}
+
+.app > .sidebar > .nav-items {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: scroll;
+  gap: 2px;
+  padding: 0 8px;
+}
+
+.app > .sidebar > .nav-items > .nav-item {
+  flex-shrink: 0;
+  height: 36px;
+}
+
+.app > .sidebar > .sidebar-footer {
+  flex-shrink: 0;
+  flex-grow: 0;
+  height: 56px;
+  padding: 0 16px;
+}
+
+.app > .content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  flex-shrink: 1;
+  overflow: hidden;
+}
+
+.app > .content > .content-header {
+  flex-shrink: 0;
+  flex-grow: 0;
+  height: 56px;
+  padding: 0 24px;
+}
+
+.app > .content > .content-body {
+  flex-grow: 1;
+  flex-shrink: 1;
+  overflow: scroll;
+  padding: 24px;
+}
+
+.app > .content > .content-footer {
+  flex-shrink: 0;
+  flex-grow: 0;
+  height: 44px;
+  padding: 0 24px;
+}
