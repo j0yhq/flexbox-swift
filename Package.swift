@@ -10,19 +10,32 @@ let package = Package(
         .watchOS(.v9),
     ],
     products: [
-        .library(name: "FlexLayout", targets: ["FlexLayout"]),
-        .executable(name: "FlexDemoApp", targets: ["FlexDemoApp"]),
+        // The only public product — consumers add "FlexLayout" as a dependency.
+        .library(
+            name: "FlexLayout",
+            targets: ["FlexLayout"]
+        ),
     ],
     targets: [
+        // ── Library ────────────────────────────────────────────────────────────
         .target(
             name: "FlexLayout",
-            path: "Sources/FlexLayout"
+            path: "Sources/FlexLayout",
+            swiftSettings: [
+                // Treat all warnings as errors in release builds to keep the
+                // public API surface clean.
+                .unsafeFlags(["-warnings-as-errors"], .when(configuration: .release)),
+            ]
         ),
+
+        // ── Demo app (not a library product; local development only) ───────────
         .executableTarget(
             name: "FlexDemoApp",
             dependencies: ["FlexLayout"],
             path: "FlexDemoApp"
         ),
+
+        // ── Tests ──────────────────────────────────────────────────────────────
         .testTarget(
             name: "FlexLayoutTests",
             dependencies: ["FlexLayout"],

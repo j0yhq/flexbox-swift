@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Swift ${{ matrix.swift }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-14
+            swift: "5.9"
+          - os: macos-15
+            swift: "6.0"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          if [ "${{ matrix.swift }}" = "6.0" ]; then
+            sudo xcode-select -s /Applications/Xcode_16.app
+          else
+            sudo xcode-select -s /Applications/Xcode_15.app
+          fi
+
+      - name: Swift version
+        run: swift --version
+
+      - name: Build
+        run: swift build --target FlexLayout
+
+      - name: Test
+        run: swift test --parallel
+
+      - name: Build release
+        run: swift build -c release --target FlexLayout

@@ -1,13 +1,16 @@
 # macOS
 .DS_Store
 
-# SwiftPM/Xcode build output
+# SwiftPM / Xcode build output
 .build/
 .swiftpm/
 
 # User-local IDE state
 **/xcuserdata/
 **/*.xcuserstate
+
+# DocC build cache (generated; not committed)
+**/.docc-build/
 
 # Local tool state
 .claude/
