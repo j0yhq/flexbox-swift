@@ -308,7 +308,7 @@ struct CSSPasteDemo: View {
 
     // MARK: - Screenshot capture
 
-    private func captureRenderedImage() {
+    @MainActor private func captureRenderedImage() {
         let renderedView = CSSRendererView(css: parsed, colorOffset: 0, fallbackCount: itemCount)
             .frame(
                 width:     canvasWidth ?? 800,
