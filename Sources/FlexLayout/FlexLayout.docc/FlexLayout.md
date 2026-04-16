@@ -55,6 +55,11 @@ justify-content, align-content, absolute positioning — can be exercised in pla
 
 ## Topics
 
+### Articles
+
+- <doc:GettingStarted>
+- <doc:CSSPropertyReference>
+
 ### Essential views
 
 - ``FlexBox``
@@ -82,8 +87,6 @@ justify-content, align-content, absolute positioning — can be exercised in pla
 
 - ``FlexItemModifier``
 - ``FlexOverflowModifier``
-- ``FlexItemModifier``
-- ``FlexOverflowModifier``
 
 ### Layout value keys
 
@@ -108,8 +111,3 @@ justify-content, align-content, absolute positioning — can be exercised in pla
 - ``FlexEngine``
 - ``FlexItemInput``
 - ``FlexSolution``
-
-### Articles
-
-- <doc:GettingStarted>
-- <doc:CSSPropertyReference>
