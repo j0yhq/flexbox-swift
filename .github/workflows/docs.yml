@@ -25,9 +25,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_15.4.app
-
       - name: Emit symbol graphs
         run: |
           mkdir -p /tmp/flex-symbols

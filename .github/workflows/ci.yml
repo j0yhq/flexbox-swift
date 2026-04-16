@@ -26,14 +26,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Select Xcode
-        run: |
-          if [ "${{ matrix.swift }}" = "6.0" ]; then
-            sudo xcode-select -s /Applications/Xcode_16.app
-          else
-            sudo xcode-select -s /Applications/Xcode_15.app
-          fi
-
       - name: Swift version
         run: swift --version
 
