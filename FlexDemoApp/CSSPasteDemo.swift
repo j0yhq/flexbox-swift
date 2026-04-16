@@ -21,6 +21,7 @@ private let canvasPresets: [CanvasPreset] = [
     CanvasPreset(label: "375",   icon: "iphone",                        width: 375),
 ]
 
+@MainActor
 struct CSSPasteDemo: View {
 
     @State private var cssText:      String      = initialCSSText
@@ -308,7 +309,7 @@ struct CSSPasteDemo: View {
 
     // MARK: - Screenshot capture
 
-    @MainActor private func captureRenderedImage() {
+    private func captureRenderedImage() {
         let renderedView = CSSRendererView(css: parsed, colorOffset: 0, fallbackCount: itemCount)
             .frame(
                 width:     canvasWidth ?? 800,
