@@ -138,6 +138,15 @@ public struct CSSLayout: View {
         // Capture the handler map locally so the event sink closure doesn't
         // need to retain `self`.
         let handlers = eventHandlers
+        // Bubble-path plumbing: look up each node's parent to walk ancestors,
+        // and every local's handlers so `.onCSSEvent` can fire during bubble.
+        let parentByID: [String: String?] = Dictionary(
+            uniqueKeysWithValues: nodes.map { ($0.id, $0.parentID) }
+        )
+        let localsByID: [String: Component] = Dictionary(
+            uniqueKeysWithValues: locals.map { ($0.id, $0) }
+        )
+        let rootID = "root"
         let resolved = ComponentResolver.resolve(
             nodes: nodes,
             locals: locals,
@@ -150,10 +159,21 @@ public struct CSSLayout: View {
                     payload: payload,
                     propagates: propagates
                 )
-                // Bubbling terminates at the root: a non-propagating event
-                // is treated as target-only. Phase 2 has no per-node handler
-                // registry yet, so "target-only" is observable as "nothing
-                // fires"; local `.onCSSEvent` handlers will hook in here.
+                // Bubble phase: visit source first, then each ancestor up to
+                // (but excluding) the root. Each local along the way may
+                // carry a matching `.onCSSEvent` handler. A non-propagating
+                // event only fires at the target.
+                var cursor: String? = sourceID
+                var visited: Set<String> = []
+                while let id = cursor, id != rootID, visited.insert(id).inserted {
+                    if let local = localsByID[id],
+                       let handler = local.handlers[name] {
+                        handler(event)
+                    }
+                    if !propagates { break }
+                    cursor = parentByID[id] ?? nil
+                }
+                // Root handlers are the terminal stop of the bubble phase.
                 if propagates {
                     handlers[name]?(event)
                     // Wildcard fires after the named handler so specific

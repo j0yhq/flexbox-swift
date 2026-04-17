@@ -237,6 +237,123 @@ final class CSSLayoutIntegrationTests: XCTestCase {
         XCTAssertFalse(wildFired)
     }
 
+    // MARK: - Local .onCSSEvent modifier (Phase 2)
+
+    func testLocalOnCSSEventFiresOnAncestorBubble() {
+        // "child" emits a bubbling event; its ancestor "parent" is a local
+        // with an `.onCSSEvent("tap")` handler — the handler must fire and
+        // see the original source id.
+        let registry = ComponentRegistry()
+        registry.register("emitter") { _, events in
+            events.emit("tap", payload: ["from": "child"])
+            return AnyView(EmptyView())
+        }
+
+        let payload = CSSPayload(
+            css: "",
+            schema: [
+                SchemaEntry(id: "parent"),
+                SchemaEntry(id: "child", type: "emitter", parentID: "parent"),
+            ]
+        )
+
+        var received: CSSEvent?
+        let layout = CSSLayout(payload: payload, registry: registry) {
+            Component("parent") { EmptyView() }
+                .onCSSEvent("tap") { event in received = event }
+        }
+
+        _ = layout.body
+        XCTAssertEqual(received?.name, "tap")
+        XCTAssertEqual(received?.sourceID, "child")
+        XCTAssertEqual(received?.payload["from"], "child")
+    }
+
+    func testLocalOnCSSEventRespectsNonPropagatingEvent() {
+        // `propagates: false` means ancestor handlers are skipped — only the
+        // target would fire, and the target here is a registry node with no
+        // local handler, so nothing observable happens.
+        let registry = ComponentRegistry()
+        registry.register("emitter") { _, events in
+            events.emit("tap", payload: [:], propagates: false)
+            return AnyView(EmptyView())
+        }
+
+        let payload = CSSPayload(
+            css: "",
+            schema: [
+                SchemaEntry(id: "parent"),
+                SchemaEntry(id: "child", type: "emitter", parentID: "parent"),
+            ]
+        )
+
+        var ancestorFired = false
+        var rootFired = false
+        let layout = CSSLayout(payload: payload, registry: registry) {
+            Component("parent") { EmptyView() }
+                .onCSSEvent("tap") { _ in ancestorFired = true }
+        }
+        .onEvent("tap") { _ in rootFired = true }
+
+        _ = layout.body
+        XCTAssertFalse(ancestorFired)
+        XCTAssertFalse(rootFired)
+    }
+
+    func testLocalOnCSSEventBubbleReachesRootToo() {
+        // Bubble must continue all the way to the root `onEvent` after any
+        // intermediate `.onCSSEvent` handlers fire.
+        let registry = ComponentRegistry()
+        registry.register("emitter") { _, events in
+            events.emit("tap", payload: [:])
+            return AnyView(EmptyView())
+        }
+
+        let payload = CSSPayload(
+            css: "",
+            schema: [
+                SchemaEntry(id: "parent"),
+                SchemaEntry(id: "child", type: "emitter", parentID: "parent"),
+            ]
+        )
+
+        var order: [String] = []
+        let layout = CSSLayout(payload: payload, registry: registry) {
+            Component("parent") { EmptyView() }
+                .onCSSEvent("tap") { _ in order.append("parent") }
+        }
+        .onEvent("tap") { _ in order.append("root") }
+
+        _ = layout.body
+        XCTAssertEqual(order, ["parent", "root"])
+    }
+
+    func testLocalOnCSSEventOnlyFiresForMatchingName() {
+        // An `.onCSSEvent("tap")` handler must ignore unrelated event names.
+        let registry = ComponentRegistry()
+        registry.register("emitter") { _, events in
+            events.emit("change", payload: [:])
+            return AnyView(EmptyView())
+        }
+
+        let payload = CSSPayload(
+            css: "",
+            schema: [
+                SchemaEntry(id: "parent"),
+                SchemaEntry(id: "child", type: "emitter", parentID: "parent"),
+            ]
+        )
+
+        var tapFired = false
+        let layout = CSSLayout(payload: payload, registry: registry) {
+            Component("parent") { EmptyView() }
+                .onCSSEvent("tap") { _ in tapFired = true }
+        }
+
+        _ = layout.body
+        XCTAssertFalse(tapFired)
+    }
+
     // MARK: - Diagnostics hook
 
     func testOnDiagnosticReceivesWarnings() {
