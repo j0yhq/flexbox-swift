@@ -37,7 +37,7 @@ jobs:
         run: |
           xcrun docc convert Sources/FlexLayout/FlexLayout.docc \
             --transform-for-static-hosting \
-            --hosting-base-path flex-layout \
+            --hosting-base-path flexbox-swift \
             --additional-symbol-graph-dir /tmp/flex-symbols \
             --output-path /tmp/FlexLayoutDocs
 
@@ -49,12 +49,12 @@ jobs:
           <html>
             <head>
               <meta charset="utf-8">
-              <meta http-equiv="refresh" content="0; url=/flex-layout/documentation/flexlayout">
+              <meta http-equiv="refresh" content="0; url=/flexbox-swift/documentation/flexlayout">
               <title>FlexLayout – redirecting…</title>
             </head>
             <body>
-              <p>Redirecting to <a href="/flex-layout/documentation/flexlayout">documentation</a>…</p>
-              <script>window.location.replace("/flex-layout/documentation/flexlayout")</script>
+              <p>Redirecting to <a href="/flexbox-swift/documentation/flexlayout">documentation</a>…</p>
+              <script>window.location.replace("/flexbox-swift/documentation/flexlayout")</script>
             </body>
           </html>
           REDIRECT
