@@ -1,0 +1,7 @@
+#root { display: flex; flex-direction: row; flex-wrap: wrap; align-content: flex-start; gap: 0; }
+#a { flex-basis: 160px; flex-shrink: 0; height: 100px; }
+#b { flex-basis: 160px; flex-shrink: 0; height: 100px; }
+#c { flex-basis: 160px; flex-shrink: 0; height: 100px; }
+#d { flex-basis: 160px; flex-shrink: 0; height: 100px; }
+#e { flex-basis: 160px; flex-shrink: 0; height: 100px; }
+#f { flex-basis: 160px; flex-shrink: 0; height: 100px; }

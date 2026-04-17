@@ -1,0 +1,7 @@
+{
+  "container": [800, 100],
+  "expected": [
+    {"id": "sidebar", "frame": [0,   0, 240, 100]},
+    {"id": "main",    "frame": [240, 0, 560, 100]}
+  ]
+}

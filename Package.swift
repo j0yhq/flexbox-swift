@@ -63,7 +63,8 @@ let package = Package(
         .testTarget(
             name: "CSSLayoutTests",
             dependencies: ["CSSLayout", "FlexLayout"],
-            path: "Tests/CSSLayoutTests"
+            path: "Tests/CSSLayoutTests",
+            resources: [.copy("Fixtures")]
         ),
     ]
 )
