@@ -1,7 +1,8 @@
 // CSSEvent — the envelope delivered to `onEvent` handlers.
 //
-// Phase 1 keeps the shape minimal: name, source id, and a string-keyed
-// payload. `propagates` and bubbling are Phase 2.
+// Phase 1 delivered the minimum: name, source id, string-keyed payload.
+// Phase 2 adds `propagates` so a handler can stop the event from bubbling
+// further up the component tree. Defaults to `true` (DOM convention).
 
 import Foundation
 
@@ -15,10 +16,21 @@ public struct CSSEvent: Equatable {
     /// Key/value payload. Phase 1 restricts this to strings to match
     /// `ComponentProps`.
     public let payload: [String: String]
+    /// When `true` (the default) the dispatcher walks ancestor nodes looking
+    /// for additional handlers after firing the handler at the source. Set to
+    /// `false` in a factory to emit an event that only reaches the node that
+    /// owns the component (Phase 2).
+    public let propagates: Bool
 
-    public init(name: String, sourceID: String, payload: [String: String] = [:]) {
+    public init(
+        name: String,
+        sourceID: String,
+        payload: [String: String] = [:],
+        propagates: Bool = true
+    ) {
         self.name = name
         self.sourceID = sourceID
         self.payload = payload
+        self.propagates = propagates
     }
 }
