@@ -45,7 +45,7 @@ let package = Package(
         // ── Demo app (not a library product; local development only) ───────────
         .executableTarget(
             name: "FlexDemoApp",
-            dependencies: ["FlexLayout"],
+            dependencies: ["FlexLayout", "CSSLayout"],
             path: "FlexDemoApp"
         ),
 
