@@ -9,7 +9,7 @@ final class SelectorParserTests: XCTestCase {
 
     // MARK: Helpers
 
-    private func parse(_ s: String) -> (SimpleSelector?, CSSDiagnostics) {
+    private func parse(_ s: String) -> (CompoundSelector?, CSSDiagnostics) {
         var diags = CSSDiagnostics()
         let result = SelectorParser.parse(s, diagnostics: &diags)
         return (result, diags)
@@ -121,7 +121,7 @@ final class SelectorParserTests: XCTestCase {
     /// `parseList` is the grouping-aware entry point used by `RuleParser`. The
     /// single-selector `parse` function still rejects a comma prelude outright,
     /// so only `parseList` expands a group into multiple selectors.
-    private func parseList(_ s: String) -> ([SimpleSelector], CSSDiagnostics) {
+    private func parseList(_ s: String) -> ([CompoundSelector], CSSDiagnostics) {
         var diags = CSSDiagnostics()
         let result = SelectorParser.parseList(s, diagnostics: &diags)
         return (result, diags)
@@ -163,5 +163,64 @@ final class SelectorParserTests: XCTestCase {
         let (list, diags) = parseList("")
         XCTAssertEqual(list, [])
         XCTAssertEqual(diags.warnings.count, 0)
+    }
+
+    // MARK: - Compound selectors (Phase 2)
+
+    func testParsesCompoundElementAndClass() {
+        let (sel, diags) = parse("button.primary")
+        XCTAssertEqual(sel, CompoundSelector([.element("button"), .class("primary")]))
+        XCTAssertEqual(diags.warnings.count, 0)
+    }
+
+    func testParsesCompoundElementClassID() {
+        let (sel, _) = parse("button.primary#submit")
+        XCTAssertEqual(sel, CompoundSelector([
+            .element("button"), .class("primary"), .id("submit"),
+        ]))
+    }
+
+    func testParsesCompoundMultipleClasses() {
+        let (sel, _) = parse(".a.b.c")
+        XCTAssertEqual(sel, CompoundSelector([.class("a"), .class("b"), .class("c")]))
+    }
+
+    func testParsesCompoundIDThenClass() {
+        let (sel, _) = parse("#submit.primary")
+        XCTAssertEqual(sel, CompoundSelector([.id("submit"), .class("primary")]))
+    }
+
+    func testRejectsEmptyIdentAfterMarker() {
+        // `#` / `.` with no ident following is invalid; no diagnostic (we
+        // already classify the malformed selector as "couldn't parse").
+        let (sel1, _) = parse("#")
+        XCTAssertNil(sel1)
+        let (sel2, _) = parse(".")
+        XCTAssertNil(sel2)
+        let (sel3, _) = parse("button#")
+        XCTAssertNil(sel3)
+    }
+
+    // MARK: - Compound specificity
+
+    func testSpecificityOfCompoundSumsContributions() {
+        let compound = CompoundSelector([
+            .element("button"), .class("primary"), .id("submit"),
+        ])
+        XCTAssertEqual(Specificity.of(compound), Specificity(a: 0, b: 1, c: 1, d: 1))
+    }
+
+    func testSpecificityOfMultipleClasses() {
+        let compound = CompoundSelector([.class("a"), .class("b"), .class("c")])
+        XCTAssertEqual(Specificity.of(compound), Specificity(a: 0, b: 0, c: 3, d: 0))
+    }
+
+    func testSpecificityOfSingleCompoundMatchesSimple() {
+        // A compound of length one carries the same specificity as the bare
+        // simple selector it wraps.
+        XCTAssertEqual(
+            Specificity.of(CompoundSelector([.id("a")])),
+            Specificity.of(part: .id("a"))
+        )
     }
 }

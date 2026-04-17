@@ -25,7 +25,7 @@ import Foundation
 public enum SelectorParser {
 
     /// Parse a **selector list** — `sel, sel, …` — into the sequence of
-    /// individual simple selectors it expands to.
+    /// compound selectors it expands to.
     ///
     /// Grouping is a prelude-level construct: `#a, #b { flex: 1; }` produces
     /// two rules sharing the same declarations. This helper is the entry point
@@ -38,8 +38,8 @@ public enum SelectorParser {
     public static func parseList(
         _ source: String,
         diagnostics: inout CSSDiagnostics
-    ) -> [SimpleSelector] {
-        var result: [SimpleSelector] = []
+    ) -> [CompoundSelector] {
+        var result: [CompoundSelector] = []
         for part in source.split(separator: ",", omittingEmptySubsequences: false) {
             let trimmed = part.trimmingCharacters(in: .whitespacesAndNewlines)
             if trimmed.isEmpty { continue }           // tolerate `,,` and trailing `,`
@@ -50,18 +50,19 @@ public enum SelectorParser {
         return result
     }
 
-    /// Parse `source` as a simple selector.
+    /// Parse `source` as a **compound selector** — a chain of simple
+    /// selectors on the same subject, e.g. `button.primary#submit`.
     ///
     /// - Parameters:
     ///   - source: The raw selector text (between `<css>{` and the `{`).
     ///   - diagnostics: Accumulator; one warning is appended per unsupported
     ///     selector shape.
-    /// - Returns: The parsed ``SimpleSelector``, or `nil` if the input is
+    /// - Returns: The parsed ``CompoundSelector``, or `nil` if the input is
     ///   empty, malformed, or uses unsupported CSS.
     public static func parse(
         _ source: String,
         diagnostics: inout CSSDiagnostics
-    ) -> SimpleSelector? {
+    ) -> CompoundSelector? {
         let trimmed = source.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return nil }
 
@@ -93,28 +94,49 @@ public enum SelectorParser {
             return nil
         }
 
-        // Simple selector parse: look at the first character.
+        // Compound selector parse — scan a chain of simple selectors.
+        //
+        // Grammar (per CSS Selectors Level 3, reduced):
+        //   compound := element? (hash | klass)*
+        //   element  := ident
+        //   hash     := '#' ident
+        //   klass    := '.' ident
+        //
+        // A second bare element would need a combinator to be meaningful; the
+        // descendant-combinator / whitespace check above already rejects it.
+
         let scalars = Array(trimmed.unicodeScalars)
-        let first = scalars[0]
+        var i = 0
+        var parts: [SimpleSelector] = []
 
-        if first == "#" {
-            let name = String(String.UnicodeScalarView(scalars.dropFirst()))
-            guard isValidIdent(name) else { return nil }
-            return .id(name)
-        }
-        if first == "." {
-            let name = String(String.UnicodeScalarView(scalars.dropFirst()))
-            guard isValidIdent(name) else { return nil }
-            return .class(name)
-        }
-        if isIdentStart(first) {
-            guard isValidIdent(trimmed) else { return nil }
-            return .element(trimmed)
+        // Optional leading element selector. The first char being an ident
+        // starter means we pick up a type selector; `#` / `.` skip straight
+        // to the hash/class loop.
+        if i < scalars.count, isIdentStart(scalars[i]) {
+            let start = i
+            while i < scalars.count, isIdentContinue(scalars[i]) { i += 1 }
+            parts.append(.element(
+                String(String.UnicodeScalarView(scalars[start..<i]))
+            ))
         }
 
-        // Anything else (numbers leading, `*` universal, `&` nesting, etc.)
-        // isn't supported in Phase 1 and isn't worth a specialized warning.
-        return nil
+        // Zero or more `#ident` / `.ident` parts.
+        while i < scalars.count {
+            let marker = scalars[i]
+            guard marker == "#" || marker == "." else {
+                // Anything other than a hash/class marker here is malformed.
+                return nil
+            }
+            i += 1
+            let start = i
+            while i < scalars.count, isIdentContinue(scalars[i]) { i += 1 }
+            guard start < i else { return nil }           // empty ident after marker
+            let name = String(String.UnicodeScalarView(scalars[start..<i]))
+            parts.append(marker == "#" ? .id(name) : .class(name))
+        }
+
+        guard !parts.isEmpty else { return nil }
+        return CompoundSelector(parts)
     }
 
     // MARK: - Character classes (mirror CSSTokenizer's rules)

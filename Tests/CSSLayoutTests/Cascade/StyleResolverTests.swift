@@ -108,6 +108,39 @@ final class StyleResolverTests: XCTestCase {
         XCTAssertEqual(style.item.grow, 5)
     }
 
+    // MARK: - Compound selectors (Phase 2)
+
+    func testCompoundSelectorMatchesOnlyWhenAllPartsMatch() {
+        // `button.primary#submit` matches iff schemaType=="button" AND
+        // classes contains "primary" AND id=="submit".
+        let css = "button.primary#submit { flex-grow: 7; }"
+        let (match, _)  = resolve(css,
+                                  id: "submit", schemaType: "button",
+                                  classes: ["primary"])
+        XCTAssertEqual(match.item.grow, 7)
+
+        // Drop any one part → the rule no longer matches.
+        let (miss1, _) = resolve(css, id: "submit", schemaType: "button",
+                                 classes: [])
+        XCTAssertEqual(miss1.item.grow, 0)
+        let (miss2, _) = resolve(css, id: "other",  schemaType: "button",
+                                 classes: ["primary"])
+        XCTAssertEqual(miss2.item.grow, 0)
+        let (miss3, _) = resolve(css, id: "submit", schemaType: "input",
+                                 classes: ["primary"])
+        XCTAssertEqual(miss3.item.grow, 0)
+    }
+
+    func testCompoundSelectorSpecificityBeatsBareID() {
+        // `#submit` (0,1,0,0) vs `button#submit.primary` (0,1,1,1) — compound
+        // wins even though it appears first.
+        let (style, _) = resolve("""
+            button#submit.primary { flex-grow: 9; }
+            #submit               { flex-grow: 1; }
+        """, id: "submit", schemaType: "button", classes: ["primary"])
+        XCTAssertEqual(style.item.grow, 9)
+    }
+
     func testIDBeatsElement() {
         let (style, _) = resolve("""
             button { flex-grow: 1; }

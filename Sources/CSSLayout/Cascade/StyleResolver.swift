@@ -41,12 +41,15 @@ public enum StyleResolver {
         stylesheet: Stylesheet,
         diagnostics: inout CSSDiagnostics
     ) -> ComputedStyle {
-        // 1. Select matching rules.
+        // 1. Select matching rules. A compound selector matches iff **every**
+        // part matches the node — a single dissenter rejects the whole rule.
         let matched = stylesheet.rules.filter { rule in
-            switch rule.selector {
-            case .id(let name):      return name == id
-            case .element(let name): return name == schemaType
-            case .class(let name):   return classes.contains(name)
+            rule.selector.parts.allSatisfy { part in
+                switch part {
+                case .id(let name):      return name == id
+                case .element(let name): return name == schemaType
+                case .class(let name):   return classes.contains(name)
+                }
             }
         }
 

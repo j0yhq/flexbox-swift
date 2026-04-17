@@ -9,8 +9,10 @@ import Foundation
 
 /// One parsed CSS rule.
 public struct CSSRule: Equatable {
-    /// The (Phase 1: simple) selector this rule matches against.
-    public let selector: SimpleSelector
+    /// The compound selector this rule matches against. A bare `#a` is stored
+    /// as a compound of length one; `button.primary#submit` is stored as a
+    /// three-part compound whose specificity sums to (0,1,1,1).
+    public let selector: CompoundSelector
     /// Declarations in source order. Unsupported properties have already
     /// been filtered out by ``DeclarationParser``.
     public let declarations: [Declaration]
@@ -20,7 +22,7 @@ public struct CSSRule: Equatable {
     public let sourceOrder: Int
 
     public init(
-        selector: SimpleSelector,
+        selector: CompoundSelector,
         declarations: [Declaration],
         specificity: Specificity,
         sourceOrder: Int
