@@ -169,6 +169,74 @@ final class CSSLayoutIntegrationTests: XCTestCase {
         XCTAssertTrue(rootFired)
     }
 
+    // MARK: - Wildcard handler (Phase 2)
+
+    func testWildcardHandlerReceivesEveryEvent() {
+        let registry = ComponentRegistry()
+        registry.register("multi") { _, events in
+            events.emit("submit", payload: [:])
+            events.emit("tap",    payload: [:])
+            events.emit("change", payload: [:])
+            return AnyView(EmptyView())
+        }
+
+        let payload = CSSPayload(
+            css: "",
+            schema: [SchemaEntry(id: "x", type: "multi")]
+        )
+
+        var seen: [String] = []
+        let layout = CSSLayout(payload: payload, registry: registry)
+            .onEvent("*") { event in seen.append(event.name) }
+
+        _ = layout.body
+        XCTAssertEqual(seen, ["submit", "tap", "change"])
+    }
+
+    func testWildcardFiresAlongsideNamedHandler() {
+        // Named + wildcard both fire; named before wildcard.
+        let registry = ComponentRegistry()
+        registry.register("one") { _, events in
+            events.emit("submit", payload: [:])
+            return AnyView(EmptyView())
+        }
+
+        let payload = CSSPayload(
+            css: "",
+            schema: [SchemaEntry(id: "x", type: "one")]
+        )
+
+        var order: [String] = []
+        let layout = CSSLayout(payload: payload, registry: registry)
+            .onEvent("submit") { _ in order.append("named") }
+            .onEvent("*")      { _ in order.append("wild")  }
+
+        _ = layout.body
+        XCTAssertEqual(order, ["named", "wild"])
+    }
+
+    func testWildcardIgnoresNonPropagatingEvents() {
+        // `propagates: false` means root-level handlers (including `*`) are
+        // skipped — the wildcard is a root-level convenience, not a sniffer.
+        let registry = ComponentRegistry()
+        registry.register("silent") { _, events in
+            events.emit("tap", payload: [:], propagates: false)
+            return AnyView(EmptyView())
+        }
+
+        let payload = CSSPayload(
+            css: "",
+            schema: [SchemaEntry(id: "x", type: "silent")]
+        )
+
+        var wildFired = false
+        let layout = CSSLayout(payload: payload, registry: registry)
+            .onEvent("*") { _ in wildFired = true }
+
+        _ = layout.body
+        XCTAssertFalse(wildFired)
+    }
+
     // MARK: - Diagnostics hook
 
     func testOnDiagnosticReceivesWarnings() {

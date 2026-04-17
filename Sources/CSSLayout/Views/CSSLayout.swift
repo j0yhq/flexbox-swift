@@ -79,8 +79,10 @@ public struct CSSLayout: View {
     /// Register a handler for events named `name`. Returns a new view — chain
     /// multiple calls to register for different names.
     ///
-    /// Phase 1: no `"*"` catch-all, no event bubbling. Only the exact name
-    /// matches. Later calls with the same name overwrite the earlier handler.
+    /// Pass `"*"` to register a catch-all that fires for every propagating
+    /// event after the named handler (if any). Later calls with the same name
+    /// overwrite the earlier handler. Non-propagating events (emitted with
+    /// `propagates: false`) bypass both named and wildcard handlers.
     public func onEvent(_ name: String, _ handler: @escaping (CSSEvent) -> Void) -> CSSLayout {
         var copy = self
         copy.eventHandlers[name] = handler
@@ -154,6 +156,9 @@ public struct CSSLayout: View {
                 // fires"; local `.onCSSEvent` handlers will hook in here.
                 if propagates {
                     handlers[name]?(event)
+                    // Wildcard fires after the named handler so specific
+                    // logic (which may modify state) runs before the sniffer.
+                    if name != "*" { handlers["*"]?(event) }
                 }
             },
             diagnostics: &diagnostics
