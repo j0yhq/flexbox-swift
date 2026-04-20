@@ -140,12 +140,16 @@ public struct CSSLayout: View {
         let handlers = eventHandlers
         // Bubble-path plumbing: look up each node's parent to walk ancestors,
         // and every local's handlers so `.onCSSEvent` can fire during bubble.
-        let parentByID: [String: String?] = Dictionary(
-            uniqueKeysWithValues: nodes.map { ($0.id, $0.parentID) }
-        )
-        let localsByID: [String: Component] = Dictionary(
-            uniqueKeysWithValues: locals.map { ($0.id, $0) }
-        )
+        // Both dictionaries use a tolerant init (`[key] = value` in a loop)
+        // so adversarial payloads with duplicate ids never hard-crash.
+        var parentByID: [String: String?] = [:]
+        parentByID.reserveCapacity(nodes.count)
+        for n in nodes where parentByID[n.id] == nil {
+            parentByID[n.id] = n.parentID
+        }
+        var localsByID: [String: Component] = [:]
+        localsByID.reserveCapacity(locals.count)
+        for l in locals { localsByID[l.id] = l }
         let rootID = "root"
         let resolved = ComponentResolver.resolve(
             nodes: nodes,

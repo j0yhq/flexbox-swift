@@ -197,4 +197,24 @@ final class StyleTreeBuilderTests: XCTestCase {
         XCTAssertEqual(nodes[1].computedStyle.item.grow, 5)
         XCTAssertEqual(nodes[2].computedStyle.item.grow, 2)
     }
+
+    func testDuplicateSchemaIDDoesNotCrashAndDeduplicates() {
+        // Adversarial payloads may contain two entries with the same id.
+        // The builder must emit one node (first wins) and surface a warning,
+        // never crash.
+        var diags = CSSDiagnostics()
+        let sheet = CSSParser.parse("", diagnostics: &diags)
+        let nodes = StyleTreeBuilder.build(
+            rootID: "root",
+            schema: [
+                SchemaEntry(id: "a", type: "text"),
+                SchemaEntry(id: "a", type: "button"),  // duplicate id
+            ],
+            stylesheet: sheet,
+            diagnostics: &diags
+        )
+        XCTAssertEqual(nodes.map(\.id), ["root", "a"])
+        XCTAssertEqual(nodes[1].schemaType, "text", "first wins")
+        XCTAssertEqual(diags.count(of: .duplicateSchemaID("a")), 1)
+    }
 }

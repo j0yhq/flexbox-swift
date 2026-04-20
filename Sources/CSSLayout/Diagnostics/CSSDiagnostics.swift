@@ -23,6 +23,13 @@ public struct CSSWarning: Equatable {
         case unsupportedAtRule(String)
         /// A property value that couldn't be parsed.
         case invalidValue(property: String, value: String)
+        /// Two or more `Component("x")` entries were passed with the same id.
+        /// The last declaration wins; this surfaces so authors can fix the
+        /// shadowed declaration.
+        case duplicateLocalID(String)
+        /// Two or more `SchemaEntry(id: "x")` entries share an id. The first
+        /// wins for rendering; later duplicates are dropped.
+        case duplicateSchemaID(String)
         /// Any other parse-level recovery event.
         case other
     }

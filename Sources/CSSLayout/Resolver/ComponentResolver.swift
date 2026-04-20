@@ -78,10 +78,17 @@ public enum ComponentResolver {
         )
         let childNodes = nodes.dropFirst()
 
-        // Pre-index locals for O(1) lookup by id.
-        let localsByID: [String: Component] = Dictionary(
-            uniqueKeysWithValues: locals.map { ($0.id, $0) }
-        )
+        // Pre-index locals for O(1) lookup by id. Duplicates resolve to
+        // last-wins with a diagnostic so a typo in the author's locals block
+        // surfaces instead of crashing the pipeline.
+        var localsByID: [String: Component] = [:]
+        localsByID.reserveCapacity(locals.count)
+        for local in locals {
+            if localsByID[local.id] != nil {
+                diagnostics.warn(.init(.duplicateLocalID(local.id)))
+            }
+            localsByID[local.id] = local
+        }
 
         var resolved: [ResolvedChild] = []
         resolved.reserveCapacity(childNodes.count)

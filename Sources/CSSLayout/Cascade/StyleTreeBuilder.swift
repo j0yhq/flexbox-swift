@@ -34,9 +34,19 @@ public enum StyleTreeBuilder {
         stylesheet: Stylesheet,
         diagnostics: inout CSSDiagnostics
     ) -> [StyleNode] {
-        // Index schema entries by id for parent lookup.
+        // Index schema entries by id for parent lookup. First-wins on
+        // duplicates (matches the render-order invariant — later copies would
+        // be silently shadowed by earlier parent-chain lookups otherwise) and
+        // emits one diagnostic per duplicated id so authors notice.
         var byID: [String: SchemaEntry] = [:]
-        for entry in schema { byID[entry.id] = entry }
+        var seen: Set<String> = []
+        for entry in schema {
+            if seen.insert(entry.id).inserted {
+                byID[entry.id] = entry
+            } else {
+                diagnostics.warn(.init(.duplicateSchemaID(entry.id)))
+            }
+        }
 
         /// Resolve an entry's effective parent id. Missing `parentID` or one
         /// that doesn't point at another entry both fall back to root — this
@@ -84,10 +94,11 @@ public enum StyleTreeBuilder {
             computedStyle: rootStyle
         ))
 
-        // Children in schema insertion order. Each gets its ancestor chain
-        // computed independently — we deliberately don't cache parent styles
-        // because the cascade for each node is independent in this MVP.
-        for entry in schema {
+        // Children in schema insertion order, deduplicated by id so a
+        // duplicate schema entry doesn't produce two StyleNodes with the
+        // same id (which would break `parentByID` and event bubbling).
+        var emitted: Set<String> = []
+        for entry in schema where emitted.insert(entry.id).inserted {
             let ancestors = ancestorChain(of: entry)
             let style = StyleResolver.resolve(
                 id: entry.id,

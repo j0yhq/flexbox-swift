@@ -128,4 +128,27 @@ final class ComponentResolverTests: XCTestCase {
         )
         XCTAssertEqual(res.children.first?.itemStyle.grow, 2)
     }
+
+    // MARK: - Duplicate-id tolerance (robustness)
+
+    func testDuplicateLocalIDsDoNotCrashAndLastWins() {
+        // Author mistake: two `Component("a")` in the locals block. We want
+        // graceful handling — last declaration wins, no trap.
+        var marker = 0
+        let locals: [Component] = [
+            Component("a") { Color.red },
+            Component("a") { Color.blue },
+        ]
+        _ = locals  // silence "unused" when not exercised directly
+
+        let (res, diags) = resolve(
+            nodes: [rootNode(), styleNode(id: "a")],
+            locals: locals
+        )
+        marker += res.children.count
+        XCTAssertEqual(marker, 1, "one resolved child despite duplicate locals")
+        XCTAssertEqual(res.children.first?.resolution, .local)
+        // A diagnostic should surface so the author notices.
+        XCTAssertTrue(diags.warnings.contains { $0.kind == .duplicateLocalID("a") })
+    }
 }
