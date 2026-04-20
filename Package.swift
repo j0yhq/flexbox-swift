@@ -10,10 +10,14 @@ let package = Package(
         .watchOS(.v9),
     ],
     products: [
-        // The only public product — consumers add "FlexLayout" as a dependency.
+        // Public products — consumers add these as dependencies.
         .library(
             name: "FlexLayout",
             targets: ["FlexLayout"]
+        ),
+        .library(
+            name: "CSSLayout",
+            targets: ["CSSLayout"]
         ),
     ],
     targets: [
@@ -28,10 +32,20 @@ let package = Package(
             ]
         ),
 
+        // ── CSSLayout — flexbox-only CSS → FlexLayout bridge ───────────────────
+        .target(
+            name: "CSSLayout",
+            dependencies: ["FlexLayout"],
+            path: "Sources/CSSLayout",
+            swiftSettings: [
+                .unsafeFlags(["-warnings-as-errors"], .when(configuration: .release)),
+            ]
+        ),
+
         // ── Demo app (not a library product; local development only) ───────────
         .executableTarget(
             name: "FlexDemoApp",
-            dependencies: ["FlexLayout"],
+            dependencies: ["FlexLayout", "CSSLayout"],
             path: "FlexDemoApp"
         ),
 
@@ -45,6 +59,12 @@ let package = Package(
             name: "FlexDemoAppTests",
             dependencies: ["FlexDemoApp", "FlexLayout"],
             path: "Tests/FlexDemoAppTests"
+        ),
+        .testTarget(
+            name: "CSSLayoutTests",
+            dependencies: ["CSSLayout", "FlexLayout"],
+            path: "Tests/CSSLayoutTests",
+            resources: [.copy("Fixtures")]
         ),
     ]
 )

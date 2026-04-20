@@ -1,0 +1,4 @@
+#root { display: flex; flex-direction: row; gap: 0; }
+#a { flex-grow: 1; flex-basis: 0; height: 80px; }
+#b { flex-grow: 2; flex-basis: 0; height: 80px; }
+#c { flex-grow: 1; flex-basis: 0; height: 80px; }

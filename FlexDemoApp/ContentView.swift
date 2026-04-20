@@ -12,6 +12,7 @@ private struct DemoItem: Identifiable {
 
 private let allDemos: [DemoItem] = [
     DemoItem(id: "paste",    icon: "doc.text.magnifyingglass",      title: "CSS → Preview",    subtitle: "paste any flex CSS"),
+    DemoItem(id: "csslayout",icon: "rectangle.and.text.magnifyingglass", title: "CSSLayout Form", subtitle: "10-field server-driven demo"),
     DemoItem(id: "sandbox",  icon: "slider.horizontal.3",           title: "Sandbox",          subtitle: "all properties live"),
     DemoItem(id: "hero",     icon: "rectangle.center.inset.filled", title: "Centered Hero",    subtitle: "column · center · gap"),
     DemoItem(id: "navbar",   icon: "menubar.rectangle",             title: "Navigation Bar",   subtitle: "row · space-between"),
@@ -71,6 +72,7 @@ struct ContentView: View {
             Group {
                 switch selectedId {
                 case "paste":   CSSPasteDemo()
+                case "csslayout": ResponsivePreview { CSSLayoutDemo() }
                 case "hero":    CenteredHeroDemo()
                 case "navbar":  NavBarDemo()
                 case "grid":    CardGridDemo()

@@ -1,0 +1,4 @@
+#root { display: flex; flex-direction: row; align-items: flex-end; gap: 0; }
+#a { width: 60px; height: 50px; flex-shrink: 0; }
+#b { width: 60px; height: 50px; flex-shrink: 0; align-self: flex-start; }
+#c { width: 60px; height: 50px; flex-shrink: 0; }
