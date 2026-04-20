@@ -481,4 +481,51 @@ final class StyleResolverTests: XCTestCase {
         XCTAssertFalse(style.isDisplayNone)
         XCTAssertEqual(style.display, .flex)
     }
+
+    // MARK: - `visibility: hidden` (Phase 2)
+
+    /// Unlike `display: none`, `visibility: hidden` keeps the node in the
+    /// layout (it still reserves space) but hides its painted content. We
+    /// track it as a separate flag on ComputedStyle so the resolver can
+    /// wrap the node's view in `.hidden()` without removing it from the
+    /// flex tree.
+    func testVisibilityHiddenSetsFlagWithoutWarning() {
+        let (style, diags) = resolve("#a { visibility: hidden; }")
+        XCTAssertTrue(style.isVisibilityHidden)
+        XCTAssertFalse(style.isDisplayNone,
+                       "visibility:hidden must NOT set the display:none flag")
+        XCTAssertEqual(
+            diags.count(of: .invalidValue(property: "visibility", value: "hidden")),
+            0
+        )
+        XCTAssertFalse(
+            diags.warnings.contains { $0.kind == .unsupportedProperty("visibility") }
+        )
+    }
+
+    /// `visibility: visible` is the default and must clear a prior
+    /// `hidden` so the cascade stays last-wins.
+    func testLaterVisibilityVisibleClearsHiddenFlag() {
+        let (style, _) = resolve("""
+            #a { visibility: hidden; }
+            #a { visibility: visible; }
+        """)
+        XCTAssertFalse(style.isVisibilityHidden)
+    }
+
+    /// Unknown values (e.g. `collapse`, which applies only to table rows
+    /// in CSS 2.1) are rejected with an `.invalidValue` diagnostic and do
+    /// not clobber a prior valid value.
+    func testInvalidVisibilityValueDoesNotClobberEarlierValidValue() {
+        let (style, diags) = resolve("""
+            #a { visibility: hidden; }
+            #a { visibility: collapse; }
+        """)
+        XCTAssertTrue(style.isVisibilityHidden,
+                      "invalid visibility value must not reset the flag")
+        XCTAssertEqual(
+            diags.count(of: .invalidValue(property: "visibility", value: "collapse")),
+            1
+        )
+    }
 }

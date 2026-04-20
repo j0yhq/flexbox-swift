@@ -229,6 +229,38 @@ final class ComponentResolverTests: XCTestCase {
         XCTAssertEqual(res.children.map(\.id), ["b"])
     }
 
+    /// Unlike `display: none`, `visibility: hidden` keeps the node in
+    /// the layout — it reserves space, only its paint is suppressed.
+    /// The resolver therefore must NOT filter it out, and the flag must
+    /// reach `ResolvedChild` so the render layer can apply `.hidden()`.
+    private func hiddenVisibilityStyle() -> ComputedStyle {
+        var s = ComputedStyle()
+        s.isVisibilityHidden = true
+        return s
+    }
+
+    func testVisibilityHiddenNodeIsPreservedInTree() {
+        let node = StyleNode(id: "a", schemaType: nil,
+                             computedStyle: hiddenVisibilityStyle())
+        let (res, _) = resolve(nodes: [rootNode(), node, styleNode(id: "b")])
+        XCTAssertEqual(res.children.map(\.id), ["a", "b"],
+                       "visibility:hidden nodes keep their layout slot")
+        XCTAssertTrue(res.children[0].isVisibilityHidden)
+    }
+
+    func testVisibilityHiddenDoesNotRemoveDescendants() {
+        let hiddenParent = StyleNode(id: "row", schemaType: nil,
+                                     computedStyle: hiddenVisibilityStyle())
+        let (res, _) = resolve(nodes: [
+            rootNode(),
+            hiddenParent,
+            styleNode(id: "a", parentID: "row"),
+        ])
+        XCTAssertEqual(res.children.map(\.id), ["row"])
+        XCTAssertEqual(res.children[0].nested.map(\.id), ["a"],
+                       "visibility:hidden must NOT prune descendants (CSS §11.2)")
+    }
+
     /// CSS `display: none` removes the node's whole subtree, not just the
     /// node itself — children of a hidden node must not render either.
     func testDisplayNoneRemovesDescendantSubtree() {

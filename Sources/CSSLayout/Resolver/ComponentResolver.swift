@@ -38,6 +38,9 @@ public struct ResolvedChild {
     public let resolution: Resolution
     public let view: AnyView
     public let nested: [ResolvedChild]
+    /// Mirrors `ComputedStyle.isVisibilityHidden`. When true the render
+    /// layer wraps this child in `.hidden()` — the flex slot stays.
+    public let isVisibilityHidden: Bool
 
     /// True iff the node has at least one schema-declared child; such nodes
     /// render as a nested `FlexLayout` wrapping ``nested`` and the factory's
@@ -50,7 +53,8 @@ public struct ResolvedChild {
         containerStyle: FlexContainerConfig = FlexContainerConfig(),
         resolution: Resolution,
         view: AnyView,
-        nested: [ResolvedChild] = []
+        nested: [ResolvedChild] = [],
+        isVisibilityHidden: Bool = false
     ) {
         self.id = id
         self.itemStyle = itemStyle
@@ -58,6 +62,7 @@ public struct ResolvedChild {
         self.resolution = resolution
         self.view = view
         self.nested = nested
+        self.isVisibilityHidden = isVisibilityHidden
     }
 }
 

@@ -151,4 +151,20 @@ final class DeclarationParserTests: XCTestCase {
         XCTAssertEqual(decls.count, 16)
         XCTAssertEqual(diags.warnings.count, 0)
     }
+
+    // MARK: - `visibility` (Phase 2 — see CSSLayout-Design.md §10 Phase 2)
+
+    /// `visibility` is a Phase-2 supported property per the design doc.
+    /// The allow-list must accept it without emitting an
+    /// `.unsupportedProperty` diagnostic.
+    func testVisibilityDeclarationIsAccepted() {
+        let (decls, diags) = parse("visibility: hidden;")
+        XCTAssertEqual(decls.count, 1)
+        XCTAssertEqual(decls.first?.property, "visibility")
+        XCTAssertEqual(decls.first?.value, "hidden")
+        XCTAssertFalse(
+            diags.warnings.contains { $0.kind == .unsupportedProperty("visibility") },
+            "visibility must not be reported as unsupported once Phase 2 ships"
+        )
+    }
 }

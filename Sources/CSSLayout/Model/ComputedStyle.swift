@@ -53,5 +53,12 @@ public struct ComputedStyle: Equatable {
     /// flagged nodes out before any view is produced.
     public var isDisplayNone: Bool = false
 
+    /// `visibility: hidden` keeps the element in layout (it still reserves
+    /// space) but suppresses its paint. Carried as a flag on ComputedStyle
+    /// so the resolver can forward it to `ResolvedChild`, which in turn
+    /// lets the render layer apply SwiftUI's `.hidden()` without touching
+    /// the flex tree.
+    public var isVisibilityHidden: Bool = false
+
     public init() {}
 }
