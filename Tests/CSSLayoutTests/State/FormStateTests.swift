@@ -114,15 +114,34 @@ final class FormStateTests: XCTestCase {
         XCTAssertEqual(fired, 0, "no publish expected when value is unchanged")
     }
 
-    /// Prune publishes only when it actually removed at least one path.
-    func testPrunePublishesOnlyWhenItRemovesPaths() {
+    /// `prune` must never fire `objectWillChange`, whether it removes paths
+    /// or not. Prune is internal bookkeeping that `CSSLayout.renderSnapshot`
+    /// calls *during* SwiftUI view composition to drop orphaned paths; if
+    /// it published, SwiftUI would log
+    ///
+    ///   "Publishing changes from within view updates is not allowed"
+    ///
+    /// and the render order would be undefined. Pruned paths are by
+    /// definition ones whose binding factory is gone from the tree, so no
+    /// observer needs a re-render.
+    func testPruneDoesNotPublish() {
         let state = FormState(values: ["a": "1", "b": "2"])
         var fired = 0
         let bag = state.objectWillChange.sink { fired += 1 }
         state.prune(keeping: ["a", "b"])   // nothing to remove
-        XCTAssertEqual(fired, 0)
+        XCTAssertEqual(fired, 0, "no-op prune must not publish")
         state.prune(keeping: ["a"])        // drops b
         bag.cancel()
-        XCTAssertEqual(fired, 1)
+        XCTAssertEqual(fired, 0, "removing prune must not publish either — it runs during render")
+    }
+
+    /// Prune is still observably correct: after a removing prune, the
+    /// dropped path is gone and kept paths remain unchanged. The publish
+    /// contract changed; the data contract did not.
+    func testPruneStillRemovesOrphanPathsWithoutPublishing() {
+        let state = FormState(values: ["a": "1", "b": "2", "c": "3"])
+        state.prune(keeping: ["a", "c"])
+        XCTAssertEqual(state.snapshot(), ["a": "1", "c": "3"])
+        XCTAssertNil(state.get("b"))
     }
 }
