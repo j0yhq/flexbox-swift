@@ -7,9 +7,13 @@
 // production, a plain local value in tests/previews); factories remain
 // oblivious.
 //
-// Stub note: the red commit returns `.constant("")` from `binding(_:)`
-// unconditionally. The matching green commit will delegate to an injected
-// resolver so `FormState` can own the storage.
+// The `binding(_:)` implementation delegates to an injected `BindingResolver`
+// closure. In production that closure is built by `ComponentResolver`, which
+// closes over `FormState` and the current node's props so `binding("value")`
+// resolves to the correct FormState path. When no resolver is wired (test,
+// preview, or a factory whose schema didn't declare a binding), the method
+// falls back to `Binding.constant("")` — factories don't have to branch on
+// whether the surrounding payload is participating.
 
 import Foundation
 import SwiftUI
@@ -62,10 +66,11 @@ public struct ComponentEvents {
         sink?(name, payload, propagates)
     }
 
-    /// Return a `Binding<String>` for `field`. Red stub always returns a
-    /// dead binding; the green commit will delegate to `bindingResolver`.
+    /// Return a `Binding<String>` for `field`. If a resolver is installed
+    /// it is called with the verbatim field name; otherwise a dead binding
+    /// (`Binding.constant("")`) is returned so factories don't have to
+    /// branch on whether the surrounding payload wired them up.
     public func binding(_ field: String) -> Binding<String> {
-        _ = field
-        return .constant("")
+        bindingResolver?(field) ?? .constant("")
     }
 }
