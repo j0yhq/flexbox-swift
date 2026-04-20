@@ -36,7 +36,14 @@ struct FormStateDemo: View {
 
     /// Actor-isolated cache of "server" payloads. Keyed by the version
     /// string the demo knows (could be an ETag in a real app).
-    private let cache = CSSPayloadCache(capacity: 4)
+    ///
+    /// Must be `@State`, not `let`: a SwiftUI `View` is a value type and
+    /// gets reconstructed on every parent re-render. A plain `let cache`
+    /// would rebuild a fresh empty cache on each reconstruction,
+    /// defeating the whole point of the demo — hits would never
+    /// accumulate. `@State` parks the actor reference in SwiftUI's
+    /// per-view storage so it survives across View-struct rebuilds.
+    @State private var cache = CSSPayloadCache(capacity: 4)
 
     @State private var activeVersion: String = "v1-compact"
     @State private var currentPayload: CSSPayload = FormStateDemo.compactPayload
