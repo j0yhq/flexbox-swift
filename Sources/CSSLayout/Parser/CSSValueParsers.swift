@@ -42,23 +42,25 @@ public enum CSSValueParsers {
 
     /// Parses a CSS `flex-basis` value.
     ///
-    /// Always returns a `FlexBasis`: falls back to `.auto` when the value is
-    /// unrecognised so the cascade still produces a usable style.
-    public static func parseFlexBasis(_ v: String) -> FlexBasis {
+    /// Returns `nil` for unrecognised values so the caller can follow the CSS
+    /// spec's rule that invalid declarations are ignored (preserving any
+    /// prior value) rather than silently resetting to `.auto`.
+    public static func parseFlexBasis(_ v: String) -> FlexBasis? {
         let s = v.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         if s == "auto" { return .auto }
         if s.hasSuffix("%"), let n = Double(s.dropLast()) {
             return .fraction(CGFloat(n) / 100)
         }
         if let n = parsePx(s) { return .points(n) }
-        return .auto
+        return nil
     }
 
     /// Parses a CSS `width` / `height` value into ``FlexSize``.
     ///
     /// Supports `auto`, `min-content`, percentages (`50%` → `.fraction(0.5)`),
-    /// and all ``parsePx`` length units. Unknown values fall back to `.auto`.
-    public static func parseFlexSize(_ v: String) -> FlexSize {
+    /// and all ``parsePx`` length units. Returns `nil` for unknown values so
+    /// the cascade honours "invalid declarations are dropped".
+    public static func parseFlexSize(_ v: String) -> FlexSize? {
         let s = v.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         if s == "auto"        { return .auto }
         if s == "min-content" { return .minContent }
@@ -66,7 +68,7 @@ public enum CSSValueParsers {
             return .fraction(CGFloat(n) / 100)
         }
         if let n = parsePx(s) { return .points(n) }
-        return .auto
+        return nil
     }
 
     // MARK: - Enumerations

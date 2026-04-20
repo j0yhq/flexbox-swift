@@ -381,4 +381,37 @@ final class StyleResolverTests: XCTestCase {
         XCTAssertEqual(style.item.grow, 1)
         XCTAssertEqual(diags.count(of: .invalidValue(property: "flex-direction", value: "diagonal")), 1)
     }
+
+    // Regression: invalid flex-basis / width / height used to silently reset
+    // to `.auto`, overwriting any earlier valid declaration. The CSS spec
+    // says invalid declarations are ignored; we now emit a diagnostic and
+    // preserve the prior value.
+
+    func testInvalidFlexBasisDoesNotClobberEarlierValidValue() {
+        let (style, diags) = resolve("""
+            #a { flex-basis: 100px; }
+            #a { flex-basis: banana; }
+        """)
+        XCTAssertEqual(style.item.basis, .points(100),
+                       "invalid flex-basis must not reset to .auto")
+        XCTAssertEqual(diags.count(of: .invalidValue(property: "flex-basis", value: "banana")), 1)
+    }
+
+    func testInvalidWidthDoesNotClobberEarlierValidValue() {
+        let (style, diags) = resolve("""
+            #a { width: 240px; }
+            #a { width: nonsense; }
+        """)
+        XCTAssertEqual(style.item.width, .points(240))
+        XCTAssertEqual(diags.count(of: .invalidValue(property: "width", value: "nonsense")), 1)
+    }
+
+    func testInvalidHeightDoesNotClobberEarlierValidValue() {
+        let (style, diags) = resolve("""
+            #a { height: 80%; }
+            #a { height: tall; }
+        """)
+        XCTAssertEqual(style.item.height, .fraction(0.8))
+        XCTAssertEqual(diags.count(of: .invalidValue(property: "height", value: "tall")), 1)
+    }
 }

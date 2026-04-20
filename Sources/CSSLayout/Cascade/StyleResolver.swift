@@ -262,7 +262,11 @@ public enum StyleResolver {
             else { diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value))) }
 
         case "flex-basis":
-            style.item.basis = CSSValueParsers.parseFlexBasis(decl.value)
+            if let v = CSSValueParsers.parseFlexBasis(decl.value) {
+                style.item.basis = v
+            } else {
+                diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value)))
+            }
 
         case "align-self":
             if let v = CSSValueParsers.parseAlignSelf(decl.value) {
@@ -278,8 +282,18 @@ public enum StyleResolver {
                 diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value)))
             }
 
-        case "width":  style.item.width  = CSSValueParsers.parseFlexSize(decl.value)
-        case "height": style.item.height = CSSValueParsers.parseFlexSize(decl.value)
+        case "width":
+            if let v = CSSValueParsers.parseFlexSize(decl.value) {
+                style.item.width = v
+            } else {
+                diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value)))
+            }
+        case "height":
+            if let v = CSSValueParsers.parseFlexSize(decl.value) {
+                style.item.height = v
+            } else {
+                diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value)))
+            }
 
         case "z-index":
             if let n = Int(decl.value.trimmingCharacters(in: .whitespaces)) {
@@ -396,8 +410,10 @@ public enum StyleResolver {
                 item.grow = CGFloat(n)
                 item.shrink = 1
                 item.basis = .points(0)
+            } else if let b = CSSValueParsers.parseFlexBasis(parts[0]) {
+                item.basis = b
             } else {
-                item.basis = CSSValueParsers.parseFlexBasis(parts[0])
+                diagnostics.warn(.init(.invalidValue(property: "flex", value: value)))
             }
         case 2:
             if let g = Double(parts[0]), let s = Double(parts[1]) {
@@ -407,10 +423,11 @@ public enum StyleResolver {
                 diagnostics.warn(.init(.invalidValue(property: "flex", value: value)))
             }
         case 3...:
-            if let g = Double(parts[0]), let s = Double(parts[1]) {
+            if let g = Double(parts[0]), let s = Double(parts[1]),
+               let b = CSSValueParsers.parseFlexBasis(parts[2]) {
                 item.grow = CGFloat(g)
                 item.shrink = CGFloat(s)
-                item.basis = CSSValueParsers.parseFlexBasis(parts[2])
+                item.basis = b
             } else {
                 diagnostics.warn(.init(.invalidValue(property: "flex", value: value)))
             }
