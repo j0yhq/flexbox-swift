@@ -35,6 +35,12 @@ struct CSSLayoutDemo: View {
     /// 10 rows (1 title + 9 inputs) in a column container with gap.
     /// The CSS uses only §4.1 primitives to prove the Phase-1 subset is
     /// enough for a real form.
+    // Column flex container: each field just needs an explicit `height`.
+    // Using `flex: 1` here would set `flex-basis: 0` on the main
+    // (height) axis, overriding the explicit height and collapsing every
+    // row so the fields overlap. In a column, `flex: 1` only makes sense
+    // when the container has a definite height you want to divide — not
+    // for a tall form in a scroll view.
     private let css = """
     #root {
         display: flex;
@@ -43,15 +49,15 @@ struct CSSLayoutDemo: View {
         gap: 14px;
     }
     #title        { height: 36px; }
-    #firstName    { flex: 1; height: 32px; }
-    #lastName     { flex: 1; height: 32px; }
-    #email        { flex: 1; height: 32px; }
-    #company      { flex: 1; height: 32px; }
-    #role         { flex: 1; height: 32px; }
-    #phone        { flex: 1; height: 32px; }
-    #website      { flex: 1; height: 32px; }
-    #country      { flex: 1; height: 32px; }
-    #notes        { flex: 1; height: 72px; }
+    #firstName    { height: 32px; }
+    #lastName     { height: 32px; }
+    #email        { height: 32px; }
+    #company      { height: 32px; }
+    #role         { height: 32px; }
+    #phone        { height: 32px; }
+    #website      { height: 32px; }
+    #country      { height: 32px; }
+    #notes        { height: 72px; }
     #submit       { height: 40px; }
     """
 

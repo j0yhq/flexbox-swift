@@ -205,8 +205,8 @@ struct FormStateDemo: View {
             padding: 16px;
         }
         #heading { height: 30px; }
-        #name    { flex: 1; height: 32px; }
-        #email   { flex: 1; height: 32px; }
+        #name    { height: 32px; }
+        #email   { height: 32px; }
         #submit  { height: 38px; }
         """,
         schema: [
