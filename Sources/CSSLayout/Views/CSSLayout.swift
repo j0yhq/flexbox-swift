@@ -41,6 +41,7 @@ public struct CSSLayout: View {
     private var eventHandlers: [String: (CSSEvent) -> Void] = [:]
     private var placeholderFactory: (String) -> AnyView = { AnyView(PlaceholderBox(id: $0)) }
     private var diagnosticHandler: ((CSSWarning) -> Void)?
+    private var formStateRef: FormState?
 
     // MARK: - Initialisers
 
@@ -103,6 +104,17 @@ public struct CSSLayout: View {
     public func onDiagnostic(_ handler: @escaping (CSSWarning) -> Void) -> CSSLayout {
         var copy = self
         copy.diagnosticHandler = handler
+        return copy
+    }
+
+    /// Attach a `FormState` so every factory in the tree that declares a
+    /// schema `binding` (or `binding.<field>`) prop can read and write its
+    /// value live. The caller owns the `FormState` — state survives payload
+    /// hot-swaps and is pruned to the paths the current schema declares on
+    /// every render, so stale values don't accumulate across fetches.
+    public func formState(_ form: FormState) -> CSSLayout {
+        var copy = self
+        copy.formStateRef = form
         return copy
     }
 

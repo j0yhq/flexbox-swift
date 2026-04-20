@@ -354,6 +354,206 @@ final class CSSLayoutIntegrationTests: XCTestCase {
         XCTAssertFalse(tapFired)
     }
 
+    // MARK: - Phase 3 — FormState integration
+
+    /// Harness: a factory that captures the `ComponentEvents` it's handed
+    /// so tests can read the binding the resolver produced. Also captures
+    /// the initial binding value on first render — useful to prove the
+    /// factory sees live FormState data the moment it runs.
+    private final class BindingCapture {
+        var events: ComponentEvents?
+        var initialValue: String?
+    }
+
+    private func makeBindingCaptureRegistry(
+        into cap: BindingCapture,
+        type: String = "text-input"
+    ) -> ComponentRegistry {
+        let r = ComponentRegistry()
+        r.register(type) { _, events in
+            cap.events = events
+            cap.initialValue = events.binding("value").wrappedValue
+            return AnyView(EmptyView())
+        }
+        return r
+    }
+
+    /// `.formState(_:)` returns a `CSSLayout` so callers can keep chaining
+    /// other modifiers.
+    func testFormStateModifierReturnsSelfForChaining() {
+        let form = FormState()
+        let base = CSSLayout(css: "")
+        let chained = base
+            .formState(form)
+            .onEvent("submit") { _ in }
+        _ = chained
+    }
+
+    /// A bound factory must see the live FormState value the first time it
+    /// renders. This is the wire-up test: if `.formState(_:)` isn't
+    /// threaded into `ComponentResolver.resolve(formState:)`, the binding
+    /// falls back to the empty-string dead default.
+    func testBoundFactorySeesFormStateValueOnFirstRender() {
+        let form = FormState(values: ["user.name": "Ada"])
+        let cap = BindingCapture()
+        let registry = makeBindingCaptureRegistry(into: cap)
+        let payload = CSSPayload(
+            css: "",
+            schema: [SchemaEntry(
+                id: "name",
+                type: "text-input",
+                props: ["binding": "user.name"]
+            )]
+        )
+        let layout = CSSLayout(payload: payload, registry: registry)
+            .formState(form)
+        _ = layout.body
+        XCTAssertEqual(cap.initialValue, "Ada")
+    }
+
+    /// Writes through the factory's binding must reach the caller's
+    /// FormState. This closes the loop: factory ↔ binding ↔ FormState.
+    func testFactoryWriteThroughBindingUpdatesFormState() {
+        let form = FormState(values: ["user.name": "Ada"])
+        let cap = BindingCapture()
+        let registry = makeBindingCaptureRegistry(into: cap)
+        let payload = CSSPayload(
+            css: "",
+            schema: [SchemaEntry(
+                id: "name",
+                type: "text-input",
+                props: ["binding": "user.name"]
+            )]
+        )
+        let layout = CSSLayout(payload: payload, registry: registry)
+            .formState(form)
+        _ = layout.body
+        cap.events!.binding("value").wrappedValue = "Grace"
+        XCTAssertEqual(form.get("user.name"), "Grace")
+    }
+
+    /// Hot-swap contract: FormState outlives any single CSSLayout
+    /// instance. Rendering payload A, mutating FormState, then rendering
+    /// payload B (same binding path) must surface the mutated value —
+    /// proving the state isn't owned by the view.
+    func testHotSwapPreservesValuesAtSharedBindingPath() {
+        let form = FormState(values: ["user.name": "initial"])
+
+        // Payload A: bind to user.name via a capturing factory.
+        let capA = BindingCapture()
+        let registryA = makeBindingCaptureRegistry(into: capA)
+        let payloadA = CSSPayload(
+            css: "",
+            schema: [SchemaEntry(
+                id: "name",
+                type: "text-input",
+                props: ["binding": "user.name"]
+            )]
+        )
+        let layoutA = CSSLayout(payload: payloadA, registry: registryA)
+            .formState(form)
+        _ = layoutA.body
+        // User types a new value.
+        capA.events!.binding("value").wrappedValue = "Ada"
+
+        // Payload B: fresh CSSLayout, new factory capture, same path.
+        let capB = BindingCapture()
+        let registryB = makeBindingCaptureRegistry(into: capB)
+        let payloadB = CSSPayload(
+            css: "#root { gap: 8px; }",
+            schema: [SchemaEntry(
+                id: "name",
+                type: "text-input",
+                props: ["binding": "user.name"]
+            )]
+        )
+        let layoutB = CSSLayout(payload: payloadB, registry: registryB)
+            .formState(form)
+        _ = layoutB.body
+        XCTAssertEqual(capB.initialValue, "Ada",
+                       "hot-swapping the payload must preserve FormState values")
+    }
+
+    /// Paths referenced by the previous payload but not the next one
+    /// should be pruned on render — otherwise stale form data grows
+    /// unbounded across repeated server fetches.
+    func testOrphanedBindingPathsArePrunedOnRender() {
+        let form = FormState(values: [
+            "user.name":  "Ada",
+            "user.email": "ada@example.com", // orphaned after swap
+        ])
+
+        // New payload only declares user.name — email is no longer bound.
+        let registry = ComponentRegistry()
+        registry.register("text-input") { _, _ in AnyView(EmptyView()) }
+        let payload = CSSPayload(
+            css: "",
+            schema: [SchemaEntry(
+                id: "name",
+                type: "text-input",
+                props: ["binding": "user.name"]
+            )]
+        )
+        let layout = CSSLayout(payload: payload, registry: registry)
+            .formState(form)
+        _ = layout.body
+
+        XCTAssertEqual(form.get("user.name"), "Ada",
+                       "active path must survive prune")
+        XCTAssertNil(form.get("user.email"),
+                     "orphaned path must be pruned")
+    }
+
+    /// Field-scoped binding keys (`binding.<field>`) must be collected
+    /// alongside the default `binding` key when computing which paths to
+    /// keep — otherwise a row binding both `value` and `checked` would
+    /// lose one of them on render.
+    func testPruneCollectsFieldScopedBindingPaths() {
+        let form = FormState(values: [
+            "row.value":   "x",
+            "row.checked": "yes",
+            "gone":        "should-prune",
+        ])
+        let registry = ComponentRegistry()
+        registry.register("row") { _, _ in AnyView(EmptyView()) }
+        let payload = CSSPayload(
+            css: "",
+            schema: [SchemaEntry(
+                id: "r",
+                type: "row",
+                props: [
+                    "binding":         "row.value",
+                    "binding.checked": "row.checked",
+                ]
+            )]
+        )
+        let layout = CSSLayout(payload: payload, registry: registry)
+            .formState(form)
+        _ = layout.body
+        XCTAssertEqual(form.get("row.value"),   "x")
+        XCTAssertEqual(form.get("row.checked"), "yes")
+        XCTAssertNil(form.get("gone"))
+    }
+
+    /// When no FormState is wired in, CSSLayout must not crash and the
+    /// factories must still see dead bindings (empty strings). This is
+    /// the preview / schema-without-state path.
+    func testNoFormStateKeepsBindingsDead() {
+        let cap = BindingCapture()
+        let registry = makeBindingCaptureRegistry(into: cap)
+        let payload = CSSPayload(
+            css: "",
+            schema: [SchemaEntry(
+                id: "name",
+                type: "text-input",
+                props: ["binding": "user.name"]
+            )]
+        )
+        let layout = CSSLayout(payload: payload, registry: registry)
+        _ = layout.body
+        XCTAssertEqual(cap.initialValue, "")
+    }
+
     // MARK: - Diagnostics hook
 
     func testOnDiagnosticReceivesWarnings() {
