@@ -113,6 +113,7 @@ public enum StyleTreeBuilder {
                 parentID: effectiveParentID(entry),
                 schemaType: entry.type,
                 classes: entry.classes,
+                props: entry.props,
                 computedStyle: style
             ))
         }

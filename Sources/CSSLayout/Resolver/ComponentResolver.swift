@@ -170,7 +170,7 @@ public enum ComponentResolver {
                 view = local.content
             } else if let type = node.schemaType, let factory = registry.factory(for: type) {
                 resolution = .registry
-                let props = ComponentProps([:], id: node.id)
+                let props = ComponentProps(node.props, id: node.id)
                 let id = node.id
                 let events = ComponentEvents { name, payload, propagates in
                     eventSink?(id, name, payload, propagates)
