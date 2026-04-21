@@ -18,17 +18,31 @@ import SwiftUI
 /// `.uiKit`, `.webView`). The resolver calls ``makeView()`` to obtain the
 /// SwiftUI-consumable view it inserts into the flex tree.
 public struct ComponentBody {
-    // Red-phase stub: the builder is never stored, so the counter test
-    // below will observe zero invocations after `makeView()`. Unit 1's
-    // green commit replaces this with a proper `Storage` enum.
-    private let _stubbed: Void
 
+    /// Type-erased storage for each supported backend. Kept internal so
+    /// tests (`@testable import`) can introspect without the cases
+    /// leaking into the public surface.
+    internal enum Storage {
+        /// A pure SwiftUI body built by the caller's `@ViewBuilder`.
+        case custom(() -> AnyView)
+    }
+
+    /// Tag mirrored onto `Storage` for test assertions.
     internal enum Kind: Equatable {
         case custom
     }
 
-    /// Internal tag for tests (via `@testable import`).
-    internal var kind: Kind { .custom }
+    internal let storage: Storage
+
+    internal var kind: Kind {
+        switch storage {
+        case .custom: return .custom
+        }
+    }
+
+    internal init(storage: Storage) {
+        self.storage = storage
+    }
 
     /// Build a `ComponentBody` that renders a SwiftUI view.
     ///
@@ -36,15 +50,15 @@ public struct ComponentBody {
     /// not assume single invocation — SwiftUI may rebuild the wrapped view
     /// repeatedly during a layout pass.
     public static func custom<V: View>(_ build: @escaping () -> V) -> ComponentBody {
-        // Red stub: ignores `build` entirely so the "builder invoked"
-        // assertion fails. Green replaces this with proper storage.
-        _ = build
-        return ComponentBody(_stubbed: ())
+        ComponentBody(storage: .custom { AnyView(build()) })
     }
 
     /// Produce the SwiftUI view. The resolver inserts the result into the
     /// flex tree — callers typically don't invoke this directly.
     public func makeView() -> AnyView {
-        AnyView(EmptyView())
+        switch storage {
+        case .custom(let build):
+            return build()
+        }
     }
 }
