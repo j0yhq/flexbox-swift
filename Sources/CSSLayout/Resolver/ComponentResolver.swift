@@ -170,7 +170,7 @@ public enum ComponentResolver {
             if let local = localsByID[node.id] {
                 resolution = .local
                 view = local.content
-            } else if let type = node.schemaType, let factory = registry.factory(for: type) {
+            } else if let type = node.schemaType, let factory = registry.bodyFactory(for: type) {
                 resolution = .registry
                 let props = ComponentProps(node.props, id: node.id)
                 let id = node.id
@@ -194,8 +194,16 @@ public enum ComponentResolver {
                         )
                     }
                 }
-                let events = ComponentEvents(sink: sink, bindings: bindings)
-                view = factory(props, events)
+                // Tier 2: host-agnostic value store plumb-through. When
+                // the caller supplied a `valueStore`, every factory's
+                // ComponentEvents gets it — enabling setValue / observe
+                // for non-SwiftUI bridges that can't speak Binding.
+                let events = ComponentEvents(
+                    sink: sink,
+                    bindings: bindings,
+                    values: valueStore
+                )
+                view = factory(props, events).makeView()
             } else {
                 resolution = .placeholder
                 // Only diagnose when the schema names a type we can't find —
