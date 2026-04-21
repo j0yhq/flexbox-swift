@@ -36,7 +36,12 @@ public final class ComponentRegistry {
     /// registry.
     public static let shared = ComponentRegistry()
 
-    private var factories: [String: ComponentFactory] = [:]
+    // Tier 2 unifies storage on the ``ComponentBodyFactory`` shape.
+    // Legacy ``ComponentFactory`` registrations are wrapped at
+    // registration time so both lookup methods share one bucket, and
+    // either overload's registration can be retrieved via either
+    // `factory(for:)` or `bodyFactory(for:)`.
+    private var factories: [String: ComponentBodyFactory] = [:]
 
     public init() {}
 
@@ -55,37 +60,43 @@ public final class ComponentRegistry {
         _ type: String,
         factory: @escaping ComponentFactory
     ) -> ComponentRegistry {
-        factories[type] = factory
+        // Adapt the legacy AnyView-returning factory into the unified
+        // ComponentBody storage. The adapter captures `factory` and
+        // reconstructs a `.custom` body on each lookup, so the legacy
+        // factory is re-invoked per render (same contract as before).
+        factories[type] = { props, events in
+            .custom { factory(props, events) }
+        }
         return self
     }
 
     /// Tier 2 register overload for the new ``ComponentBodyFactory`` shape.
-    ///
-    /// RED stub: compiles, accepts the closure, but silently drops it
-    /// without populating any storage. Unit 3's green commit wires it
-    /// through shared storage alongside the legacy overload.
+    /// This is the preferred path for new code — the returned
+    /// ``ComponentBody`` can carry SwiftUI, UIKit, or WebKit-backed views
+    /// uniformly.
     @discardableResult
     public func register(
         _ type: String,
         body: @escaping ComponentBodyFactory
     ) -> ComponentRegistry {
-        // RED: intentionally a no-op to make bodyFactory(for:) return nil
-        // for the tests that exercise the new path.
-        _ = type
-        _ = body
+        factories[type] = body
         return self
     }
 
     /// Look up a factory by component type. Returns `nil` for unknown types.
+    ///
+    /// Returns an AnyView-producing closure regardless of whether the
+    /// original registration used the legacy or body overload — the body
+    /// result is materialised via ``ComponentBody/makeView()``.
     public func factory(for type: String) -> ComponentFactory? {
-        factories[type]
+        guard let body = factories[type] else { return nil }
+        return { props, events in body(props, events).makeView() }
     }
 
-    /// Tier 2: look up a ``ComponentBodyFactory`` by type.
-    ///
-    /// RED stub: always nil. Green merges body + legacy storage so either
-    /// registration shape round-trips through this method.
+    /// Tier 2: look up a ``ComponentBodyFactory`` by type. Returns the
+    /// unified body factory — works for both legacy and Tier-2
+    /// registrations.
     public func bodyFactory(for type: String) -> ComponentBodyFactory? {
-        nil
+        factories[type]
     }
 }
