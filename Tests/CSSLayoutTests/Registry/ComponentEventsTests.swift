@@ -83,6 +83,63 @@ final class ComponentEventsTests: XCTestCase {
                        "second lookup must see the updated value")
     }
 
+    // MARK: - Host-agnostic value surface (Tier 2)
+
+    /// With no `ValueStore` injected, `value(for:)` returns nil — this
+    /// lets factories call it unconditionally without branching on
+    /// whether the surrounding payload wired a store.
+    func testValueForReturnsNilWhenUnbound() {
+        let events = ComponentEvents()
+        XCTAssertNil(events.value(for: "name"))
+    }
+
+    /// `setValue(_:for:)` must route to the injected store's `set`
+    /// closure — the store is the single source of truth, not
+    /// `ComponentEvents` itself.
+    func testSetValueRoutesToProvider() {
+        let store = InMemoryValueStore()
+        let events = ComponentEvents(
+            sink: nil,
+            bindings: nil,
+            values: store.asValueStore
+        )
+        events.setValue("hello", for: "name")
+        XCTAssertEqual(store.values["name"], "hello")
+    }
+
+    /// `observe(_:_:)` must deliver callbacks on subsequent writes to the
+    /// same field. This is the entry point for UIKit/WebKit factories
+    /// that can't consume SwiftUI's `Binding<String>`.
+    func testObserveFiresOnSetValue() {
+        let store = InMemoryValueStore()
+        let events = ComponentEvents(
+            sink: nil,
+            bindings: nil,
+            values: store.asValueStore
+        )
+        var received: [String] = []
+        _ = events.observe("name") { received.append($0) }
+        events.setValue("ada", for: "name")
+        events.setValue("lovelace", for: "name")
+        XCTAssertEqual(received, ["ada", "lovelace"])
+    }
+
+    /// Cancelling the observer token stops further delivery.
+    func testObserveCancellableStopsDelivery() {
+        let store = InMemoryValueStore()
+        let events = ComponentEvents(
+            sink: nil,
+            bindings: nil,
+            values: store.asValueStore
+        )
+        var received: [String] = []
+        let token = events.observe("name") { received.append($0) }
+        events.setValue("one", for: "name")
+        token.cancel()
+        events.setValue("two", for: "name")
+        XCTAssertEqual(received, ["one"], "writes after cancel must not fire")
+    }
+
     // MARK: - emit() untouched
 
     /// Adding the binding parameter must not change the existing `emit`
@@ -100,5 +157,41 @@ final class ComponentEventsTests: XCTestCase {
         XCTAssertEqual(rec.events.count, 1)
         XCTAssertEqual(rec.events.first?.name, "tap")
         XCTAssertEqual(rec.events.first?.payload["x"], "1")
+    }
+}
+
+// MARK: - Test doubles
+
+/// A minimal test double for the Tier-2 host-agnostic value store. It
+/// mirrors FormState's read/write/observe contract but keeps everything
+/// in a local dictionary so tests can assert directly on state.
+///
+/// Cancellation is modeled via a flag on the ``ObserverToken`` rather
+/// than array mutation — simpler to reason about and avoids self-capture
+/// dance inside the observer closure.
+private final class InMemoryValueStore {
+    var values: [String: String] = [:]
+    private var observers: [String: [(token: ObserverToken, handler: (String) -> Void)]] = [:]
+
+    final class ObserverToken: Cancellable {
+        private(set) var cancelled = false
+        func cancel() { cancelled = true }
+    }
+
+    var asValueStore: ValueStore {
+        ValueStore(
+            get: { [weak self] field in self?.values[field] },
+            set: { [weak self] value, field in
+                self?.values[field] = value
+                self?.observers[field]?.forEach { entry in
+                    if !entry.token.cancelled { entry.handler(value) }
+                }
+            },
+            observe: { [weak self] field, handler in
+                let token = ObserverToken()
+                self?.observers[field, default: []].append((token, handler))
+                return token
+            }
+        )
     }
 }

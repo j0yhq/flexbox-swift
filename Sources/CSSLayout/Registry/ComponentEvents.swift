@@ -7,16 +7,60 @@
 // production, a plain local value in tests/previews); factories remain
 // oblivious.
 //
-// The `binding(_:)` implementation delegates to an injected `BindingResolver`
-// closure. In production that closure is built by `ComponentResolver`, which
-// closes over `FormState` and the current node's props so `binding("value")`
-// resolves to the correct FormState path. When no resolver is wired (test,
-// preview, or a factory whose schema didn't declare a binding), the method
-// falls back to `Binding.constant("")` — factories don't have to branch on
-// whether the surrounding payload is participating.
+// Tier 2 adds a host-agnostic companion to `binding(_:)`: `value(for:)`,
+// `setValue(_:for:)`, and `observe(_:_:)`. These are what non-SwiftUI
+// factories (UIKit, WKWebView, Flutter) can reach for without pulling in
+// SwiftUI's `Binding<String>`. All three delegate to an optional
+// `ValueStore` injected via the new init overload; unwired instances
+// return nil / no-op / a dead cancellable so test and preview call sites
+// stay clean.
 
 import Foundation
 import SwiftUI
+
+/// Token returned by ``ComponentEvents/observe(_:_:)``. Calling
+/// ``cancel()`` stops further observer callbacks for the registration.
+///
+/// Deliberately **not** Combine's `Cancellable`: CSSLayout has no Combine
+/// dependency and host-agnostic factories should not need one either.
+public protocol Cancellable: AnyObject {
+    func cancel()
+}
+
+/// Host-agnostic value store injected into ``ComponentEvents``.
+///
+/// Production wires this to `FormState`; tests and previews can inject an
+/// in-memory double. The three closures mirror the host-agnostic surface
+/// of ``ComponentEvents`` — there's no SwiftUI-specific type anywhere.
+public struct ValueStore {
+    public typealias Getter = (_ field: String) -> String?
+    public typealias Setter = (_ value: String, _ field: String) -> Void
+    public typealias Observer = (
+        _ field: String,
+        _ handler: @escaping (String) -> Void
+    ) -> Cancellable
+
+    public let get: Getter
+    public let set: Setter
+    public let observe: Observer
+
+    public init(
+        get: @escaping Getter,
+        set: @escaping Setter,
+        observe: @escaping Observer
+    ) {
+        self.get = get
+        self.set = set
+        self.observe = observe
+    }
+}
+
+/// Internal no-op cancellable — returned when no value store is wired,
+/// so factories can call `observe` unconditionally and just discard the
+/// token.
+internal final class NoopCancellable: Cancellable {
+    func cancel() {}
+}
 
 /// The outbound event channel given to a component factory.
 ///
@@ -40,10 +84,12 @@ public struct ComponentEvents {
 
     private let sink: Sink?
     private let bindingResolver: BindingResolver?
+    private let valueStore: ValueStore?
 
     public init(_ sink: Sink? = nil) {
         self.sink = sink
         self.bindingResolver = nil
+        self.valueStore = nil
     }
 
     /// Wire both the event sink and the binding resolver. The resolver
@@ -52,6 +98,23 @@ public struct ComponentEvents {
     public init(sink: Sink?, bindings: BindingResolver?) {
         self.sink = sink
         self.bindingResolver = bindings
+        self.valueStore = nil
+    }
+
+    /// Wire the sink, binding resolver, and host-agnostic value store in
+    /// one go. All three parameters are optional — pass `nil` for the
+    /// surfaces a given factory doesn't exercise.
+    public init(
+        sink: Sink?,
+        bindings: BindingResolver?,
+        values: ValueStore?
+    ) {
+        self.sink = sink
+        self.bindingResolver = bindings
+        // RED stub: accept but ignore the store so setValue / observe
+        // have nothing to delegate to. Green replaces this assignment.
+        _ = values
+        self.valueStore = nil
     }
 
     /// Emit a named event with an optional payload. `propagates` controls
@@ -72,5 +135,35 @@ public struct ComponentEvents {
     /// branch on whether the surrounding payload wired them up.
     public func binding(_ field: String) -> Binding<String> {
         bindingResolver?(field) ?? .constant("")
+    }
+
+    // MARK: - Host-agnostic value surface (Tier 2)
+
+    /// Read `field`'s current value from the injected ``ValueStore``, or
+    /// `nil` when nothing is wired. Host-agnostic: no SwiftUI types.
+    public func value(for field: String) -> String? {
+        // RED stub — always returns nil, regardless of injection.
+        nil
+    }
+
+    /// Write `value` to `field` through the injected ``ValueStore``. A
+    /// no-op when nothing is wired.
+    public func setValue(_ value: String, for field: String) {
+        // RED stub — discards the write.
+        _ = value
+        _ = field
+    }
+
+    /// Subscribe to changes on `field`. The returned token's ``cancel()``
+    /// removes the subscription. When nothing is wired the token is
+    /// harmless and the handler is never called.
+    public func observe(
+        _ field: String,
+        _ handler: @escaping (String) -> Void
+    ) -> Cancellable {
+        // RED stub — ignores the handler and returns a dead token.
+        _ = field
+        _ = handler
+        return NoopCancellable()
     }
 }
