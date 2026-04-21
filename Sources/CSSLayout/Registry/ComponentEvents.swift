@@ -111,10 +111,7 @@ public struct ComponentEvents {
     ) {
         self.sink = sink
         self.bindingResolver = bindings
-        // RED stub: accept but ignore the store so setValue / observe
-        // have nothing to delegate to. Green replaces this assignment.
-        _ = values
-        self.valueStore = nil
+        self.valueStore = values
     }
 
     /// Emit a named event with an optional payload. `propagates` controls
@@ -142,16 +139,13 @@ public struct ComponentEvents {
     /// Read `field`'s current value from the injected ``ValueStore``, or
     /// `nil` when nothing is wired. Host-agnostic: no SwiftUI types.
     public func value(for field: String) -> String? {
-        // RED stub — always returns nil, regardless of injection.
-        nil
+        valueStore?.get(field)
     }
 
     /// Write `value` to `field` through the injected ``ValueStore``. A
     /// no-op when nothing is wired.
     public func setValue(_ value: String, for field: String) {
-        // RED stub — discards the write.
-        _ = value
-        _ = field
+        valueStore?.set(value, field)
     }
 
     /// Subscribe to changes on `field`. The returned token's ``cancel()``
@@ -161,9 +155,6 @@ public struct ComponentEvents {
         _ field: String,
         _ handler: @escaping (String) -> Void
     ) -> Cancellable {
-        // RED stub — ignores the handler and returns a dead token.
-        _ = field
-        _ = handler
-        return NoopCancellable()
+        valueStore?.observe(field, handler) ?? NoopCancellable()
     }
 }
