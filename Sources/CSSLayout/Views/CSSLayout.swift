@@ -41,6 +41,7 @@ public struct CSSLayout: View {
     private var eventHandlers: [String: (CSSEvent) -> Void] = [:]
     private var placeholderFactory: (String) -> AnyView = { AnyView(PlaceholderBox(id: $0)) }
     private var diagnosticHandler: ((CSSWarning) -> Void)?
+    private var formStateRef: FormState?
 
     // MARK: - Initialisers
 
@@ -103,6 +104,17 @@ public struct CSSLayout: View {
     public func onDiagnostic(_ handler: @escaping (CSSWarning) -> Void) -> CSSLayout {
         var copy = self
         copy.diagnosticHandler = handler
+        return copy
+    }
+
+    /// Attach a `FormState` so every factory in the tree that declares a
+    /// schema `binding` (or `binding.<field>`) prop can read and write its
+    /// value live. The caller owns the `FormState` — state survives payload
+    /// hot-swaps and is pruned to the paths the current schema declares on
+    /// every render, so stale values don't accumulate across fetches.
+    public func formState(_ form: FormState) -> CSSLayout {
+        var copy = self
+        copy.formStateRef = form
         return copy
     }
 
@@ -193,6 +205,22 @@ public struct CSSLayout: View {
         localsByID.reserveCapacity(locals.count)
         for l in locals { localsByID[l.id] = l }
         let rootID = "root"
+        // Prune FormState to the binding paths the current schema
+        // declares *before* handing it to the resolver. Done up front so
+        // a factory that reads its binding during its initial render
+        // can't observe a stale value from a previous payload that
+        // happened to reuse a now-dropped path key.
+        if let form = formStateRef {
+            var keep: Set<String> = []
+            for n in nodes {
+                for (key, value) in n.props {
+                    if key == "binding" || key.hasPrefix("binding.") {
+                        keep.insert(value)
+                    }
+                }
+            }
+            form.prune(keeping: keep)
+        }
         let resolved = ComponentResolver.resolve(
             nodes: nodes,
             locals: locals,
@@ -227,6 +255,7 @@ public struct CSSLayout: View {
                     if name != "*" { handlers["*"]?(event) }
                 }
             },
+            formState: formStateRef,
             diagnostics: &diagnostics
         )
 

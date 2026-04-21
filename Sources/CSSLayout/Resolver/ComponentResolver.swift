@@ -105,6 +105,7 @@ public enum ComponentResolver {
             _ payload: [String: String],
             _ propagates: Bool
         ) -> Void)? = nil,
+        formState: FormState? = nil,
         diagnostics: inout CSSDiagnostics
     ) -> Resolved {
         // Precondition: `StyleTreeBuilder` always emits at least the root.
@@ -170,11 +171,29 @@ public enum ComponentResolver {
                 view = local.content
             } else if let type = node.schemaType, let factory = registry.factory(for: type) {
                 resolution = .registry
-                let props = ComponentProps([:], id: node.id)
+                let props = ComponentProps(node.props, id: node.id)
                 let id = node.id
-                let events = ComponentEvents { name, payload, propagates in
+                let nodeProps = node.props
+                let sink: ComponentEvents.Sink = { name, payload, propagates in
                     eventSink?(id, name, payload, propagates)
                 }
+                // Only wire a binding resolver when a FormState is available.
+                // Otherwise factories get the dead-binding default, matching
+                // the test/preview contract of `ComponentEvents.binding(_:)`.
+                let bindings: ComponentEvents.BindingResolver? = formState.map { form in
+                    { field in
+                        // Field-scoped key wins over the default `binding`
+                        // key so one component can bind multiple fields
+                        // (e.g. a row that binds both "value" and "checked").
+                        let path = nodeProps["binding.\(field)"] ?? nodeProps["binding"]
+                        guard let path else { return .constant("") }
+                        return Binding(
+                            get: { form.get(path) ?? "" },
+                            set: { form.set(path, $0) }
+                        )
+                    }
+                }
+                let events = ComponentEvents(sink: sink, bindings: bindings)
                 view = factory(props, events)
             } else {
                 resolution = .placeholder

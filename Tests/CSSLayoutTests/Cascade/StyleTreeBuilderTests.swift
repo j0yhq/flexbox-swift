@@ -217,4 +217,44 @@ final class StyleTreeBuilderTests: XCTestCase {
         XCTAssertEqual(nodes[1].schemaType, "text", "first wins")
         XCTAssertEqual(diags.count(of: .duplicateSchemaID("a")), 1)
     }
+
+    // MARK: - Phase 3 — `SchemaEntry.props` propagation
+
+    /// `SchemaEntry.props` is the server-sent prop bag (placeholder text,
+    /// binding paths, labels, etc.). `StyleTreeBuilder` must preserve it on
+    /// the emitted `StyleNode` so the resolver can later hand it to the
+    /// component factory as a `ComponentProps`.
+    func testSchemaPropsPropagateToStyleNode() {
+        var diags = CSSDiagnostics()
+        let sheet = CSSParser.parse("", diagnostics: &diags)
+        let nodes = StyleTreeBuilder.build(
+            rootID: "root",
+            schema: [
+                SchemaEntry(
+                    id: "name",
+                    type: "text-input",
+                    props: ["placeholder": "Full name", "binding": "user.name"]
+                ),
+            ],
+            stylesheet: sheet,
+            diagnostics: &diags
+        )
+        let node = nodes.first { $0.id == "name" }
+        XCTAssertEqual(node?.props["placeholder"], "Full name")
+        XCTAssertEqual(node?.props["binding"], "user.name")
+    }
+
+    /// Entries without `props` must still produce a node (with empty props)
+    /// so existing callers keep compiling unchanged.
+    func testMissingPropsYieldsEmptyDictionary() {
+        var diags = CSSDiagnostics()
+        let sheet = CSSParser.parse("", diagnostics: &diags)
+        let nodes = StyleTreeBuilder.build(
+            rootID: "root",
+            schema: [SchemaEntry(id: "a", type: "text")],
+            stylesheet: sheet,
+            diagnostics: &diags
+        )
+        XCTAssertEqual(nodes.first { $0.id == "a" }?.props, [:])
+    }
 }

@@ -28,17 +28,23 @@ public struct SchemaEntry: Equatable {
     /// attaches the entry to the implicit root. Non-nil ids that don't resolve
     /// to another entry fall back to root — the tree is always connected.
     public let parentID: String?
+    /// Opaque server-sent prop bag (placeholder text, labels, binding paths,
+    /// etc.) handed to the component factory as `ComponentProps.values`.
+    /// Phase 3 stores strings only — typed accessors arrive in Phase 4.
+    public let props: [String: String]
 
     public init(
         id: String,
         type: String? = nil,
         classes: [String] = [],
-        parentID: String? = nil
+        parentID: String? = nil,
+        props: [String: String] = [:]
     ) {
         self.id = id
         self.type = type
         self.classes = classes
         self.parentID = parentID
+        self.props = props
     }
 }
 

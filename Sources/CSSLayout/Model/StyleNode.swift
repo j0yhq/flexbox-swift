@@ -22,6 +22,10 @@ public struct StyleNode: Equatable {
     /// Preserved in source order so the resolver doesn't hash-allocate per
     /// lookup (schemas are small; linear scan wins on cache).
     public let classes: [String]
+    /// Mirror of `SchemaEntry.props` — forwarded to the component factory
+    /// as `ComponentProps.values` by the resolver. Empty for the implicit
+    /// root node and for entries that didn't declare props.
+    public let props: [String: String]
     /// The fully cascaded style for this node.
     public let computedStyle: ComputedStyle
 
@@ -30,12 +34,14 @@ public struct StyleNode: Equatable {
         parentID: String? = nil,
         schemaType: String?,
         classes: [String] = [],
+        props: [String: String] = [:],
         computedStyle: ComputedStyle
     ) {
         self.id = id
         self.parentID = parentID
         self.schemaType = schemaType
         self.classes = classes
+        self.props = props
         self.computedStyle = computedStyle
     }
 }

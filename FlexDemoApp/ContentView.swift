@@ -13,6 +13,9 @@ private struct DemoItem: Identifiable {
 private let allDemos: [DemoItem] = [
     DemoItem(id: "paste",    icon: "doc.text.magnifyingglass",      title: "CSS → Preview",    subtitle: "paste any flex CSS"),
     DemoItem(id: "csslayout",icon: "rectangle.and.text.magnifyingglass", title: "CSSLayout Form", subtitle: "10-field server-driven demo"),
+    DemoItem(id: "formstate",icon: "arrow.triangle.2.circlepath.doc.on.clipboard", title: "FormState + Hot-Swap", subtitle: "Phase 3 · binding + cache"),
+    DemoItem(id: "profile",  icon: "person.crop.rectangle",         title: "Profile — Layout Swap", subtitle: "Phase 3 · same state, new layout"),
+    DemoItem(id: "wizard",   icon: "list.bullet.indent",            title: "Signup Wizard",         subtitle: "Phase 3 · multi-step server flow"),
     DemoItem(id: "sandbox",  icon: "slider.horizontal.3",           title: "Sandbox",          subtitle: "all properties live"),
     DemoItem(id: "hero",     icon: "rectangle.center.inset.filled", title: "Centered Hero",    subtitle: "column · center · gap"),
     DemoItem(id: "navbar",   icon: "menubar.rectangle",             title: "Navigation Bar",   subtitle: "row · space-between"),
@@ -73,6 +76,9 @@ struct ContentView: View {
                 switch selectedId {
                 case "paste":   CSSPasteDemo()
                 case "csslayout": ResponsivePreview { CSSLayoutDemo() }
+                case "formstate": ResponsivePreview { FormStateDemo() }
+                case "profile":   ResponsivePreview { ProfileEditDemo() }
+                case "wizard":    ResponsivePreview { WizardDemo() }
                 case "hero":    CenteredHeroDemo()
                 case "navbar":  NavBarDemo()
                 case "grid":    CardGridDemo()
