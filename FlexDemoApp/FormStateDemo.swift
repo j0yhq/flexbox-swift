@@ -284,14 +284,44 @@ struct FormStateDemo: View {
                     .accessibilityIdentifier(props.id)
             }
         }
+        // Tier 2 showcase: the text field is backed by a UIKit
+        // `UITextField` via `ComponentBody.uiKit(...)` on iOS/iPadOS.
+        // macOS (no UIKit) gets the SwiftUI fallback so the demo still
+        // builds cross-platform.
         r.register("text-field") { props, events in
-            .custom {
+            let placeholder = props.string("placeholder") ?? ""
+            let binding = events.binding("value")
+            let id = props.id
+            #if canImport(UIKit) && !os(watchOS)
+            return .uiKit(
+                make: { () -> BindingBackedTextField in
+                    let tf = BindingBackedTextField()
+                    tf.placeholder = placeholder
+                    tf.borderStyle = .roundedRect
+                    tf.accessibilityIdentifier = id
+                    tf.onChange = { binding.wrappedValue = $0 }
+                    tf.text = binding.wrappedValue
+                    return tf
+                },
+                update: { tf in
+                    // Avoid cursor jumps: only overwrite the text when
+                    // FormState moved out of sync with the field (e.g.
+                    // payload hot-swap). Typing keeps them in sync via
+                    // `onChange` so the guard stays false during edit.
+                    if tf.text != binding.wrappedValue {
+                        tf.text = binding.wrappedValue
+                    }
+                }
+            )
+            #else
+            return .custom {
                 BoundTextField(
-                    placeholder: props.string("placeholder") ?? "",
-                    text: events.binding("value")
+                    placeholder: placeholder,
+                    text: binding
                 )
-                .accessibilityIdentifier(props.id)
+                .accessibilityIdentifier(id)
             }
+            #endif
         }
         r.register("submit-button") { props, events in
             .custom {
@@ -310,9 +340,8 @@ struct FormStateDemo: View {
 // MARK: - Text field wrapper
 
 /// A plain `TextField` that reads and writes through a SwiftUI
-/// `Binding<String>`. The factory passes the binding produced by
-/// `ComponentEvents.binding("value")`, so the field edits land in
-/// FormState without the view layer seeing FormState directly.
+/// `Binding<String>`. Used on platforms without UIKit (macOS) as the
+/// fallback path in the `text-field` factory above.
 private struct BoundTextField: View {
     let placeholder: String
     @Binding var text: String
@@ -323,3 +352,34 @@ private struct BoundTextField: View {
             .frame(maxWidth: .infinity)
     }
 }
+
+#if canImport(UIKit) && !os(watchOS)
+import UIKit
+
+/// UIKit-backed text field used by the Tier-2 `.uiKit(...)` showcase in
+/// the `text-field` factory. The demo captures SwiftUI's `Binding<String>`
+/// in the factory closure and pipes edits back through `onChange` — so the
+/// UIKit widget is a drop-in replacement for the SwiftUI `TextField`
+/// without leaking FormState into the view layer.
+fileprivate final class BindingBackedTextField: UITextField {
+    /// Called on every `.editingChanged` event with the field's live
+    /// text. The factory sets this to `{ binding.wrappedValue = $0 }`.
+    var onChange: (String) -> Void = { _ in }
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        addTarget(self, action: #selector(editingChangedAction),
+                  for: .editingChanged)
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        addTarget(self, action: #selector(editingChangedAction),
+                  for: .editingChanged)
+    }
+
+    @objc private func editingChangedAction() {
+        onChange(text ?? "")
+    }
+}
+#endif

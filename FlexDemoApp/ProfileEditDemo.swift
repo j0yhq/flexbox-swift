@@ -196,6 +196,7 @@ struct ProfileEditDemo: View {
         }
         #heading { height: 30px; }
         #name, #email, #bio, #website { height: 32px; }
+        #bio-preview { height: 120px; }
         #save { height: 38px; }
         """,
         schema: [
@@ -210,6 +211,10 @@ struct ProfileEditDemo: View {
             SchemaEntry(id: "bio",     type: "text-field",
                         props: ["binding": "profile.bio",
                                 "placeholder": "Short bio"]),
+            // Tier 2 showcase: WKWebView-backed preview. Its Clear bio
+            // button posts a JS message that clears profile.bio.
+            SchemaEntry(id: "bio-preview", type: "bio-preview",
+                        props: ["binding": "profile.bio"]),
             SchemaEntry(id: "website", type: "text-field",
                         props: ["binding": "profile.website",
                                 "placeholder": "Website URL"]),
@@ -233,6 +238,7 @@ struct ProfileEditDemo: View {
             gap: 12px;
         }
         #name, #email, #bio, #website { flex: 1; height: 32px; }
+        #bio-preview { height: 120px; }
         #save { height: 38px; }
         """,
         schema: [
@@ -256,6 +262,8 @@ struct ProfileEditDemo: View {
                         parentID: "row-2",
                         props: ["binding": "profile.website",
                                 "placeholder": "Website URL"]),
+            SchemaEntry(id: "bio-preview", type: "bio-preview",
+                        props: ["binding": "profile.bio"]),
             SchemaEntry(id: "save",    type: "save-button",
                         props: ["text": "Save profile"]),
         ]
@@ -292,8 +300,72 @@ struct ProfileEditDemo: View {
                 .accessibilityIdentifier(props.id)
             }
         }
+        // Tier 2 showcase: a static "profile tips" panel rendered as
+        // HTML through `ComponentBody.webView(...)`. The embedded
+        // <button> posts a JS message back through
+        // `window.webkit.messageHandlers.cssLayout.postMessage({...})`
+        // — we wire `onMessage` to clear the bio field, proving the
+        // JS → Swift channel round-trips through FormState.
+        r.register("bio-preview") { props, events in
+            let binding = events.binding("value")
+            let id = props.id
+            #if canImport(WebKit) && !os(tvOS) && !os(watchOS)
+            return .webView(
+                html: Self.bioPreviewHTML,
+                onMessage: { payload in
+                    if payload["action"] == "clear" {
+                        binding.wrappedValue = ""
+                    }
+                }
+            )
+            #else
+            return .custom {
+                Text("Bio preview unavailable on this platform")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .accessibilityIdentifier(id)
+            }
+            #endif
+        }
         return r
     }
+
+    /// Inline HTML for the `.webView` showcase. The `<button>` calls
+    /// `window.webkit.messageHandlers.cssLayout.postMessage({...})` —
+    /// that dictionary reaches the `onMessage` handler above, proving
+    /// the JS → Swift channel.
+    fileprivate static let bioPreviewHTML = """
+    <!doctype html>
+    <html>
+      <head>
+        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">
+        <style>
+          body {
+            font: -apple-system-body, sans-serif;
+            color: #1d1d1f;
+            margin: 12px;
+            background: #fafafa;
+          }
+          h3 { margin: 0 0 6px; font-size: 15px; }
+          p  { margin: 0 0 8px; font-size: 13px; color: #444; }
+          button {
+            font-size: 13px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #d0d0d0;
+            background: #fff;
+          }
+        </style>
+      </head>
+      <body>
+        <h3>Bio tips</h3>
+        <p>Keep it short — one sentence about who you are, one about what you build.</p>
+        <button onclick=\"window.webkit.messageHandlers.cssLayout.postMessage({action:'clear'})\">
+          Clear bio
+        </button>
+      </body>
+    </html>
+    """
 }
 
 // MARK: - Text field wrapper
