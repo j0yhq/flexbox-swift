@@ -337,32 +337,32 @@ struct WizardDemo: View {
         let r = ComponentRegistry()
 
         r.register("heading") { props, _ in
-            AnyView(
+            .custom {
                 Text(props.string("text") ?? "")
                     .font(.title3.weight(.semibold))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .accessibilityIdentifier(props.id)
-            )
+            }
         }
 
         r.register("subheading") { props, _ in
-            AnyView(
+            .custom {
                 Text(props.string("text") ?? "")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .accessibilityIdentifier(props.id)
-            )
+            }
         }
 
         r.register("text-field") { props, events in
-            AnyView(
+            .custom {
                 WizardBoundField(
                     placeholder: props.string("placeholder") ?? "",
                     text: events.binding("value")
                 )
                 .accessibilityIdentifier(props.id)
-            )
+            }
         }
 
         // A read-only row. Either binds to a single FormState path via
@@ -380,7 +380,7 @@ struct WizardDemo: View {
                 }
                 return single.isEmpty ? "—" : single
             }()
-            return AnyView(
+            return .custom {
                 HStack {
                     Text(label)
                         .font(.system(.caption, design: .monospaced))
@@ -390,7 +390,7 @@ struct WizardDemo: View {
                         .font(.system(.caption, design: .monospaced))
                 }
                 .accessibilityIdentifier(props.id)
-            )
+            }
         }
 
         // Generic event button — emits whatever name the payload put in
@@ -400,7 +400,7 @@ struct WizardDemo: View {
             let title   = props.string("text")  ?? "Continue"
             let name    = props.string("event") ?? "next"
             let primary = (props.string("style") ?? "primary") == "primary"
-            return AnyView(
+            return .custom {
                 Group {
                     if primary {
                         Button(title) { events.emit(name, payload: [:]) }
@@ -412,7 +412,7 @@ struct WizardDemo: View {
                 }
                 .frame(maxWidth: .infinity)
                 .accessibilityIdentifier(props.id)
-            )
+            }
         }
 
         return r

@@ -277,31 +277,31 @@ struct FormStateDemo: View {
     private var registry: ComponentRegistry {
         let r = ComponentRegistry()
         r.register("heading") { props, _ in
-            AnyView(
+            .custom {
                 Text(props.string("text") ?? "")
                     .font(.title3.weight(.semibold))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .accessibilityIdentifier(props.id)
-            )
+            }
         }
         r.register("text-field") { props, events in
-            AnyView(
+            .custom {
                 BoundTextField(
                     placeholder: props.string("placeholder") ?? "",
                     text: events.binding("value")
                 )
                 .accessibilityIdentifier(props.id)
-            )
+            }
         }
         r.register("submit-button") { props, events in
-            AnyView(
+            .custom {
                 Button(props.string("text") ?? "Submit") {
                     events.emit("submit", payload: [:])
                 }
                 .buttonStyle(.borderedProminent)
                 .frame(maxWidth: .infinity)
                 .accessibilityIdentifier(props.id)
-            )
+            }
         }
         return r
     }

@@ -71,7 +71,7 @@ final class ComponentResolverTests: XCTestCase {
 
     func testLocalComponentWinsOverRegistry() {
         let registry = ComponentRegistry()
-            .register("button") { _, _ in AnyView(Text("registry")) }
+            .register("button") { _, _ in .custom { Text("registry") } }
         let locals = [Component("submit") { Text("local") }]
         let (res, _) = resolve(
             nodes: [rootNode(), styleNode(id: "submit", schemaType: "button")],
@@ -83,7 +83,7 @@ final class ComponentResolverTests: XCTestCase {
 
     func testFallsBackToRegistry() {
         let registry = ComponentRegistry()
-            .register("button") { _, _ in AnyView(Text("registry")) }
+            .register("button") { _, _ in .custom { Text("registry") } }
         let (res, _) = resolve(
             nodes: [rootNode(), styleNode(id: "submit", schemaType: "button")],
             registry: registry
@@ -116,16 +116,17 @@ final class ComponentResolverTests: XCTestCase {
 
     // MARK: - Tier 2: ComponentBody + ValueStore plumb-through
 
-    /// A factory registered via the body overload runs through the
-    /// resolver and surfaces as `.registry`. The returned view is
-    /// materialised via `ComponentBody.makeView()` under the hood.
+    /// A factory registered through the (now unified) ComponentFactory
+    /// surface runs through the resolver and surfaces as `.registry`.
+    /// The returned view is materialised via `ComponentBody.makeView()`
+    /// under the hood.
     func testResolverInvokesBodyFactory() {
         var calls = 0
         let registry = ComponentRegistry()
-        registry.register("card", body: { _, _ -> ComponentBody in
+        registry.register("card") { _, _ -> ComponentBody in
             calls += 1
             return .custom { EmptyView() }
-        })
+        }
         let (res, _) = resolve(
             nodes: [rootNode(), styleNode(id: "hero", schemaType: "card")],
             registry: registry
@@ -148,10 +149,10 @@ final class ComponentResolverTests: XCTestCase {
             observe: { _, _ in NoopCancellableStub() }
         )
         let registry = ComponentRegistry()
-        registry.register("input", body: { _, events -> ComponentBody in
+        registry.register("input") { _, events -> ComponentBody in
             events.setValue("hello", for: "name")
             return .custom { EmptyView() }
-        })
+        }
         _ = resolve(
             nodes: [rootNode(), styleNode(id: "n", schemaType: "input")],
             registry: registry,
@@ -240,7 +241,7 @@ final class ComponentResolverTests: XCTestCase {
     /// notices rather than silently losing the view.
     func testContainerWithFactoryDropsViewWithDiagnostic() {
         let registry = ComponentRegistry()
-            .register("box") { _, _ in AnyView(Text("dropped")) }
+            .register("box") { _, _ in .custom { Text("dropped") } }
         let (res, diags) = resolve(
             nodes: [
                 rootNode(),
@@ -274,7 +275,7 @@ final class ComponentResolverTests: XCTestCase {
     /// no factory runs, and no placeholder is emitted.
     func testDisplayNoneNodeIsFiltered() {
         let registry = ComponentRegistry()
-            .register("button") { _, _ in AnyView(Text("should not render")) }
+            .register("button") { _, _ in .custom { Text("should not render") } }
         let hidden = StyleNode(id: "a", schemaType: "button", computedStyle: hiddenStyle())
         let (res, _) = resolve(
             nodes: [rootNode(), hidden, styleNode(id: "b")],
@@ -356,7 +357,7 @@ final class ComponentResolverTests: XCTestCase {
         let registry = ComponentRegistry()
             .register("text-input") { props, _ in
                 captured.seen = props.values
-                return AnyView(EmptyView())
+                return .custom { EmptyView() }
             }
         _ = resolve(
             nodes: [
@@ -400,7 +401,7 @@ final class ComponentResolverTests: XCTestCase {
         let registry = ComponentRegistry()
             .register(type) { _, events in
                 probe.events = events
-                return AnyView(EmptyView())
+                return .custom { EmptyView() }
             }
         _ = resolve(nodes: nodes, registry: registry, formState: formState)
         return probe

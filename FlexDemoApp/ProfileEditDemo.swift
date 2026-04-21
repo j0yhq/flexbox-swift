@@ -266,31 +266,31 @@ struct ProfileEditDemo: View {
     private var registry: ComponentRegistry {
         let r = ComponentRegistry()
         r.register("heading") { props, _ in
-            AnyView(
+            .custom {
                 Text(props.string("text") ?? "")
                     .font(.title3.weight(.semibold))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .accessibilityIdentifier(props.id)
-            )
+            }
         }
         r.register("text-field") { props, events in
-            AnyView(
+            .custom {
                 ProfileBoundField(
                     placeholder: props.string("placeholder") ?? "",
                     text: events.binding("value")
                 )
                 .accessibilityIdentifier(props.id)
-            )
+            }
         }
         r.register("save-button") { props, events in
-            AnyView(
+            .custom {
                 Button(props.string("text") ?? "Save") {
                     events.emit("save", payload: [:])
                 }
                 .buttonStyle(.borderedProminent)
                 .frame(maxWidth: .infinity)
                 .accessibilityIdentifier(props.id)
-            )
+            }
         }
         return r
     }

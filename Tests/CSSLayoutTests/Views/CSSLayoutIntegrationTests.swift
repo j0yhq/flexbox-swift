@@ -58,7 +58,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
         let registry = ComponentRegistry()
         registry.register("auto-button") { _, events in
             events.emit("submit", payload: ["form": "signup"])
-            return AnyView(EmptyView())
+            return .custom { EmptyView() }
         }
 
         let payload = CSSPayload(
@@ -85,7 +85,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
         let registry = ComponentRegistry()
         registry.register("auto-button") { _, events in
             events.emit("change", payload: [:])
-            return AnyView(EmptyView())
+            return .custom { EmptyView() }
         }
 
         let payload = CSSPayload(
@@ -109,7 +109,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
         let registry = ComponentRegistry()
         registry.register("silent-button") { _, events in
             events.emit("tap", payload: [:], propagates: false)
-            return AnyView(EmptyView())
+            return .custom { EmptyView() }
         }
 
         let payload = CSSPayload(
@@ -131,7 +131,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
         let registry = ComponentRegistry()
         registry.register("bubbling-button") { _, events in
             events.emit("tap", payload: [:], propagates: true)
-            return AnyView(EmptyView())
+            return .custom { EmptyView() }
         }
 
         let payload = CSSPayload(
@@ -153,7 +153,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
         let registry = ComponentRegistry()
         registry.register("legacy-button") { _, events in
             events.emit("tap", payload: [:])
-            return AnyView(EmptyView())
+            return .custom { EmptyView() }
         }
 
         let payload = CSSPayload(
@@ -177,7 +177,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
             events.emit("submit", payload: [:])
             events.emit("tap",    payload: [:])
             events.emit("change", payload: [:])
-            return AnyView(EmptyView())
+            return .custom { EmptyView() }
         }
 
         let payload = CSSPayload(
@@ -198,7 +198,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
         let registry = ComponentRegistry()
         registry.register("one") { _, events in
             events.emit("submit", payload: [:])
-            return AnyView(EmptyView())
+            return .custom { EmptyView() }
         }
 
         let payload = CSSPayload(
@@ -221,7 +221,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
         let registry = ComponentRegistry()
         registry.register("silent") { _, events in
             events.emit("tap", payload: [:], propagates: false)
-            return AnyView(EmptyView())
+            return .custom { EmptyView() }
         }
 
         let payload = CSSPayload(
@@ -246,7 +246,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
         let registry = ComponentRegistry()
         registry.register("emitter") { _, events in
             events.emit("tap", payload: ["from": "child"])
-            return AnyView(EmptyView())
+            return .custom { EmptyView() }
         }
 
         let payload = CSSPayload(
@@ -276,7 +276,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
         let registry = ComponentRegistry()
         registry.register("emitter") { _, events in
             events.emit("tap", payload: [:], propagates: false)
-            return AnyView(EmptyView())
+            return .custom { EmptyView() }
         }
 
         let payload = CSSPayload(
@@ -306,7 +306,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
         let registry = ComponentRegistry()
         registry.register("emitter") { _, events in
             events.emit("tap", payload: [:])
-            return AnyView(EmptyView())
+            return .custom { EmptyView() }
         }
 
         let payload = CSSPayload(
@@ -333,7 +333,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
         let registry = ComponentRegistry()
         registry.register("emitter") { _, events in
             events.emit("change", payload: [:])
-            return AnyView(EmptyView())
+            return .custom { EmptyView() }
         }
 
         let payload = CSSPayload(
@@ -373,7 +373,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
         r.register(type) { _, events in
             cap.events = events
             cap.initialValue = events.binding("value").wrappedValue
-            return AnyView(EmptyView())
+            return .custom { EmptyView() }
         }
         return r
     }
@@ -485,7 +485,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
 
         // New payload only declares user.name — email is no longer bound.
         let registry = ComponentRegistry()
-        registry.register("text-input") { _, _ in AnyView(EmptyView()) }
+        registry.register("text-input") { _, _ in .custom { EmptyView() } }
         let payload = CSSPayload(
             css: "",
             schema: [SchemaEntry(
@@ -515,7 +515,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
             "gone":        "should-prune",
         ])
         let registry = ComponentRegistry()
-        registry.register("row") { _, _ in AnyView(EmptyView()) }
+        registry.register("row") { _, _ in .custom { EmptyView() } }
         let payload = CSSPayload(
             css: "",
             schema: [SchemaEntry(

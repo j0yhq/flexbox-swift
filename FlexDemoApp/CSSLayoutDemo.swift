@@ -82,31 +82,31 @@ struct CSSLayoutDemo: View {
     private var registry: ComponentRegistry {
         let r = ComponentRegistry()
         r.register("heading") { props, _ in
-            AnyView(
+            .custom {
                 Text("Create your account")
                     .font(.title2.weight(.semibold))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .accessibilityIdentifier(props.id)
-            )
+            }
         }
         r.register("text-field") { props, _ in
-            AnyView(
+            .custom {
                 TextFieldBinding(
                     id: props.id,
                     placeholder: props.id
                 )
                 .accessibilityIdentifier(props.id)
-            )
+            }
         }
         r.register("submit-button") { props, events in
-            AnyView(
+            .custom {
                 Button("Submit") {
                     events.emit("submit", payload: [:])
                 }
                 .buttonStyle(.borderedProminent)
                 .frame(maxWidth: .infinity)
                 .accessibilityIdentifier(props.id)
-            )
+            }
         }
         return r
     }
