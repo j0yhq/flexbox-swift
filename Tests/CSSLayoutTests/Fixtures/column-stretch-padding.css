@@ -1,5 +1,0 @@
-#root { display: flex; flex-direction: column; padding: 20px; align-items: stretch; gap: 0; }
-#a { height: 40px; flex-shrink: 0; }
-#b { height: 40px; flex-shrink: 0; }
-#c { height: 40px; flex-shrink: 0; }
-#d { height: 40px; flex-shrink: 0; }

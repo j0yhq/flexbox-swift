@@ -1,3 +1,0 @@
-#root { display: flex; flex-direction: row; gap: 0; }
-#sidebar { flex-basis: 240px; flex-shrink: 0; height: 100px; }
-#main    { flex: 1; height: 100px; }
