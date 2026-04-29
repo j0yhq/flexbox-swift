@@ -31,7 +31,7 @@
 import Foundation
 
 /// Pure-function flattener for a joy-dom tree.
-public enum SchemaFlattener {
+internal enum SchemaFlattener {
 
     // MARK: - Public API
 
@@ -43,7 +43,7 @@ public enum SchemaFlattener {
     ///   `parentID == nil` so CSSLayout's existing root-attach behavior
     ///   applies (`StyleTreeBuilder` re-parents `nil` to the implicit
     ///   root, then composes the rest of the tree via `parentID` links).
-    public static func flatten(_ layout: Node) -> [SchemaEntry] {
+    internal static func flatten(_ layout: Node) -> [SchemaEntry] {
         var output: [SchemaEntry] = []
         emit(node: layout, parentID: nil, path: [], into: &output)
         return output

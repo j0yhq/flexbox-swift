@@ -46,7 +46,6 @@ struct JoyDOMShowcaseDemo: View {
 
     var body: some View {
         let viewport = Viewport(width: simulatedWidth)
-        let payload  = JoyDOMConverter.convert(spec, viewport: viewport)
         let activeIndex = BreakpointResolver.activeIndex(
             in: viewport,
             breakpoints: spec.breakpoints
@@ -57,7 +56,8 @@ struct JoyDOMShowcaseDemo: View {
                 header
                 control
                 Divider()
-                canvas(payload: payload)
+                canvas
+                    .joyViewport(viewport)
                 debug(active: activeIndex)
             }
             .padding(24)
@@ -125,8 +125,8 @@ struct JoyDOMShowcaseDemo: View {
             )
     }
 
-    private func canvas(payload: CSSPayload) -> some View {
-        CSSLayout(payload: payload, registry: registry)
+    private var canvas: some View {
+        CSSLayout(spec: spec, registry: registry)
             .onEvent("*") { event in
                 eventLog.append("\(event.sourceID) → \(event.name) \(event.payload)")
                 if eventLog.count > 8 {

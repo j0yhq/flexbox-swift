@@ -27,7 +27,7 @@
 import Foundation
 
 /// Pure-function converter from `JoyDOMSpec` to `CSSPayload`.
-public enum JoyDOMConverter {
+internal enum JoyDOMConverter {
 
     // MARK: - Public API
 
@@ -42,7 +42,7 @@ public enum JoyDOMConverter {
     /// Per-node breakpoint overrides also REPLACE `className` on the
     /// affected `SchemaEntry` so class selectors re-match against the
     /// breakpoint-effective class list.
-    public static func convert(_ spec: JoyDOMSpec, viewport: Viewport?) -> CSSPayload {
+    internal static func convert(_ spec: JoyDOMSpec, viewport: Viewport?) -> CSSPayload {
         let activeBreakpoint = viewport.flatMap {
             BreakpointResolver.active(in: $0, breakpoints: spec.breakpoints)
         }
@@ -93,7 +93,7 @@ public enum JoyDOMConverter {
 
     /// Convert a `JoyDOMSpec` into the `CSSPayload` CSSLayout's
     /// resolver consumes.
-    public static func convert(_ spec: JoyDOMSpec) -> CSSPayload {
+    internal static func convert(_ spec: JoyDOMSpec) -> CSSPayload {
         return convert(spec, viewport: nil)
     }
 
@@ -104,7 +104,7 @@ public enum JoyDOMConverter {
     /// `#id` selector the resolver uses.
     ///
     /// Returns an empty string when no node carries an inline style.
-    public static func inlineStyleCSS(for layout: Node) -> String {
+    internal static func inlineStyleCSS(for layout: Node) -> String {
         var rules: [String] = []
         collectInlineRules(node: layout, path: [], into: &rules)
         return rules.joined(separator: "\n")

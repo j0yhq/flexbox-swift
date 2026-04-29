@@ -15,7 +15,7 @@
 import Foundation
 
 /// Builds the flat style tree consumed by `ComponentResolver`.
-public enum StyleTreeBuilder {
+internal enum StyleTreeBuilder {
 
     /// Construct a node list for rendering.
     ///
@@ -28,7 +28,7 @@ public enum StyleTreeBuilder {
     ///   - stylesheet: The parsed CSS to cascade over.
     ///   - diagnostics: Forwarded to `StyleResolver` for invalid-value warnings.
     /// - Returns: `[root] + children`, always at least one node.
-    public static func build(
+    internal static func build(
         rootID: String,
         schema: [SchemaEntry],
         stylesheet: Stylesheet,

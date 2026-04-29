@@ -21,7 +21,7 @@
 import Foundation
 
 /// Pure-function serializer for `Style` → CSS text.
-public enum StyleSerializer {
+internal enum StyleSerializer {
 
     // MARK: - Public API
 
@@ -30,7 +30,7 @@ public enum StyleSerializer {
     ///
     /// Field emission order matches the property order on `Style` itself,
     /// so the output is deterministic and stable for golden-string tests.
-    public static func serialize(_ style: Style) -> String {
+    internal static func serialize(_ style: Style) -> String {
         var parts: [String] = []
 
         if let v = style.position       { parts.append("position: \(v.rawValue);") }
@@ -63,7 +63,7 @@ public enum StyleSerializer {
     /// Wrap declarations inside a selector to produce a complete CSS
     /// rule. Returns an empty string when the style has no fields, so
     /// callers can safely chain output without checking emptiness first.
-    public static func rule(selector: String, style: Style) -> String {
+    internal static func rule(selector: String, style: Style) -> String {
         let body = serialize(style)
         guard !body.isEmpty else { return "" }
         return "\(selector) { \(body) }"

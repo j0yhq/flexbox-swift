@@ -19,24 +19,33 @@ import SwiftUI
 import FlexLayout
 import CoreGraphics
 
-/// Renders a CSS payload as a live SwiftUI view tree backed by `FlexLayout`.
+/// Renders a `JoyDOMSpec` as a live SwiftUI view tree backed by `FlexLayout`.
 ///
 /// ```swift
-/// CSSLayout(
-///     payload: CSSPayload(
-///         css: "#root { display: flex; gap: 12px; } #a { flex: 1; }",
-///         schema: [SchemaEntry(id: "a", type: "text")]
-///     )
-/// )
-/// .onEvent("submit") { event in print("submitted:", event.payload) }
+/// CSSLayout(spec: spec)
+///     .joyViewport(.init(width: 1024))
+///     .onEvent("submit") { event in print("submitted:", event.payload) }
 /// ```
+///
+/// Pass a `Viewport` via `.joyViewport(_:)` so breakpoint resolution can
+/// pick the active breakpoint. Without one, only the document-level styles
+/// apply.
 public struct CSSLayout: View {
 
     // MARK: - Stored state
 
-    private let payload: CSSPayload
+    /// Either a joy-dom spec (the public API path) or a pre-resolved
+    /// payload (used internally by the test suite to exercise the
+    /// rendering pipeline without the spec layer in the way).
+    private enum Source {
+        case spec(JoyDOMSpec)
+        case payload(CSSPayload)
+    }
+    private let source: Source
     private let registry: ComponentRegistry
     private let locals: [Component]
+
+    @Environment(\.joyViewport) private var environmentViewport
 
     private var eventHandlers: [String: (CSSEvent) -> Void] = [:]
     private var placeholderFactory: (String) -> AnyView = { AnyView(PlaceholderBox(id: $0)) }
@@ -45,24 +54,37 @@ public struct CSSLayout: View {
 
     // MARK: - Initialisers
 
-    /// Primary initialiser.
+    /// Render a `JoyDOMSpec`.
     ///
     /// - Parameters:
-    ///   - payload: The CSS text + schema to render.
+    ///   - spec: The joy-dom document to render.
     ///   - registry: Component factory registry. Defaults to ``ComponentRegistry/shared``.
     ///   - locals: Inline `Component("id") { … }` overrides (optional).
     public init(
-        payload: CSSPayload,
+        spec: JoyDOMSpec,
         registry: ComponentRegistry = .shared,
         @CSSLayoutBuilder locals: () -> [Component] = { [] }
     ) {
-        self.payload = payload
+        self.source = .spec(spec)
         self.registry = registry
         self.locals = locals()
     }
 
-    /// Convenience initialiser for CSS-only payloads (typical for previews).
-    public init(
+    /// Internal initialiser for tests that want to exercise the
+    /// rendering pipeline directly with a pre-baked `CSSPayload`. Not
+    /// part of the public API.
+    internal init(
+        payload: CSSPayload,
+        registry: ComponentRegistry = .shared,
+        @CSSLayoutBuilder locals: () -> [Component] = { [] }
+    ) {
+        self.source = .payload(payload)
+        self.registry = registry
+        self.locals = locals()
+    }
+
+    /// Internal CSS-string convenience used by integration tests.
+    internal init(
         css: String,
         schema: [SchemaEntry] = [],
         registry: ComponentRegistry = .shared,
@@ -73,6 +95,19 @@ public struct CSSLayout: View {
             registry: registry,
             locals: locals
         )
+    }
+
+    /// Compute the effective `CSSPayload` for the current source. For
+    /// joy-dom specs this runs the full converter (which honors the
+    /// active breakpoint via the env viewport); for pre-baked payloads
+    /// we hand back the supplied payload unchanged.
+    private func resolvePayload() -> CSSPayload {
+        switch source {
+        case .spec(let s):
+            return JoyDOMConverter.convert(s, viewport: environmentViewport)
+        case .payload(let p):
+            return p
+        }
     }
 
     // MARK: - Modifiers
@@ -130,7 +165,8 @@ public struct CSSLayout: View {
     }
 
     public var body: some View {
-        let snapshot = renderSnapshot()
+        let payload = resolvePayload()
+        let snapshot = renderSnapshot(payload: payload)
         return FlexLayout(snapshot.rootStyle.container) {
             childrenView(snapshot.children)
         }
@@ -179,7 +215,7 @@ public struct CSSLayout: View {
     /// Separated from `body` so test helpers can exercise the full flow by
     /// simply reading `body`, yet the resolver's factories only run once per
     /// evaluation.
-    private func renderSnapshot() -> ComponentResolver.Resolved {
+    private func renderSnapshot(payload: CSSPayload) -> ComponentResolver.Resolved {
         var diagnostics = CSSDiagnostics()
         let stylesheet = CSSParser.parse(payload.css, diagnostics: &diagnostics)
         let nodes = StyleTreeBuilder.build(
