@@ -14,10 +14,10 @@
 //   • `primitive_null`   — `EmptyView()` — explicit nothing.
 //
 // Apps that don't want these defaults can ignore the helper; apps
-// that want to override one of them should call
-// `withDefaultPrimitives()` first and then `register(_:factory:)`
-// with the type they want to replace (last-wins, matching the
-// existing registry contract).
+// that want to override one of them should register a custom factory
+// AFTER calling `withDefaultPrimitives()` (last-wins per the registry's
+// existing contract) — the helper itself preserves any pre-existing
+// registration to support the opposite ordering too.
 
 import Foundation
 import SwiftUI
@@ -40,7 +40,39 @@ extension ComponentRegistry {
     /// ```
     @discardableResult
     public func withDefaultPrimitives() -> ComponentRegistry {
-        // RED stub — replaced in Unit 9 GREEN.
+        registerIfAbsent("div") { _, _ in
+            // Passthrough — children render through the layout tree.
+            // The container itself contributes no visible chrome.
+            .custom { EmptyView() }
+        }
+        registerIfAbsent("p") { _, _ in
+            // Same as div for now. Block-flow semantics aren't part
+            // of CSSLayout's flex-only model; `p` is meaningful for
+            // selector targeting only.
+            .custom { EmptyView() }
+        }
+        registerIfAbsent("primitive_string") { props, _ in
+            let value = props.string("value") ?? ""
+            return .custom { Text(value) }
+        }
+        registerIfAbsent("primitive_number") { props, _ in
+            let value = props.string("value") ?? ""
+            return .custom { Text(value) }
+        }
+        registerIfAbsent("primitive_null") { _, _ in
+            .custom { EmptyView() }
+        }
         return self
+    }
+
+    /// Helper: register a factory only when the type isn't already
+    /// registered. Lets `withDefaultPrimitives()` preserve user-supplied
+    /// factories no matter the chaining order.
+    private func registerIfAbsent(
+        _ type: String,
+        factory: @escaping ComponentFactory
+    ) {
+        guard self.factory(for: type) == nil else { return }
+        register(type, factory: factory)
     }
 }
