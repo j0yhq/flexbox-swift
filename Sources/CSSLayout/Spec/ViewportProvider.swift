@@ -40,8 +40,7 @@ public struct StaticViewportProvider: ViewportProvider {
     }
 
     public func currentViewport() -> Viewport {
-        // RED stub — replaced in Unit 6 GREEN.
-        return Viewport(width: -1)
+        viewport
     }
 }
 
@@ -60,9 +59,8 @@ extension EnvironmentValues {
     /// hasn't been populated; resolvers should treat that as a signal
     /// to fall back to a default rather than throw.
     public var joyViewport: Viewport? {
-        // RED stubs — replaced in Unit 6 GREEN.
-        get { nil }
-        set { /* swallow writes so tests observe the stub */ }
+        get { self[ViewportEnvironmentKey.self] }
+        set { self[ViewportEnvironmentKey.self] = newValue }
     }
 }
 
