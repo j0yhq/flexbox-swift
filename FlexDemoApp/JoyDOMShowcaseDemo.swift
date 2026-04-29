@@ -56,8 +56,7 @@ struct JoyDOMShowcaseDemo: View {
                 header
                 control
                 Divider()
-                canvas
-                    .joyViewport(viewport)
+                canvas(viewport: viewport)
                 debug(active: activeIndex)
             }
             .padding(24)
@@ -125,8 +124,9 @@ struct JoyDOMShowcaseDemo: View {
             )
     }
 
-    private var canvas: some View {
+    private func canvas(viewport: Viewport) -> some View {
         CSSLayout(spec: spec, registry: registry)
+            .viewport(viewport)
             .onEvent("*") { event in
                 eventLog.append("\(event.sourceID) → \(event.name) \(event.payload)")
                 if eventLog.count > 8 {

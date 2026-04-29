@@ -45,12 +45,19 @@ public struct CSSLayout: View {
     private let registry: ComponentRegistry
     private let locals: [Component]
 
-    @Environment(\.joyViewport) private var environmentViewport
-
     private var eventHandlers: [String: (CSSEvent) -> Void] = [:]
     private var placeholderFactory: (String) -> AnyView = { AnyView(PlaceholderBox(id: $0)) }
     private var diagnosticHandler: ((CSSWarning) -> Void)?
     private var formStateRef: FormState?
+    /// Viewport supplied via `.viewport(_:)`. Drives breakpoint
+    /// resolution. Demos typically wire this to `GeometryReader`'s
+    /// width; tests construct viewports directly.
+    private var storedViewport: Viewport?
+    /// Sidecar binding map declared via `.bindings(_:)`. Keys are
+    /// `Node.props.id` values; values are FormState dotted paths.
+    /// Empty by default — joy-dom payloads stay pure (no iOS-specific
+    /// binding tokens leak into the wire format).
+    private var bindingsByID: [String: String] = [:]
 
     // MARK: - Initialisers
 
@@ -104,10 +111,36 @@ public struct CSSLayout: View {
     private func resolvePayload() -> CSSPayload {
         switch source {
         case .spec(let s):
-            return JoyDOMConverter.convert(s, viewport: environmentViewport)
+            // Build the payload, then inject `.bindings(...)` declared
+            // FormState paths into the matching schema entries' props
+            // so the existing resolver picks them up via the same
+            // "binding"/"binding.<field>" prop convention used since
+            // Phase 3.
+            let raw = JoyDOMConverter.convert(s, viewport: storedViewport)
+            return injectBindings(into: raw)
         case .payload(let p):
             return p
         }
+    }
+
+    /// Apply `bindingsByID` to each matching `SchemaEntry.props` so
+    /// `events.binding(...)` finds a path. No-op when the map is empty
+    /// or when no entry matches.
+    private func injectBindings(into payload: CSSPayload) -> CSSPayload {
+        guard !bindingsByID.isEmpty else { return payload }
+        let patched = payload.schema.map { entry -> SchemaEntry in
+            guard let path = bindingsByID[entry.id] else { return entry }
+            var props = entry.props
+            props["binding"] = path
+            return SchemaEntry(
+                id: entry.id,
+                type: entry.type,
+                classes: entry.classes,
+                parentID: entry.parentID,
+                props: props
+            )
+        }
+        return CSSPayload(css: payload.css, schema: patched)
     }
 
     // MARK: - Modifiers
@@ -139,6 +172,42 @@ public struct CSSLayout: View {
     public func onDiagnostic(_ handler: @escaping (CSSWarning) -> Void) -> CSSLayout {
         var copy = self
         copy.diagnosticHandler = handler
+        return copy
+    }
+
+    /// Override the viewport used for breakpoint resolution. When unset
+    /// (or set to `nil`), no breakpoint applies and the document-level
+    /// styles render unchanged. Demos typically wrap CSSLayout in a
+    /// `GeometryReader` and feed `proxy.size.width` here.
+    public func viewport(_ viewport: Viewport?) -> CSSLayout {
+        var copy = self
+        copy.storedViewport = viewport
+        return copy
+    }
+
+    /// Declare the FormState path each node id binds to.
+    ///
+    /// Joy-dom payloads carry no iOS-specific binding tokens — that's
+    /// the spec's "pre-resolved values" stance. iOS hosts that want
+    /// live two-way binding wire it up here, declaratively, at the
+    /// SwiftUI surface:
+    ///
+    /// ```swift
+    /// CSSLayout(spec: spec)
+    ///     .formState(form)
+    ///     .bindings([
+    ///         "name-field":  "user.name",
+    ///         "email-field": "user.email",
+    ///     ])
+    /// ```
+    ///
+    /// Calling `.bindings(_:)` more than once merges the maps — later
+    /// calls win on conflicting keys.
+    public func bindings(_ map: [String: String]) -> CSSLayout {
+        var copy = self
+        for (id, path) in map {
+            copy.bindingsByID[id] = path
+        }
         return copy
     }
 
@@ -219,7 +288,7 @@ public struct CSSLayout: View {
         var diagnostics = CSSDiagnostics()
         let stylesheet = CSSParser.parse(payload.css, diagnostics: &diagnostics)
         let nodes = StyleTreeBuilder.build(
-            rootID: "root",
+            rootID: "__csslayout_root__",
             schema: payload.schema,
             stylesheet: stylesheet,
             diagnostics: &diagnostics
@@ -240,7 +309,7 @@ public struct CSSLayout: View {
         var localsByID: [String: Component] = [:]
         localsByID.reserveCapacity(locals.count)
         for l in locals { localsByID[l.id] = l }
-        let rootID = "root"
+        let rootID = "__csslayout_root__"
         // Prune FormState to the binding paths the current schema
         // declares *before* handing it to the resolver. Done up front so
         // a factory that reads its binding during its initial render
