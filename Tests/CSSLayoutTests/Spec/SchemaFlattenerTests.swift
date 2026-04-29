@@ -171,7 +171,9 @@ final class SchemaFlattenerTests: XCTestCase {
             .node(Node(type: "span", props: NodeProps(id: "tail"))),
         ])
         let entries = SchemaFlattener.flatten(layout)
-        XCTAssertEqual(entries.map(\.id), ["para", "lead", "_n_0_1", "tail"])
+        // Primitive "middle" sits at root's child index 1, so its
+        // path is `[1]` and the synthetic id is `_n_1`.
+        XCTAssertEqual(entries.map(\.id), ["para", "lead", "_n_1", "tail"])
         XCTAssertEqual(entries.map(\.type), ["p", "span", "primitive_string", "span"])
     }
 
