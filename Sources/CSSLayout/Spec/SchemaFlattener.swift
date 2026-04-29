@@ -44,6 +44,91 @@ public enum SchemaFlattener {
     ///   applies (`StyleTreeBuilder` re-parents `nil` to the implicit
     ///   root, then composes the rest of the tree via `parentID` links).
     public static func flatten(_ layout: Node) -> [SchemaEntry] {
-        return []
+        var output: [SchemaEntry] = []
+        emit(node: layout, parentID: nil, path: [], into: &output)
+        return output
+    }
+
+    // MARK: - Recursion
+
+    /// Append the entry for `node` (and recursively its children) to
+    /// `output`. `path` is the index trail from the root used to mint
+    /// synthetic ids when `node.props.id` is absent.
+    private static func emit(
+        node: Node,
+        parentID: String?,
+        path: [Int],
+        into output: inout [SchemaEntry]
+    ) {
+        let id = node.props?.id ?? syntheticID(for: path)
+        output.append(SchemaEntry(
+            id: id,
+            type: node.type,
+            classes: node.props?.className ?? [],
+            parentID: parentID,
+            props: [:]   // Inline styles & arbitrary props arrive in later units.
+        ))
+
+        // Recurse children. Each ChildNode is either a Node (deeper
+        // recursion) or a primitive (leaf entry).
+        for (index, child) in (node.children ?? []).enumerated() {
+            let childPath = path + [index]
+            switch child {
+            case .node(let childNode):
+                emit(node: childNode, parentID: id, path: childPath, into: &output)
+            case .primitive(let value):
+                output.append(primitiveEntry(value, parentID: id, path: childPath))
+            }
+        }
+    }
+
+    // MARK: - Synthetic id
+
+    /// `[]` → `"_root"`; `[0]` → `"_n_0"`; `[0, 1]` → `"_n_0_1"`.
+    private static func syntheticID(for path: [Int]) -> String {
+        guard !path.isEmpty else { return "_root" }
+        return "_n_" + path.map(String.init).joined(separator: "_")
+    }
+
+    // MARK: - Primitive child → SchemaEntry
+
+    private static func primitiveEntry(
+        _ value: PrimitiveValue,
+        parentID: String,
+        path: [Int]
+    ) -> SchemaEntry {
+        let id = syntheticID(for: path)
+        switch value {
+        case .string(let s):
+            return SchemaEntry(
+                id: id,
+                type: "primitive_string",
+                parentID: parentID,
+                props: ["value": s]
+            )
+        case .number(let n):
+            return SchemaEntry(
+                id: id,
+                type: "primitive_number",
+                parentID: parentID,
+                props: ["value": formatNumber(n)]
+            )
+        case .null:
+            return SchemaEntry(
+                id: id,
+                type: "primitive_null",
+                parentID: parentID,
+                props: [:]
+            )
+        }
+    }
+
+    /// Match `StyleSerializer`'s number formatting so primitive numbers
+    /// round-trip without spurious `.0` decorations.
+    private static func formatNumber(_ value: Double) -> String {
+        if value.truncatingRemainder(dividingBy: 1) == 0 {
+            return String(Int(value))
+        }
+        return String(value)
     }
 }
