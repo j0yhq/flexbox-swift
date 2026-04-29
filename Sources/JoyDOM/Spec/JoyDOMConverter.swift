@@ -1,9 +1,9 @@
 // JoyDOMConverter — turns a `JoyDOMSpec` (Unit 1) into the
-// `CSSPayload` CSSLayout's resolver already consumes.
+// `CSSPayload` JoyDOMView's resolver already consumes.
 //
 // The converter is the boundary between joy-dom's structured-object
 // world (tree of `Node`s, typed `Style` values, `Breakpoint` arrays)
-// and CSSLayout's text-CSS-plus-flat-schema world. By doing the
+// and JoyDOMView's text-CSS-plus-flat-schema world. By doing the
 // translation at this seam we keep the existing parser, cascade, and
 // resolver as the single source of truth for layout — no fork.
 //
@@ -31,7 +31,7 @@ internal enum JoyDOMConverter {
 
     // MARK: - Public API
 
-    /// Convert a `JoyDOMSpec` into the `CSSPayload` CSSLayout's
+    /// Convert a `JoyDOMSpec` into the `CSSPayload` JoyDOMView's
     /// resolver consumes, applying the active breakpoint (if any) for
     /// `viewport`.
     ///
@@ -91,7 +91,7 @@ internal enum JoyDOMConverter {
         )
     }
 
-    /// Convert a `JoyDOMSpec` into the `CSSPayload` CSSLayout's
+    /// Convert a `JoyDOMSpec` into the `CSSPayload` JoyDOMView's
     /// resolver consumes.
     internal static func convert(_ spec: JoyDOMSpec) -> CSSPayload {
         return convert(spec, viewport: nil)

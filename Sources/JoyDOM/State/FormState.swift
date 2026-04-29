@@ -1,7 +1,7 @@
 // FormState — the Phase-3 binding value store.
 //
 // Owns every field value that a component binds against via
-// `events.binding(_:)`. Because FormState lives *outside* the CSSLayout view
+// `events.binding(_:)`. Because FormState lives *outside* the JoyDOMView view
 // tree (typically as an `@StateObject` on the hosting screen), field values
 // survive the re-render that fires when the CSS payload hot-swaps. That
 // state continuity is the whole point of having a separate store rather
@@ -16,7 +16,7 @@
 //   • `prune(keeping:)` is the hot-swap escape hatch: callers compute the
 //     new payload's binding paths and ask FormState to drop anything else.
 //     Critically, `prune` does **not** publish — it runs during SwiftUI
-//     render (inside `CSSLayout.renderSnapshot`), where publishing would
+//     render (inside `JoyDOMView.renderSnapshot`), where publishing would
 //     trigger the runtime warning "Publishing changes from within view
 //     updates is not allowed" and leave render order undefined. Pruned
 //     paths are by definition orphans whose binding factory has been
@@ -35,7 +35,7 @@
 import Foundation
 import Combine
 
-/// Binding-backed value store that outlives any single `CSSLayout` render.
+/// Binding-backed value store that outlives any single `JoyDOMView` render.
 ///
 /// Inject as an `@StateObject` (or `@EnvironmentObject` for nested screens)
 /// so bound components can read/write form state across CSS hot-swaps.
@@ -84,7 +84,7 @@ public final class FormState: ObservableObject {
     /// stale fields don't leak across payloads.
     ///
     /// **Does not publish**, even when it removes paths. `prune` runs during
-    /// SwiftUI view composition (inside `CSSLayout.renderSnapshot`); firing
+    /// SwiftUI view composition (inside `JoyDOMView.renderSnapshot`); firing
     /// `objectWillChange` there would provoke the runtime warning
     /// "Publishing changes from within view updates is not allowed" and
     /// make render order undefined. A pruned path is by definition one

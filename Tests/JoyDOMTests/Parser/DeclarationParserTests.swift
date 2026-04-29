@@ -10,8 +10,8 @@ final class DeclarationParserTests: XCTestCase {
 
     // MARK: - Helpers
 
-    private func parse(_ body: String) -> ([Declaration], CSSDiagnostics) {
-        var diags = CSSDiagnostics()
+    private func parse(_ body: String) -> ([Declaration], JoyDiagnostics) {
+        var diags = JoyDiagnostics()
         let decls = DeclarationParser.parse(body, diagnostics: &diags)
         return (decls, diags)
     }
@@ -152,7 +152,7 @@ final class DeclarationParserTests: XCTestCase {
         XCTAssertEqual(diags.warnings.count, 0)
     }
 
-    // MARK: - `visibility` (Phase 2 — see CSSLayout-Design.md §10 Phase 2)
+    // MARK: - `visibility` (Phase 2 — see JoyDOMView-Design.md §10 Phase 2)
 
     /// `visibility` is a Phase-2 supported property per the design doc.
     /// The allow-list must accept it without emitting an

@@ -1,4 +1,4 @@
-// CSSEvent — the envelope delivered to `onEvent` handlers.
+// JoyEvent — the envelope delivered to `onEvent` handlers.
 //
 // Phase 1 delivered the minimum: name, source id, string-keyed payload.
 // Phase 2 adds `propagates` so a handler can stop the event from bubbling
@@ -7,8 +7,8 @@
 import Foundation
 
 /// An event produced by a component factory and dispatched to the
-/// `CSSLayout` view's registered `onEvent(_:)` handlers.
-public struct CSSEvent: Equatable {
+/// `JoyDOMView` view's registered `onEvent(_:)` handlers.
+public struct JoyEvent: Equatable {
     /// The event name, e.g. `"submit"`, `"tap"`.
     public let name: String
     /// The id of the component that emitted the event (the `SchemaEntry.id`).

@@ -1,6 +1,6 @@
 // Component — a local override for a single schema id.
 //
-// `CSSLayout` looks up every rendered node against:
+// `JoyDOMView` looks up every rendered node against:
 //   1. The locals block (this type)
 //   2. The component registry
 //   3. A placeholder fallback
@@ -8,7 +8,7 @@
 // Locals let app code render one-off SwiftUI views without touching the
 // global registry — typical for inline components, previews, and tests.
 //
-// Phase 2 adds `.onCSSEvent(_ name:, _ handler:)` so a local can observe
+// Phase 2 adds `.onJoyEvent(_ name:, _ handler:)` so a local can observe
 // bubbling events from its descendants in the schema tree. Handlers are
 // keyed by event name; non-matching names are ignored.
 
@@ -17,14 +17,14 @@ import SwiftUI
 
 /// A local component override for a single node id.
 ///
-/// Use inside the trailing closure of `CSSLayout(...)` to attach a SwiftUI
+/// Use inside the trailing closure of `JoyDOMView(...)` to attach a SwiftUI
 /// view directly to a schema id, bypassing the registry.
 ///
 /// ```swift
-/// CSSLayout(payload: payload) {
+/// JoyDOMView(payload: payload) {
 ///     Component("banner") { Image("hero").resizable() }
 ///     Component("submit") { Button("Go") { … } }
-///         .onCSSEvent("tap") { event in print(event.sourceID) }
+///         .onJoyEvent("tap") { event in print(event.sourceID) }
 /// }
 /// ```
 public struct Component {
@@ -33,8 +33,8 @@ public struct Component {
     /// Type-erased SwiftUI body captured from the trailing closure.
     public let content: AnyView
     /// Event handlers keyed by event name. Empty by default; populated by
-    /// ``onCSSEvent(_:_:)``.
-    internal var handlers: [String: (CSSEvent) -> Void]
+    /// ``onJoyEvent(_:_:)``.
+    internal var handlers: [String: (JoyEvent) -> Void]
 
     public init<V: View>(_ id: String, @ViewBuilder _ content: () -> V) {
         self.id = id
@@ -50,9 +50,9 @@ public struct Component {
     /// then each ancestor in turn, then the root `onEvent` handlers. Events
     /// emitted with `propagates: false` are target-only and never reach an
     /// ancestor handler registered here.
-    public func onCSSEvent(
+    public func onJoyEvent(
         _ name: String,
-        _ handler: @escaping (CSSEvent) -> Void
+        _ handler: @escaping (JoyEvent) -> Void
     ) -> Component {
         var copy = self
         copy.handlers[name] = handler

@@ -2,7 +2,7 @@
 //
 // This file defines the data types that match `DOM/spec.ts` from the
 // joyfill `.joy` repository, so an iOS host can decode a server-sent
-// `joy-dom` document and feed it into CSSLayout's render pipeline.
+// `joy-dom` document and feed it into JoyDOMView's render pipeline.
 //
 // The shapes below are pure data — no behavior, no rendering. Subsequent
 // units add:

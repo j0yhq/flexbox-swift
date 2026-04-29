@@ -1,4 +1,4 @@
-// CSSLayout — the top-level SwiftUI view that renders a `CSSPayload`.
+// JoyDOMView — the top-level SwiftUI view that renders a `CSSPayload`.
 //
 // Data flow per `body` evaluation:
 //
@@ -12,7 +12,7 @@
 //   6. `FlexLayout`             ──────────► lays out children using `ItemStyle`
 //
 // Caller-facing knobs are `.onEvent`, `.placeholder`, `.onDiagnostic`. Each
-// returns a new `CSSLayout` so chains compose like any SwiftUI modifier.
+// returns a new `JoyDOMView` so chains compose like any SwiftUI modifier.
 
 import Foundation
 import SwiftUI
@@ -22,7 +22,7 @@ import CoreGraphics
 /// Renders a `JoyDOMSpec` as a live SwiftUI view tree backed by `FlexLayout`.
 ///
 /// ```swift
-/// CSSLayout(spec: spec)
+/// JoyDOMView(spec: spec)
 ///     .joyViewport(.init(width: 1024))
 ///     .onEvent("submit") { event in print("submitted:", event.payload) }
 /// ```
@@ -30,7 +30,7 @@ import CoreGraphics
 /// Pass a `Viewport` via `.joyViewport(_:)` so breakpoint resolution can
 /// pick the active breakpoint. Without one, only the document-level styles
 /// apply.
-public struct CSSLayout: View {
+public struct JoyDOMView: View {
 
     // MARK: - Stored state
 
@@ -45,9 +45,9 @@ public struct CSSLayout: View {
     private let registry: ComponentRegistry
     private let locals: [Component]
 
-    private var eventHandlers: [String: (CSSEvent) -> Void] = [:]
+    private var eventHandlers: [String: (JoyEvent) -> Void] = [:]
     private var placeholderFactory: (String) -> AnyView = { AnyView(PlaceholderBox(id: $0)) }
-    private var diagnosticHandler: ((CSSWarning) -> Void)?
+    private var diagnosticHandler: ((JoyWarning) -> Void)?
     private var formStateRef: FormState?
     /// Viewport supplied via `.viewport(_:)`. Drives breakpoint
     /// resolution. Demos typically wire this to `GeometryReader`'s
@@ -152,7 +152,7 @@ public struct CSSLayout: View {
     /// event after the named handler (if any). Later calls with the same name
     /// overwrite the earlier handler. Non-propagating events (emitted with
     /// `propagates: false`) bypass both named and wildcard handlers.
-    public func onEvent(_ name: String, _ handler: @escaping (CSSEvent) -> Void) -> CSSLayout {
+    public func onEvent(_ name: String, _ handler: @escaping (JoyEvent) -> Void) -> JoyDOMView {
         var copy = self
         copy.eventHandlers[name] = handler
         return copy
@@ -160,16 +160,16 @@ public struct CSSLayout: View {
 
     /// Override the default placeholder factory. `id` is the node id that
     /// couldn't be resolved.
-    public func placeholder(_ build: @escaping (String) -> AnyView) -> CSSLayout {
+    public func placeholder(_ build: @escaping (String) -> AnyView) -> JoyDOMView {
         var copy = self
         copy.placeholderFactory = build
         return copy
     }
 
-    /// Register a diagnostic handler. Called once per `CSSWarning` emitted
+    /// Register a diagnostic handler. Called once per `JoyWarning` emitted
     /// during parse/cascade/resolve. Useful for surfacing parse errors in
     /// debug builds; intentionally silent by default.
-    public func onDiagnostic(_ handler: @escaping (CSSWarning) -> Void) -> CSSLayout {
+    public func onDiagnostic(_ handler: @escaping (JoyWarning) -> Void) -> JoyDOMView {
         var copy = self
         copy.diagnosticHandler = handler
         return copy
@@ -177,9 +177,9 @@ public struct CSSLayout: View {
 
     /// Override the viewport used for breakpoint resolution. When unset
     /// (or set to `nil`), no breakpoint applies and the document-level
-    /// styles render unchanged. Demos typically wrap CSSLayout in a
+    /// styles render unchanged. Demos typically wrap JoyDOMView in a
     /// `GeometryReader` and feed `proxy.size.width` here.
-    public func viewport(_ viewport: Viewport?) -> CSSLayout {
+    public func viewport(_ viewport: Viewport?) -> JoyDOMView {
         var copy = self
         copy.storedViewport = viewport
         return copy
@@ -193,7 +193,7 @@ public struct CSSLayout: View {
     /// SwiftUI surface:
     ///
     /// ```swift
-    /// CSSLayout(spec: spec)
+    /// JoyDOMView(spec: spec)
     ///     .formState(form)
     ///     .bindings([
     ///         "name-field":  "user.name",
@@ -203,7 +203,7 @@ public struct CSSLayout: View {
     ///
     /// Calling `.bindings(_:)` more than once merges the maps — later
     /// calls win on conflicting keys.
-    public func bindings(_ map: [String: String]) -> CSSLayout {
+    public func bindings(_ map: [String: String]) -> JoyDOMView {
         var copy = self
         for (id, path) in map {
             copy.bindingsByID[id] = path
@@ -216,7 +216,7 @@ public struct CSSLayout: View {
     /// value live. The caller owns the `FormState` — state survives payload
     /// hot-swaps and is pruned to the paths the current schema declares on
     /// every render, so stale values don't accumulate across fetches.
-    public func formState(_ form: FormState) -> CSSLayout {
+    public func formState(_ form: FormState) -> JoyDOMView {
         var copy = self
         copy.formStateRef = form
         return copy
@@ -285,7 +285,7 @@ public struct CSSLayout: View {
     /// simply reading `body`, yet the resolver's factories only run once per
     /// evaluation.
     private func renderSnapshot(payload: CSSPayload) -> ComponentResolver.Resolved {
-        var diagnostics = CSSDiagnostics()
+        var diagnostics = JoyDiagnostics()
         let stylesheet = CSSParser.parse(payload.css, diagnostics: &diagnostics)
         let nodes = StyleTreeBuilder.build(
             rootID: "__csslayout_root__",
@@ -298,7 +298,7 @@ public struct CSSLayout: View {
         // need to retain `self`.
         let handlers = eventHandlers
         // Bubble-path plumbing: look up each node's parent to walk ancestors,
-        // and every local's handlers so `.onCSSEvent` can fire during bubble.
+        // and every local's handlers so `.onJoyEvent` can fire during bubble.
         // Both dictionaries use a tolerant init (`[key] = value` in a loop)
         // so adversarial payloads with duplicate ids never hard-crash.
         var parentByID: [String: String?] = [:]
@@ -332,7 +332,7 @@ public struct CSSLayout: View {
             registry: registry,
             placeholder: placeholderFactory,
             eventSink: { sourceID, name, payload, propagates in
-                let event = CSSEvent(
+                let event = JoyEvent(
                     name: name,
                     sourceID: sourceID,
                     payload: payload,
@@ -340,7 +340,7 @@ public struct CSSLayout: View {
                 )
                 // Bubble phase: visit source first, then each ancestor up to
                 // (but excluding) the root. Each local along the way may
-                // carry a matching `.onCSSEvent` handler. A non-propagating
+                // carry a matching `.onJoyEvent` handler. A non-propagating
                 // event only fires at the target.
                 var cursor: String? = sourceID
                 var visited: Set<String> = []

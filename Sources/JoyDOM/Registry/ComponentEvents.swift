@@ -21,7 +21,7 @@ import SwiftUI
 /// Token returned by ``ComponentEvents/observe(_:_:)``. Calling
 /// ``cancel()`` stops further observer callbacks for the registration.
 ///
-/// Deliberately **not** Combine's `Cancellable`: CSSLayout has no Combine
+/// Deliberately **not** Combine's `Cancellable`: JoyDOMView has no Combine
 /// dependency and host-agnostic factories should not need one either.
 public protocol Cancellable: AnyObject {
     func cancel()
@@ -64,7 +64,7 @@ internal final class NoopCancellable: Cancellable {
 
 /// The outbound event channel given to a component factory.
 ///
-/// Factories call `emit` to notify the surrounding `CSSLayout` of user
+/// Factories call `emit` to notify the surrounding `JoyDOMView` of user
 /// interactions; the sink decides what to do with the event (typically fan
 /// out to the registered `onEvent` handlers, but for tests it's often a
 /// simple closure that records calls).

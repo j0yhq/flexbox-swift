@@ -10,8 +10,8 @@ final class RuleParserTests: XCTestCase {
 
     // MARK: - Helpers
 
-    private func parse(_ css: String) -> ([CSSRule], CSSDiagnostics) {
-        var diags = CSSDiagnostics()
+    private func parse(_ css: String) -> ([CSSRule], JoyDiagnostics) {
+        var diags = JoyDiagnostics()
         let rules = RuleParser.parseRules(from: css, diagnostics: &diags)
         return (rules, diags)
     }

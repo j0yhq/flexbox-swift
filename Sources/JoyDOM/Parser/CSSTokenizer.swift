@@ -8,7 +8,7 @@ import Foundation
 
 /// Turns a CSS source string into a stream of ``CSSToken`` values.
 ///
-/// This is the only layer in CSSLayout that inspects raw text. Every other
+/// This is the only layer in JoyDOMView that inspects raw text. Every other
 /// unit consumes tokens.
 public enum CSSTokenizer {
 

@@ -4,7 +4,7 @@ import XCTest
 
 /// Unit 6 — `ViewportProvider` (the testable seam) and the SwiftUI
 /// environment key that lets a host push the current viewport down to
-/// CSSLayout's resolver pipeline.
+/// JoyDOMView's resolver pipeline.
 ///
 /// Live geometry observation (`GeometryReader`, `UITraitCollection`)
 /// is a host concern that the end-to-end demo (Unit 11) exercises;

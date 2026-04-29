@@ -3,8 +3,8 @@ import Combine
 @testable import JoyDOM
 
 /// Unit 1 — `FormState` is the Phase-3 value store that outlives any single
-/// `CSSLayout` render, giving bound components state continuity across CSS
-/// hot-swaps (per CSSLayout-Design.md §4.6).
+/// `JoyDOMView` render, giving bound components state continuity across CSS
+/// hot-swaps (per JoyDOMView-Design.md §4.6).
 ///
 /// Contract:
 ///   • A flat string-to-string key/value map. The key is the binding path
@@ -115,7 +115,7 @@ final class FormStateTests: XCTestCase {
     }
 
     /// `prune` must never fire `objectWillChange`, whether it removes paths
-    /// or not. Prune is internal bookkeeping that `CSSLayout.renderSnapshot`
+    /// or not. Prune is internal bookkeeping that `JoyDOMView.renderSnapshot`
     /// calls *during* SwiftUI view composition to drop orphaned paths; if
     /// it published, SwiftUI would log
     ///

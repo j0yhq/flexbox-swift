@@ -12,7 +12,7 @@ import SwiftUI
 /// Builds a ``ComponentBody`` for one schema-supplied component.
 ///
 /// The factory receives the props extracted from the schema and an event
-/// sink that routes user interactions back to the `CSSLayout` host. Return
+/// sink that routes user interactions back to the `JoyDOMView` host. Return
 /// a ``ComponentBody`` — constructed via `.custom { ... }`, `.uiKit(...)`,
 /// or `.webView(...)` — so the registry stays host-agnostic.
 ///
@@ -26,7 +26,7 @@ public typealias ComponentFactory = (_ props: ComponentProps, _ events: Componen
 public final class ComponentRegistry {
 
     /// The package-wide default registry. Apps register their factories here
-    /// once at startup; `CSSLayout` reads from it unless given a custom
+    /// once at startup; `JoyDOMView` reads from it unless given a custom
     /// registry.
     public static let shared = ComponentRegistry()
 

@@ -1,4 +1,4 @@
-// ViewportProvider — wires `Viewport` (Unit 5) into CSSLayout's render
+// ViewportProvider — wires `Viewport` (Unit 5) into JoyDOMView's render
 // pipeline so breakpoint resolution (Unit 7) and breakpoint application
 // (Unit 8) can read the current rendering environment without each
 // step having to scrape SwiftUI geometry on its own.
@@ -12,7 +12,7 @@
 //   2. A SwiftUI environment key + `.joyViewport(_:)` view modifier —
 //      so a host that knows the current viewport (e.g. a window with
 //      a `GeometryReader` wrapping the layout) can push it down the
-//      view tree. CSSLayout's render pipeline reads it from the
+//      view tree. JoyDOMView's render pipeline reads it from the
 //      environment in Unit 8.
 //
 // Live geometry observation (`GeometryReader` + `UITraitCollection` /
@@ -66,7 +66,7 @@ extension EnvironmentValues {
 
 extension View {
     /// Inject a viewport into the SwiftUI environment for downstream
-    /// CSSLayout views. Hosts call this from inside a `GeometryReader`
+    /// JoyDOMView views. Hosts call this from inside a `GeometryReader`
     /// (or a `ResponsivePreview`-like simulator) to feed the current
     /// width / orientation / print-mode into breakpoint resolution.
     public func joyViewport(_ viewport: Viewport) -> some View {

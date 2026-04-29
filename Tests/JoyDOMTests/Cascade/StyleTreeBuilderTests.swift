@@ -16,8 +16,8 @@ final class StyleTreeBuilderTests: XCTestCase {
         css: String,
         schema: [(String, String)] = [],
         rootID: String = "root"
-    ) -> ([StyleNode], CSSDiagnostics) {
-        var diags = CSSDiagnostics()
+    ) -> ([StyleNode], JoyDiagnostics) {
+        var diags = JoyDiagnostics()
         let sheet = CSSParser.parse(css, diagnostics: &diags)
         // Preserve insertion order — tests need deterministic ordering.
         let schemaEntries = schema.map { SchemaEntry(id: $0.0, type: $0.1) }
@@ -116,7 +116,7 @@ final class StyleTreeBuilderTests: XCTestCase {
     // MARK: - Hierarchical schema (Phase 2)
 
     func testParentIDEstablishesHierarchy() {
-        var diags = CSSDiagnostics()
+        var diags = JoyDiagnostics()
         let sheet = CSSParser.parse("", diagnostics: &diags)
         let nodes = StyleTreeBuilder.build(
             rootID: "root",
@@ -136,7 +136,7 @@ final class StyleTreeBuilderTests: XCTestCase {
     }
 
     func testDescendantSelectorMatchesHierarchically() {
-        var diags = CSSDiagnostics()
+        var diags = JoyDiagnostics()
         let sheet = CSSParser.parse(
             "#form #name { flex-grow: 7; }",
             diagnostics: &diags
@@ -158,7 +158,7 @@ final class StyleTreeBuilderTests: XCTestCase {
     }
 
     func testUnknownParentIDAttachesToRoot() {
-        var diags = CSSDiagnostics()
+        var diags = JoyDiagnostics()
         let sheet = CSSParser.parse("", diagnostics: &diags)
         let nodes = StyleTreeBuilder.build(
             rootID: "root",
@@ -174,7 +174,7 @@ final class StyleTreeBuilderTests: XCTestCase {
     /// A schema entry can now carry a `classes: [String]` list; `.class`
     /// selectors match against it in the cascade.
     func testSchemaClassesAreMatched() {
-        var diags = CSSDiagnostics()
+        var diags = JoyDiagnostics()
         let sheet = CSSParser.parse(".primary { flex-grow: 4; }", diagnostics: &diags)
         let nodes = StyleTreeBuilder.build(
             rootID: "root",
@@ -202,7 +202,7 @@ final class StyleTreeBuilderTests: XCTestCase {
         // Adversarial payloads may contain two entries with the same id.
         // The builder must emit one node (first wins) and surface a warning,
         // never crash.
-        var diags = CSSDiagnostics()
+        var diags = JoyDiagnostics()
         let sheet = CSSParser.parse("", diagnostics: &diags)
         let nodes = StyleTreeBuilder.build(
             rootID: "root",
@@ -225,7 +225,7 @@ final class StyleTreeBuilderTests: XCTestCase {
     /// the emitted `StyleNode` so the resolver can later hand it to the
     /// component factory as a `ComponentProps`.
     func testSchemaPropsPropagateToStyleNode() {
-        var diags = CSSDiagnostics()
+        var diags = JoyDiagnostics()
         let sheet = CSSParser.parse("", diagnostics: &diags)
         let nodes = StyleTreeBuilder.build(
             rootID: "root",
@@ -247,7 +247,7 @@ final class StyleTreeBuilderTests: XCTestCase {
     /// Entries without `props` must still produce a node (with empty props)
     /// so existing callers keep compiling unchanged.
     func testMissingPropsYieldsEmptyDictionary() {
-        var diags = CSSDiagnostics()
+        var diags = JoyDiagnostics()
         let sheet = CSSParser.parse("", diagnostics: &diags)
         let nodes = StyleTreeBuilder.build(
             rootID: "root",

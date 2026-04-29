@@ -54,7 +54,7 @@ public enum DeclarationParser {
     /// - Returns: The accepted ``Declaration`` values in source order.
     public static func parse(
         _ body: String,
-        diagnostics: inout CSSDiagnostics
+        diagnostics: inout JoyDiagnostics
     ) -> [Declaration] {
         var out: [Declaration] = []
         for segment in body.split(separator: ";", omittingEmptySubsequences: true) {

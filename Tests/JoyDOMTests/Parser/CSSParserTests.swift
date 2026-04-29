@@ -8,8 +8,8 @@ final class CSSParserTests: XCTestCase {
 
     // MARK: - Helpers
 
-    private func parse(_ css: String) -> (Stylesheet, CSSDiagnostics) {
-        var diags = CSSDiagnostics()
+    private func parse(_ css: String) -> (Stylesheet, JoyDiagnostics) {
+        var diags = JoyDiagnostics()
         let sheet = CSSParser.parse(css, diagnostics: &diags)
         return (sheet, diags)
     }
@@ -56,7 +56,7 @@ final class CSSParserTests: XCTestCase {
     func testNeverThrows() {
         // Document intent: `parse` is not `throws`. If the signature regresses
         // to throwing, this file stops compiling — which is the assertion.
-        var diags = CSSDiagnostics()
+        var diags = JoyDiagnostics()
         _ = CSSParser.parse("garbage ;;;; {{{} }} !@#", diagnostics: &diags)
     }
 

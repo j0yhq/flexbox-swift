@@ -11,7 +11,7 @@
 // Format:
 //   { "action": "submit", "args": ["form-1", "validate"] }
 //
-// CSSLayout's prop bag (`SchemaEntry.props`) is a `[String: String]`
+// JoyDOMView's prop bag (`SchemaEntry.props`) is a `[String: String]`
 // dictionary. The bridge is JSON-string-in, struct-out: callers store
 // `UiAction.encodedString()` under whatever prop key they choose
 // (e.g. `"onClick"`), and factories read it via

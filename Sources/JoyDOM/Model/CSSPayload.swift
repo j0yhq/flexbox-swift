@@ -1,4 +1,4 @@
-// CSSPayload / SchemaEntry — the caller-supplied input to `CSSLayout`.
+// CSSPayload / SchemaEntry — the caller-supplied input to `JoyDOMView`.
 //
 // A `CSSPayload` bundles the CSS text with the schema that names each
 // renderable node and optionally types it (e.g. `"button"`, `"text-input"`)
@@ -47,7 +47,7 @@ internal struct SchemaEntry: Equatable {
     }
 }
 
-/// The server-driven (or hard-coded) payload consumed by `CSSLayout`.
+/// The server-driven (or hard-coded) payload consumed by `JoyDOMView`.
 ///
 /// Phase 1 carries exactly two fields. Phase 3 will add `version` and
 /// `bindings` for `FormState` integration.

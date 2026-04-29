@@ -1,4 +1,4 @@
-// ComponentBody+UIKit — lift a UIKit `UIView` into the CSSLayout
+// ComponentBody+UIKit — lift a UIKit `UIView` into the JoyDOMView
 // component pipeline.
 //
 // The bridge lets factory authors return any `UIView` subclass from a

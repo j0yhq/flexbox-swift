@@ -107,7 +107,7 @@ public enum ComponentResolver {
         ) -> Void)? = nil,
         formState: FormState? = nil,
         valueStore: ValueStore? = nil,
-        diagnostics: inout CSSDiagnostics
+        diagnostics: inout JoyDiagnostics
     ) -> Resolved {
         // Precondition: `StyleTreeBuilder` always emits at least the root.
         let rootNode = nodes.first ?? StyleNode(

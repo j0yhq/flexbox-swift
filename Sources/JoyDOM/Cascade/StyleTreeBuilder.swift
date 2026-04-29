@@ -32,7 +32,7 @@ internal enum StyleTreeBuilder {
         rootID: String,
         schema: [SchemaEntry],
         stylesheet: Stylesheet,
-        diagnostics: inout CSSDiagnostics
+        diagnostics: inout JoyDiagnostics
     ) -> [StyleNode] {
         // Index schema entries by id for parent lookup. First-wins on
         // duplicates (matches the render-order invariant — later copies would

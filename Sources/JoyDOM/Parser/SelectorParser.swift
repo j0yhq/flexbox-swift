@@ -36,7 +36,7 @@ public enum SelectorParser {
     /// the valid ones are kept.
     public static func parseList(
         _ source: String,
-        diagnostics: inout CSSDiagnostics
+        diagnostics: inout JoyDiagnostics
     ) -> [ComplexSelector] {
         var result: [ComplexSelector] = []
         for part in source.split(separator: ",", omittingEmptySubsequences: false) {
@@ -53,7 +53,7 @@ public enum SelectorParser {
     /// selectors joined by descendant or child combinators.
     public static func parse(
         _ source: String,
-        diagnostics: inout CSSDiagnostics
+        diagnostics: inout JoyDiagnostics
     ) -> ComplexSelector? {
         let trimmed = source.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return nil }

@@ -58,7 +58,7 @@ public enum StyleResolver {
         classes: [String] = [],
         ancestors: [NodeRef] = [],
         stylesheet: Stylesheet,
-        diagnostics: inout CSSDiagnostics
+        diagnostics: inout JoyDiagnostics
     ) -> ComputedStyle {
         let subject = NodeRef(id: id, schemaType: schemaType, classes: classes)
 
@@ -192,7 +192,7 @@ public enum StyleResolver {
     private static func apply(
         _ decl: Declaration,
         to style: inout ComputedStyle,
-        diagnostics: inout CSSDiagnostics
+        diagnostics: inout JoyDiagnostics
     ) {
         switch decl.property {
 
@@ -392,7 +392,7 @@ public enum StyleResolver {
     private static func applyGap(
         _ value: String,
         to c: inout FlexContainerConfig,
-        diagnostics: inout CSSDiagnostics
+        diagnostics: inout JoyDiagnostics
     ) {
         let parts = value
             .components(separatedBy: .whitespaces)
@@ -420,7 +420,7 @@ public enum StyleResolver {
     private static func applyPaddingShorthand(
         _ value: String,
         to c: inout FlexContainerConfig,
-        diagnostics: inout CSSDiagnostics
+        diagnostics: inout JoyDiagnostics
     ) {
         let parts = value
             .components(separatedBy: .whitespaces)
@@ -446,7 +446,7 @@ public enum StyleResolver {
     private static func applyFlexShorthand(
         _ value: String,
         to item: inout ItemStyle,
-        diagnostics: inout CSSDiagnostics
+        diagnostics: inout JoyDiagnostics
     ) {
         let trimmed = value.trimmingCharacters(in: .whitespaces).lowercased()
         switch trimmed {

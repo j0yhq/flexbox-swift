@@ -4,7 +4,7 @@ import XCTest
 /// Unit 1 — `JoyDOMSpec` and its child types are the Swift mirror of the
 /// `joy-dom` JSON spec defined in `joyfill/.joy#33` (`DOM/spec.ts`).
 ///
-/// These tests assert that every shape in `Sources/CSSLayout/Spec/JoyDOM.swift`
+/// These tests assert that every shape in `Sources/JoyDOMView/Spec/JoyDOM.swift`
 /// round-trips through JSON with the exact wire format Josh's TypeScript
 /// types declare. Synthesized `Codable` covers the pure-struct types; the
 /// union-shape enums (`PrimitiveValue`, `ChildNode`, `Gap`, `Padding`,

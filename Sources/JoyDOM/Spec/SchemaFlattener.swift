@@ -1,8 +1,8 @@
 // SchemaFlattener — walks a joy-dom `Node` tree and produces the flat
-// `[SchemaEntry]` array CSSLayout's existing pipeline consumes.
+// `[SchemaEntry]` array JoyDOMView's existing pipeline consumes.
 //
 // joy-dom's `spec.ts` represents the document as a recursive tree
-// (`Node.children: ChildNode[]`); CSSLayout has always used a flat array
+// (`Node.children: ChildNode[]`); JoyDOMView has always used a flat array
 // with `parentID` links. The two shapes are equivalent in expressive
 // power, so this file is a pure structural translation — no styling, no
 // breakpoints, no resolution. Subsequent units layer on top:
@@ -36,11 +36,11 @@ internal enum SchemaFlattener {
     // MARK: - Public API
 
     /// Flatten a joy-dom layout tree into the `[SchemaEntry]` array
-    /// CSSLayout's resolver consumes.
+    /// JoyDOMView's resolver consumes.
     ///
     /// - Parameter layout: the document's root node (`Spec.layout`).
     /// - Returns: schema entries in render order. The root entry has
-    ///   `parentID == nil` so CSSLayout's existing root-attach behavior
+    ///   `parentID == nil` so JoyDOMView's existing root-attach behavior
     ///   applies (`StyleTreeBuilder` re-parents `nil` to the implicit
     ///   root, then composes the rest of the tree via `parentID` links).
     internal static func flatten(_ layout: Node) -> [SchemaEntry] {

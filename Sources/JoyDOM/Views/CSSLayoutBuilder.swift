@@ -1,4 +1,4 @@
-// CSSLayoutBuilder — the result builder backing `CSSLayout`'s locals block.
+// CSSLayoutBuilder — the result builder backing `JoyDOMView`'s locals block.
 //
 // Converts a sequence of `Component(...)` calls into the `[Component]`
 // array consumed by `ComponentResolver`. Supports conditionals
@@ -10,10 +10,10 @@
 
 import Foundation
 
-/// Result builder for the `CSSLayout` locals trailing closure.
+/// Result builder for the `JoyDOMView` locals trailing closure.
 ///
 /// ```swift
-/// CSSLayout(payload: payload) {
+/// JoyDOMView(payload: payload) {
 ///     Component("header") { Header() }
 ///     if showBanner {
 ///         Component("banner") { Banner() }

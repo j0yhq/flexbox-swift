@@ -6,7 +6,7 @@
 //   • `p`                — paragraph; children render through the
 //                          layout tree exactly like `div`. Block-flow
 //                          semantics aren't represented in flex-only
-//                          CSSLayout, so `p` and `div` differ only by
+//                          JoyDOMView, so `p` and `div` differ only by
 //                          element type for selector purposes.
 //   • `primitive_string` — `Text(props["value"])` — text content.
 //   • `primitive_number` — `Text(props["value"])` — number content
@@ -47,7 +47,7 @@ extension ComponentRegistry {
         }
         registerIfAbsent("p") { _, _ in
             // Same as div for now. Block-flow semantics aren't part
-            // of CSSLayout's flex-only model; `p` is meaningful for
+            // of JoyDOMView's flex-only model; `p` is meaningful for
             // selector targeting only.
             .custom { EmptyView() }
         }

@@ -19,8 +19,8 @@ final class StyleResolverTests: XCTestCase {
         id: String = "a",
         schemaType: String? = nil,
         classes: [String] = []
-    ) -> (ComputedStyle, CSSDiagnostics) {
-        var diags = CSSDiagnostics()
+    ) -> (ComputedStyle, JoyDiagnostics) {
+        var diags = JoyDiagnostics()
         let sheet = CSSParser.parse(css, diagnostics: &diags)
         let computed = StyleResolver.resolve(
             id: id,
@@ -150,8 +150,8 @@ final class StyleResolverTests: XCTestCase {
         schemaType: String? = nil,
         classes: [String] = [],
         ancestors: [StyleResolver.NodeRef]
-    ) -> (ComputedStyle, CSSDiagnostics) {
-        var diags = CSSDiagnostics()
+    ) -> (ComputedStyle, JoyDiagnostics) {
+        var diags = JoyDiagnostics()
         let sheet = CSSParser.parse(css, diagnostics: &diags)
         let style = StyleResolver.resolve(
             id: id,

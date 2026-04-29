@@ -3,7 +3,7 @@ import XCTest
 
 /// Unit 2 — `StyleSerializer.serialize(_:)` turns a `Style` (the Swift
 /// mirror of joy-dom's `Style` interface) into CSS declaration text that
-/// CSSLayout's existing parser already accepts.
+/// JoyDOMView's existing parser already accepts.
 ///
 /// Two-layer test strategy:
 ///
@@ -282,7 +282,7 @@ final class StyleSerializerTests: XCTestCase {
             padding: .uniform(.px(12))
         )
         let css = StyleSerializer.rule(selector: "#everything", style: style)
-        var diagnostics = CSSDiagnostics()
+        var diagnostics = JoyDiagnostics()
         _ = CSSParser.parse(css, diagnostics: &diagnostics)
         XCTAssertTrue(
             diagnostics.warnings.isEmpty,
@@ -295,7 +295,7 @@ final class StyleSerializerTests: XCTestCase {
             selector: "#g",
             style: Style(gap: .axes(column: .px(4), row: .px(8)))
         )
-        var diagnostics = CSSDiagnostics()
+        var diagnostics = JoyDiagnostics()
         _ = CSSParser.parse(css, diagnostics: &diagnostics)
         XCTAssertTrue(diagnostics.warnings.isEmpty, "diagnostics: \(diagnostics.warnings)")
     }
@@ -307,7 +307,7 @@ final class StyleSerializerTests: XCTestCase {
                 top: .px(1), right: .px(2), bottom: .px(3), left: .px(4)
             ))
         )
-        var diagnostics = CSSDiagnostics()
+        var diagnostics = JoyDiagnostics()
         _ = CSSParser.parse(css, diagnostics: &diagnostics)
         XCTAssertTrue(diagnostics.warnings.isEmpty, "diagnostics: \(diagnostics.warnings)")
     }

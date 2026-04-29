@@ -37,8 +37,8 @@ final class ComponentResolverTests: XCTestCase {
         registry: ComponentRegistry = ComponentRegistry(),
         formState: FormState? = nil,
         valueStore: ValueStore? = nil
-    ) -> (result: ComponentResolver.Resolved, diagnostics: CSSDiagnostics) {
-        var diags = CSSDiagnostics()
+    ) -> (result: ComponentResolver.Resolved, diagnostics: JoyDiagnostics) {
+        var diags = JoyDiagnostics()
         let result = ComponentResolver.resolve(
             nodes: nodes,
             locals: locals,
@@ -221,7 +221,7 @@ final class ComponentResolverTests: XCTestCase {
     /// A node with schema descendants becomes a container: its `nested`
     /// slot is populated and `isContainer` flips true. Leaves underneath
     /// stay flat. This is the structural precondition for the nested
-    /// `FlexLayout` emitted by `CSSLayout.body`.
+    /// `FlexLayout` emitted by `JoyDOMView.body`.
     func testContainerNodeExposesNestedChildren() {
         let (res, _) = resolve(nodes: [
             rootNode(),

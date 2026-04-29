@@ -173,7 +173,7 @@ final class JoyDOMBreakpointApplicationTests: XCTestCase {
     func testBreakpointAppliedOutputParsesWithoutDiagnostics() {
         let spec = twoBreakpointSpec()
         let payload = JoyDOMConverter.convert(spec, viewport: Viewport(width: 320))
-        var diagnostics = CSSDiagnostics()
+        var diagnostics = JoyDiagnostics()
         _ = CSSParser.parse(payload.css, diagnostics: &diagnostics)
         XCTAssertTrue(diagnostics.warnings.isEmpty,
                       "post-breakpoint CSS must parse cleanly; got: \(diagnostics.warnings)")

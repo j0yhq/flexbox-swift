@@ -3,7 +3,7 @@ import XCTest
 
 /// Unit 3 — `SchemaFlattener.flatten(_:)` walks a joy-dom `Node` tree
 /// (the recursive shape in `DOM/spec.ts`) and emits the flat
-/// `[SchemaEntry]` array CSSLayout's resolver consumes.
+/// `[SchemaEntry]` array JoyDOMView's resolver consumes.
 ///
 /// Contract:
 ///   • Render order is preserved: depth-first, parent-before-children.

@@ -12,7 +12,7 @@ import Foundation
 
 /// Read-only access to a component's key/value props.
 ///
-/// Factories read props but never mutate them; CSSLayout re-invokes the
+/// Factories read props but never mutate them; JoyDOMView re-invokes the
 /// factory whenever the upstream payload changes.
 public struct ComponentProps {
     /// The node's id (mirrors `SchemaEntry.id`). Included here so factories

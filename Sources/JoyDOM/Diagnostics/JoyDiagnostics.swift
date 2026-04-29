@@ -1,8 +1,8 @@
-// CSSDiagnostics — a single accumulator for non-fatal warnings emitted by
+// JoyDiagnostics — a single accumulator for non-fatal warnings emitted by
 // every parsing/cascade/resolution stage.
 //
-// CSSLayout never throws on bad input; it collects warnings here and the
-// caller (or the `CSSLayout` view, via an `onDiagnostic` closure in Unit l)
+// JoyDOMView never throws on bad input; it collects warnings here and the
+// caller (or the `JoyDOMView` view, via an `onDiagnostic` closure in Unit l)
 // can surface them in debug builds.
 
 import Foundation
@@ -12,7 +12,7 @@ import Foundation
 /// `kind` is a structured discriminator so tests can assert on categories
 /// without string-matching. `detail` is a human-readable message suitable
 /// for console logs in debug.
-public struct CSSWarning: Equatable {
+public struct JoyWarning: Equatable {
     public enum Kind: Equatable {
         /// A property outside the §4.1 supported subset.
         case unsupportedProperty(String)
@@ -44,17 +44,17 @@ public struct CSSWarning: Equatable {
 }
 
 /// Accumulator passed `inout` through the parsing/cascade pipeline.
-public struct CSSDiagnostics: Equatable {
-    public private(set) var warnings: [CSSWarning] = []
+public struct JoyDiagnostics: Equatable {
+    public private(set) var warnings: [JoyWarning] = []
 
     public init() {}
 
-    public mutating func warn(_ w: CSSWarning) {
+    public mutating func warn(_ w: JoyWarning) {
         warnings.append(w)
     }
 
     /// Convenience for tests: count warnings of a particular kind.
-    public func count(of kind: CSSWarning.Kind) -> Int {
+    public func count(of kind: JoyWarning.Kind) -> Int {
         warnings.filter { $0.kind == kind }.count
     }
 }

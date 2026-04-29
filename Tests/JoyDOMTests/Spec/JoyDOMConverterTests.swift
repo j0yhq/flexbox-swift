@@ -2,14 +2,14 @@ import XCTest
 @testable import JoyDOM
 
 /// Unit 4 — `JoyDOMConverter.convert(_:)` translates a `JoyDOMSpec`
-/// into the `CSSPayload` CSSLayout's resolver consumes. It composes:
+/// into the `CSSPayload` JoyDOMView's resolver consumes. It composes:
 ///   • `SchemaFlattener` for the schema array
 ///   • `StyleSerializer` for document-level style rules
 ///   • A new "inline style injection" pass that emits a `#id { ... }`
 ///     rule per node carrying `props.style`
 ///
 /// The converter is the seam between joy-dom's structured-object world
-/// and CSSLayout's text-CSS world. Output round-trips through the
+/// and JoyDOMView's text-CSS world. Output round-trips through the
 /// existing parser without diagnostics.
 final class JoyDOMConverterTests: XCTestCase {
 
@@ -176,7 +176,7 @@ final class JoyDOMConverterTests: XCTestCase {
             )
         )
         let payload = JoyDOMConverter.convert(spec)
-        var diagnostics = CSSDiagnostics()
+        var diagnostics = JoyDiagnostics()
         _ = CSSParser.parse(payload.css, diagnostics: &diagnostics)
         XCTAssertTrue(diagnostics.warnings.isEmpty,
                       "converter emitted CSS the parser couldn't accept: \(diagnostics.warnings)")

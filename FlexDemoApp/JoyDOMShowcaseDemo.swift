@@ -1,7 +1,7 @@
 // JoyDOMShowcaseDemo — Tier 3 end-to-end demo.
 //
 // Renders a `JoyDOMSpec` (Josh's joyfill/.joy DOM spec) through every
-// piece of plumbing CSSLayout's Tier 3 added:
+// piece of plumbing JoyDOMView's Tier 3 added:
 //
 //   • Spec types       (Unit 1)  — JoyDOMSpec / Node / NodeProps / Style
 //   • Style serializer (Unit 2)  — Style → CSS text the parser accepts
@@ -125,7 +125,7 @@ struct JoyDOMShowcaseDemo: View {
     }
 
     private func canvas(viewport: Viewport) -> some View {
-        CSSLayout(spec: spec, registry: registry)
+        JoyDOMView(spec: spec, registry: registry)
             .viewport(viewport)
             .onEvent("*") { event in
                 eventLog.append("\(event.sourceID) → \(event.name) \(event.payload)")

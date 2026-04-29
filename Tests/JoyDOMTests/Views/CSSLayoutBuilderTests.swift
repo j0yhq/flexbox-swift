@@ -5,7 +5,7 @@ import SwiftUI
 /// Unit (j) — `Component` and `CSSLayoutBuilder`.
 ///
 /// The result builder converts a trailing-closure of `Component(...)` calls
-/// into the `[Component]` array consumed by the `CSSLayout` view. These
+/// into the `[Component]` array consumed by the `JoyDOMView` view. These
 /// tests assert on the array shape, not on the rendered views.
 final class CSSLayoutBuilderTests: XCTestCase {
 

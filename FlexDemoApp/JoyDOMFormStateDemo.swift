@@ -77,7 +77,7 @@ struct JoyDOMFormStateDemo: View {
     }
 
     private func canvas(viewport: Viewport) -> some View {
-        CSSLayout(spec: spec, registry: registry)
+        JoyDOMView(spec: spec, registry: registry)
             .viewport(viewport)
             .formState(form)
             .bindings([

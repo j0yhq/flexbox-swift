@@ -9,8 +9,8 @@ final class SelectorParserTests: XCTestCase {
 
     // MARK: Helpers
 
-    private func parse(_ s: String) -> (ComplexSelector?, CSSDiagnostics) {
-        var diags = CSSDiagnostics()
+    private func parse(_ s: String) -> (ComplexSelector?, JoyDiagnostics) {
+        var diags = JoyDiagnostics()
         let result = SelectorParser.parse(s, diagnostics: &diags)
         return (result, diags)
     }
@@ -113,8 +113,8 @@ final class SelectorParserTests: XCTestCase {
     /// `parseList` is the grouping-aware entry point used by `RuleParser`. The
     /// single-selector `parse` function still rejects a comma prelude outright,
     /// so only `parseList` expands a group into multiple selectors.
-    private func parseList(_ s: String) -> ([ComplexSelector], CSSDiagnostics) {
-        var diags = CSSDiagnostics()
+    private func parseList(_ s: String) -> ([ComplexSelector], JoyDiagnostics) {
+        var diags = JoyDiagnostics()
         let result = SelectorParser.parseList(s, diagnostics: &diags)
         return (result, diags)
     }

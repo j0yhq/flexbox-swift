@@ -2,8 +2,8 @@ import XCTest
 import SwiftUI
 @testable import JoyDOM
 
-/// Phase C1 — `CSSLayout.bindings(_:)` is the iOS-side bridge between
-/// joy-dom's "pre-resolved values" stance and CSSLayout's live FormState.
+/// Phase C1 — `JoyDOMView.bindings(_:)` is the iOS-side bridge between
+/// joy-dom's "pre-resolved values" stance and JoyDOMView's live FormState.
 /// The modifier records a `[node_id: form_state_path]` map; the resolver
 /// consumes it at render time and synthesizes `binding` props on the
 /// matching schema entries so registered factories can call
@@ -43,7 +43,7 @@ final class CSSLayoutBindingsTests: XCTestCase {
             children: [.node(Node(type: "probe", props: NodeProps(id: "name-field")))]
         ))
 
-        let view = CSSLayout(spec: spec, registry: registry)
+        let view = JoyDOMView(spec: spec, registry: registry)
             .formState(form)
             .bindings(["name-field": "user.name"])
 
@@ -72,7 +72,7 @@ final class CSSLayoutBindingsTests: XCTestCase {
         // No .bindings(...) — binding falls back to dead default.
         // FormState's prune step drops "user.name" because no schema
         // entry references it; that's expected.
-        let view = CSSLayout(spec: spec, registry: registry).formState(form)
+        let view = JoyDOMView(spec: spec, registry: registry).formState(form)
 
         _ = view.body
         XCTAssertEqual(probe.lastReadValue, "",
@@ -111,7 +111,7 @@ final class CSSLayoutBindingsTests: XCTestCase {
                 .node(Node(type: "probe-b", props: NodeProps(id: "field-b"))),
             ]
         ))
-        let view = CSSLayout(spec: spec, registry: registry)
+        let view = JoyDOMView(spec: spec, registry: registry)
             .formState(form)
             .bindings(["field-a": "a", "field-b": "b"])
 
@@ -140,7 +140,7 @@ final class CSSLayoutBindingsTests: XCTestCase {
         ]))
 
         // Two .bindings calls — the maps merge across calls.
-        let view = CSSLayout(spec: spec, registry: registry)
+        let view = JoyDOMView(spec: spec, registry: registry)
             .formState(form)
             .bindings(["field-a": "a"])
             .bindings(["field-b": "b"])
@@ -159,7 +159,7 @@ final class CSSLayoutBindingsTests: XCTestCase {
             .node(Node(type: "probe", props: NodeProps(id: "field")))
         ]))
 
-        let view = CSSLayout(spec: spec, registry: registry)
+        let view = JoyDOMView(spec: spec, registry: registry)
             .formState(form)
             .bindings(["field": "x"])
             .bindings(["field": "y"])
@@ -181,7 +181,7 @@ final class CSSLayoutBindingsTests: XCTestCase {
 
         // "nonexistent-id" doesn't match any schema entry; "field"
         // doesn't have a binding. Neither should crash.
-        let view = CSSLayout(spec: spec, registry: registry)
+        let view = JoyDOMView(spec: spec, registry: registry)
             .formState(form)
             .bindings(["nonexistent-id": "x"])
 

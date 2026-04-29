@@ -31,7 +31,7 @@ public enum RuleParser {
     ///   supported subset.
     public static func parseRules(
         from css: String,
-        diagnostics: inout CSSDiagnostics
+        diagnostics: inout JoyDiagnostics
     ) -> [CSSRule] {
         let source = stripComments(css)
         var rules: [CSSRule] = []

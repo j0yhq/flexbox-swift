@@ -3,7 +3,7 @@ import XCTest
 
 /// Unit 10 — `UiAction` is the JSON-serializable event-handler
 /// descriptor referenced in joyfill/.joy's `react-dom-example.ts`.
-/// CSSLayout encodes one as a JSON string in a `SchemaEntry.props`
+/// JoyDOMView encodes one as a JSON string in a `SchemaEntry.props`
 /// slot and decodes it back via `ComponentProps.action(_:)`.
 final class UiActionTests: XCTestCase {
 

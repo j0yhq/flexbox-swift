@@ -3,7 +3,7 @@ import SwiftUI
 @testable import JoyDOM
 import FlexLayout
 
-/// Unit (l) — `CSSLayout` is the top-level SwiftUI view that assembles every
+/// Unit (l) — `JoyDOMView` is the top-level SwiftUI view that assembles every
 /// earlier unit. The tests here cover the *wiring*: initialisers, builder
 /// modifiers, and the event pipeline. Layout-geometry correctness is left
 /// to the fixture suite.
@@ -16,7 +16,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
             css: "#root { display: flex; } #a { flex: 1; }",
             schema: [SchemaEntry(id: "a", type: "text")]
         )
-        _ = CSSLayout(payload: payload) {
+        _ = JoyDOMView(payload: payload) {
             Component("a") { EmptyView() }
         }
     }
@@ -24,18 +24,18 @@ final class CSSLayoutIntegrationTests: XCTestCase {
     func testInitWithCSSOnly() {
         // Empty schema + empty locals is a valid (degenerate) construction —
         // useful for previews that just want to see the container.
-        _ = CSSLayout(css: "#root { display: flex; }")
+        _ = JoyDOMView(css: "#root { display: flex; }")
     }
 
     func testMalformedCSSDoesNotCrash() {
         // Adversarial input; must not throw.
-        _ = CSSLayout(css: "#a {{{{ garbage")
+        _ = JoyDOMView(css: "#a {{{{ garbage")
     }
 
     // MARK: - Modifier chain
 
     func testOnEventReturnsSelfForChaining() {
-        let base = CSSLayout(css: "")
+        let base = JoyDOMView(css: "")
         let chained = base
             .onEvent("submit") { _ in }
             .onEvent("tap")    { _ in }
@@ -45,7 +45,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
     }
 
     func testPlaceholderModifierReturnsSelfForChaining() {
-        let base = CSSLayout(css: "")
+        let base = JoyDOMView(css: "")
         let chained = base.placeholder { _ in AnyView(EmptyView()) }
         _ = chained
     }
@@ -66,8 +66,8 @@ final class CSSLayoutIntegrationTests: XCTestCase {
             schema: [SchemaEntry(id: "submit", type: "auto-button")]
         )
 
-        var received: CSSEvent?
-        let layout = CSSLayout(payload: payload, registry: registry)
+        var received: JoyEvent?
+        let layout = JoyDOMView(payload: payload, registry: registry)
             .onEvent("submit") { event in received = event }
 
         // Building the body triggers child resolution, which invokes the
@@ -94,7 +94,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
         )
 
         var submitFired = false
-        let layout = CSSLayout(payload: payload, registry: registry)
+        let layout = JoyDOMView(payload: payload, registry: registry)
             .onEvent("submit") { _ in submitFired = true }
 
         _ = layout.body
@@ -118,7 +118,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
         )
 
         var rootFired = false
-        let layout = CSSLayout(payload: payload, registry: registry)
+        let layout = JoyDOMView(payload: payload, registry: registry)
             .onEvent("tap") { _ in rootFired = true }
 
         _ = layout.body
@@ -139,8 +139,8 @@ final class CSSLayoutIntegrationTests: XCTestCase {
             schema: [SchemaEntry(id: "b", type: "bubbling-button")]
         )
 
-        var received: CSSEvent?
-        let layout = CSSLayout(payload: payload, registry: registry)
+        var received: JoyEvent?
+        let layout = JoyDOMView(payload: payload, registry: registry)
             .onEvent("tap") { event in received = event }
 
         _ = layout.body
@@ -162,7 +162,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
         )
 
         var rootFired = false
-        let layout = CSSLayout(payload: payload, registry: registry)
+        let layout = JoyDOMView(payload: payload, registry: registry)
             .onEvent("tap") { _ in rootFired = true }
 
         _ = layout.body
@@ -186,7 +186,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
         )
 
         var seen: [String] = []
-        let layout = CSSLayout(payload: payload, registry: registry)
+        let layout = JoyDOMView(payload: payload, registry: registry)
             .onEvent("*") { event in seen.append(event.name) }
 
         _ = layout.body
@@ -207,7 +207,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
         )
 
         var order: [String] = []
-        let layout = CSSLayout(payload: payload, registry: registry)
+        let layout = JoyDOMView(payload: payload, registry: registry)
             .onEvent("submit") { _ in order.append("named") }
             .onEvent("*")      { _ in order.append("wild")  }
 
@@ -230,18 +230,18 @@ final class CSSLayoutIntegrationTests: XCTestCase {
         )
 
         var wildFired = false
-        let layout = CSSLayout(payload: payload, registry: registry)
+        let layout = JoyDOMView(payload: payload, registry: registry)
             .onEvent("*") { _ in wildFired = true }
 
         _ = layout.body
         XCTAssertFalse(wildFired)
     }
 
-    // MARK: - Local .onCSSEvent modifier (Phase 2)
+    // MARK: - Local .onJoyEvent modifier (Phase 2)
 
     func testLocalOnCSSEventFiresOnAncestorBubble() {
         // "child" emits a bubbling event; its ancestor "parent" is a local
-        // with an `.onCSSEvent("tap")` handler — the handler must fire and
+        // with an `.onJoyEvent("tap")` handler — the handler must fire and
         // see the original source id.
         let registry = ComponentRegistry()
         registry.register("emitter") { _, events in
@@ -257,10 +257,10 @@ final class CSSLayoutIntegrationTests: XCTestCase {
             ]
         )
 
-        var received: CSSEvent?
-        let layout = CSSLayout(payload: payload, registry: registry) {
+        var received: JoyEvent?
+        let layout = JoyDOMView(payload: payload, registry: registry) {
             Component("parent") { EmptyView() }
-                .onCSSEvent("tap") { event in received = event }
+                .onJoyEvent("tap") { event in received = event }
         }
 
         _ = layout.body
@@ -289,9 +289,9 @@ final class CSSLayoutIntegrationTests: XCTestCase {
 
         var ancestorFired = false
         var rootFired = false
-        let layout = CSSLayout(payload: payload, registry: registry) {
+        let layout = JoyDOMView(payload: payload, registry: registry) {
             Component("parent") { EmptyView() }
-                .onCSSEvent("tap") { _ in ancestorFired = true }
+                .onJoyEvent("tap") { _ in ancestorFired = true }
         }
         .onEvent("tap") { _ in rootFired = true }
 
@@ -302,7 +302,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
 
     func testLocalOnCSSEventBubbleReachesRootToo() {
         // Bubble must continue all the way to the root `onEvent` after any
-        // intermediate `.onCSSEvent` handlers fire.
+        // intermediate `.onJoyEvent` handlers fire.
         let registry = ComponentRegistry()
         registry.register("emitter") { _, events in
             events.emit("tap", payload: [:])
@@ -318,9 +318,9 @@ final class CSSLayoutIntegrationTests: XCTestCase {
         )
 
         var order: [String] = []
-        let layout = CSSLayout(payload: payload, registry: registry) {
+        let layout = JoyDOMView(payload: payload, registry: registry) {
             Component("parent") { EmptyView() }
-                .onCSSEvent("tap") { _ in order.append("parent") }
+                .onJoyEvent("tap") { _ in order.append("parent") }
         }
         .onEvent("tap") { _ in order.append("root") }
 
@@ -329,7 +329,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
     }
 
     func testLocalOnCSSEventOnlyFiresForMatchingName() {
-        // An `.onCSSEvent("tap")` handler must ignore unrelated event names.
+        // An `.onJoyEvent("tap")` handler must ignore unrelated event names.
         let registry = ComponentRegistry()
         registry.register("emitter") { _, events in
             events.emit("change", payload: [:])
@@ -345,9 +345,9 @@ final class CSSLayoutIntegrationTests: XCTestCase {
         )
 
         var tapFired = false
-        let layout = CSSLayout(payload: payload, registry: registry) {
+        let layout = JoyDOMView(payload: payload, registry: registry) {
             Component("parent") { EmptyView() }
-                .onCSSEvent("tap") { _ in tapFired = true }
+                .onJoyEvent("tap") { _ in tapFired = true }
         }
 
         _ = layout.body
@@ -378,11 +378,11 @@ final class CSSLayoutIntegrationTests: XCTestCase {
         return r
     }
 
-    /// `.formState(_:)` returns a `CSSLayout` so callers can keep chaining
+    /// `.formState(_:)` returns a `JoyDOMView` so callers can keep chaining
     /// other modifiers.
     func testFormStateModifierReturnsSelfForChaining() {
         let form = FormState()
-        let base = CSSLayout(css: "")
+        let base = JoyDOMView(css: "")
         let chained = base
             .formState(form)
             .onEvent("submit") { _ in }
@@ -405,7 +405,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
                 props: ["binding": "user.name"]
             )]
         )
-        let layout = CSSLayout(payload: payload, registry: registry)
+        let layout = JoyDOMView(payload: payload, registry: registry)
             .formState(form)
         _ = layout.body
         XCTAssertEqual(cap.initialValue, "Ada")
@@ -425,14 +425,14 @@ final class CSSLayoutIntegrationTests: XCTestCase {
                 props: ["binding": "user.name"]
             )]
         )
-        let layout = CSSLayout(payload: payload, registry: registry)
+        let layout = JoyDOMView(payload: payload, registry: registry)
             .formState(form)
         _ = layout.body
         cap.events!.binding("value").wrappedValue = "Grace"
         XCTAssertEqual(form.get("user.name"), "Grace")
     }
 
-    /// Hot-swap contract: FormState outlives any single CSSLayout
+    /// Hot-swap contract: FormState outlives any single JoyDOMView
     /// instance. Rendering payload A, mutating FormState, then rendering
     /// payload B (same binding path) must surface the mutated value —
     /// proving the state isn't owned by the view.
@@ -450,13 +450,13 @@ final class CSSLayoutIntegrationTests: XCTestCase {
                 props: ["binding": "user.name"]
             )]
         )
-        let layoutA = CSSLayout(payload: payloadA, registry: registryA)
+        let layoutA = JoyDOMView(payload: payloadA, registry: registryA)
             .formState(form)
         _ = layoutA.body
         // User types a new value.
         capA.events!.binding("value").wrappedValue = "Ada"
 
-        // Payload B: fresh CSSLayout, new factory capture, same path.
+        // Payload B: fresh JoyDOMView, new factory capture, same path.
         let capB = BindingCapture()
         let registryB = makeBindingCaptureRegistry(into: capB)
         let payloadB = CSSPayload(
@@ -467,7 +467,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
                 props: ["binding": "user.name"]
             )]
         )
-        let layoutB = CSSLayout(payload: payloadB, registry: registryB)
+        let layoutB = JoyDOMView(payload: payloadB, registry: registryB)
             .formState(form)
         _ = layoutB.body
         XCTAssertEqual(capB.initialValue, "Ada",
@@ -494,7 +494,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
                 props: ["binding": "user.name"]
             )]
         )
-        let layout = CSSLayout(payload: payload, registry: registry)
+        let layout = JoyDOMView(payload: payload, registry: registry)
             .formState(form)
         _ = layout.body
 
@@ -527,7 +527,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
                 ]
             )]
         )
-        let layout = CSSLayout(payload: payload, registry: registry)
+        let layout = JoyDOMView(payload: payload, registry: registry)
             .formState(form)
         _ = layout.body
         XCTAssertEqual(form.get("row.value"),   "x")
@@ -535,7 +535,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
         XCTAssertNil(form.get("gone"))
     }
 
-    /// When no FormState is wired in, CSSLayout must not crash and the
+    /// When no FormState is wired in, JoyDOMView must not crash and the
     /// factories must still see dead bindings (empty strings). This is
     /// the preview / schema-without-state path.
     func testNoFormStateKeepsBindingsDead() {
@@ -549,7 +549,7 @@ final class CSSLayoutIntegrationTests: XCTestCase {
                 props: ["binding": "user.name"]
             )]
         )
-        let layout = CSSLayout(payload: payload, registry: registry)
+        let layout = JoyDOMView(payload: payload, registry: registry)
         _ = layout.body
         XCTAssertEqual(cap.initialValue, "")
     }
@@ -557,8 +557,8 @@ final class CSSLayoutIntegrationTests: XCTestCase {
     // MARK: - Diagnostics hook
 
     func testOnDiagnosticReceivesWarnings() {
-        var diags: [CSSWarning] = []
-        let layout = CSSLayout(
+        var diags: [JoyWarning] = []
+        let layout = JoyDOMView(
             css: "#a { margin: 8px; }"
         )
         .onDiagnostic { w in diags.append(w) }

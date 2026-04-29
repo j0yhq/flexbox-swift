@@ -1,8 +1,8 @@
 // StyleSerializer — turns a `Style` (Unit 1) into a CSS declarations
-// string that CSSLayout's existing parser (`Sources/CSSLayout/Parser/`)
+// string that JoyDOMView's existing parser (`Sources/JoyDOMView/Parser/`)
 // already accepts.
 //
-// joy-dom payloads carry styles as structured objects, but CSSLayout's
+// joy-dom payloads carry styles as structured objects, but JoyDOMView's
 // resolver consumes raw CSS text. Rather than fork the parser into two
 // input formats, we keep the CSS pipeline as the single source of truth
 // and serialize at the boundary. This file is that shim.
@@ -14,7 +14,7 @@
 // injection in Unit 4 and breakpoint style application in Unit 8).
 //
 // Every CSS property emitted here is guaranteed to be parseable by
-// CSSLayout's `CSSValueParsers` — the property surface here is the
+// JoyDOMView's `CSSValueParsers` — the property surface here is the
 // intersection of joy-dom's `Style` interface and what the parser
 // understands today (audited at the start of Tier 3).
 

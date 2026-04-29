@@ -6,7 +6,7 @@ import UIKit
 @testable import JoyDOM
 
 /// Unit 5 — `ComponentBody.uiKit(make:update:)` lifts a UIKit view into
-/// the CSSLayout pipeline.
+/// the JoyDOMView pipeline.
 ///
 /// Tests drive the stored closures through the package-internal
 /// `_invokeMake` / `_invokeUpdate` helpers so we don't have to run
