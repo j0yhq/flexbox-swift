@@ -17,6 +17,7 @@ private let allDemos: [DemoItem] = [
     DemoItem(id: "profile",  icon: "person.crop.rectangle",         title: "Profile — Layout Swap", subtitle: "Phase 3 · same state, new layout"),
     DemoItem(id: "wizard",   icon: "list.bullet.indent",            title: "Signup Wizard",         subtitle: "Phase 3 · multi-step server flow"),
     DemoItem(id: "showcase", icon: "cube.transparent",              title: "Component Showcase",   subtitle: "Tier 2 · .custom + .uiKit + .webView"),
+    DemoItem(id: "joy-dom",  icon: "doc.append",                    title: "joy-dom Showcase",     subtitle: "Tier 3 · spec + breakpoints + UiAction"),
     DemoItem(id: "sandbox",  icon: "slider.horizontal.3",           title: "Sandbox",          subtitle: "all properties live"),
     DemoItem(id: "hero",     icon: "rectangle.center.inset.filled", title: "Centered Hero",    subtitle: "column · center · gap"),
     DemoItem(id: "navbar",   icon: "menubar.rectangle",             title: "Navigation Bar",   subtitle: "row · space-between"),
@@ -81,6 +82,7 @@ struct ContentView: View {
                 case "profile":   ResponsivePreview { ProfileEditDemo() }
                 case "wizard":    ResponsivePreview { WizardDemo() }
                 case "showcase":  ResponsivePreview { ComponentShowcaseDemo() }
+                case "joy-dom":   ResponsivePreview { JoyDOMShowcaseDemo() }
                 case "hero":    CenteredHeroDemo()
                 case "navbar":  NavBarDemo()
                 case "grid":    CardGridDemo()
