@@ -75,6 +75,7 @@ extension ComponentProps {
     /// authoring tools / converters write the JSON string into
     /// `SchemaEntry.props` and factories consume it as a struct.
     public func action(_ key: String) -> UiAction? {
-        return nil
+        guard let raw = string(key) else { return nil }
+        return UiAction.decode(raw)
     }
 }
