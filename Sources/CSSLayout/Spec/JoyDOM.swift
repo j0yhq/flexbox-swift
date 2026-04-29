@@ -390,54 +390,204 @@ extension WidthOperator: Codable {}
 extension WidthUnit: Codable {}
 extension Orientation: Codable {}
 
-// MARK: - Custom Codable RED stubs (replaced in Unit 1 GREEN)
+// MARK: - Custom Codable for union-shape enums
 
+/// `PrimitiveValue` rides a single JSON value — `"hi"`, `42`, or `null` —
+/// not a wrapper object. Swift's default synthesis would emit a
+/// discriminator key (`{"string":"hi"}`); we override it.
 extension PrimitiveValue: Codable {
     public init(from decoder: Decoder) throws {
-        self = .null
+        let c = try decoder.singleValueContainer()
+        if c.decodeNil() {
+            self = .null
+        } else if let s = try? c.decode(String.self) {
+            self = .string(s)
+        } else if let n = try? c.decode(Double.self) {
+            self = .number(n)
+        } else {
+            throw DecodingError.dataCorruptedError(
+                in: c,
+                debugDescription: "PrimitiveValue must be string, number, or null"
+            )
+        }
     }
     public func encode(to encoder: Encoder) throws {
         var c = encoder.singleValueContainer()
-        try c.encodeNil()
+        switch self {
+        case .string(let s): try c.encode(s)
+        case .number(let n): try c.encode(n)
+        case .null:          try c.encodeNil()
+        }
     }
 }
 
+/// `ChildNode` is either a primitive (string / number / null) or an
+/// object that is a `Node`. We try primitive first; if the value looks
+/// like an object we decode it as `Node`.
 extension ChildNode: Codable {
     public init(from decoder: Decoder) throws {
-        self = .primitive(.null)
+        let c = try decoder.singleValueContainer()
+        if c.decodeNil() {
+            self = .primitive(.null)
+        } else if let s = try? c.decode(String.self) {
+            self = .primitive(.string(s))
+        } else if let n = try? c.decode(Double.self) {
+            self = .primitive(.number(n))
+        } else {
+            // Fall through to Node — must be an object.
+            let node = try Node(from: decoder)
+            self = .node(node)
+        }
     }
     public func encode(to encoder: Encoder) throws {
-        var c = encoder.singleValueContainer()
-        try c.encodeNil()
+        switch self {
+        case .primitive(let p): try p.encode(to: encoder)
+        case .node(let n):      try n.encode(to: encoder)
+        }
     }
 }
 
+/// `Gap` is `Length<'px'>` (uniform) or `{ c: Length, r: Length }` (axes).
+/// We try the axes form first because its keys (`c`, `r`) are disjoint
+/// from `Length`'s (`value`, `unit`).
 extension Gap: Codable {
+    private struct Axes: Codable {
+        let c: Length
+        let r: Length
+    }
     public init(from decoder: Decoder) throws {
-        self = .uniform(Length(value: 0, unit: ""))
+        if let axes = try? Axes(from: decoder) {
+            self = .axes(column: axes.c, row: axes.r)
+            return
+        }
+        let l = try Length(from: decoder)
+        self = .uniform(l)
     }
     public func encode(to encoder: Encoder) throws {
-        var c = encoder.singleValueContainer()
-        try c.encodeNil()
+        switch self {
+        case .uniform(let l):
+            try l.encode(to: encoder)
+        case .axes(let c, let r):
+            try Axes(c: c, r: r).encode(to: encoder)
+        }
     }
 }
 
+/// `Padding` is `Length<'px'>` (uniform) or
+/// `{ top, right, bottom, left }` (per-side). Same disjoint-keys
+/// discrimination as `Gap`.
 extension Padding: Codable {
+    private struct Sides: Codable {
+        let top: Length
+        let right: Length
+        let bottom: Length
+        let left: Length
+    }
     public init(from decoder: Decoder) throws {
-        self = .uniform(Length(value: 0, unit: ""))
+        if let sides = try? Sides(from: decoder) {
+            self = .sides(top: sides.top, right: sides.right,
+                          bottom: sides.bottom, left: sides.left)
+            return
+        }
+        let l = try Length(from: decoder)
+        self = .uniform(l)
     }
     public func encode(to encoder: Encoder) throws {
-        var c = encoder.singleValueContainer()
-        try c.encodeNil()
+        switch self {
+        case .uniform(let l):
+            try l.encode(to: encoder)
+        case .sides(let t, let r, let b, let lf):
+            try Sides(top: t, right: r, bottom: b, left: lf).encode(to: encoder)
+        }
     }
 }
 
+/// `MediaQuery` is a discriminated union. Logical / `not` carry an `op`
+/// key; everything else carries a `type` key (`"type"` for media-type,
+/// `"feature"` for width / orientation). Mirrors `MediaQuery` in
+/// `DOM/spec.ts`.
 extension MediaQuery: Codable {
-    public init(from decoder: Decoder) throws {
-        self = .type(.print)
+    private enum Key: String, CodingKey {
+        case op, conditions, condition
+        case type, name, value
+        case `operator`, unit
     }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: Key.self)
+
+        // Logical / not — discriminated by the `op` key.
+        if let op = try c.decodeIfPresent(String.self, forKey: .op) {
+            switch op {
+            case "and", "or":
+                let logicalOp = LogicalOp(rawValue: op)!
+                let conditions = try c.decode([MediaQuery].self, forKey: .conditions)
+                self = .logical(op: logicalOp, conditions: conditions)
+            case "not":
+                let inner = try c.decode(MediaQuery.self, forKey: .condition)
+                self = .not(inner)
+            default:
+                throw DecodingError.dataCorruptedError(
+                    forKey: .op, in: c,
+                    debugDescription: "unknown op '\(op)'"
+                )
+            }
+            return
+        }
+
+        // type / feature — discriminated by the `type` key.
+        let kind = try c.decode(String.self, forKey: .type)
+        switch kind {
+        case "type":
+            let value = try c.decode(MediaTypeKind.self, forKey: .value)
+            self = .type(value)
+        case "feature":
+            let name = try c.decode(String.self, forKey: .name)
+            switch name {
+            case "width":
+                let op   = try c.decodeIfPresent(WidthOperator.self, forKey: .operator)
+                let val  = try c.decodeIfPresent(Double.self,        forKey: .value)
+                let unit = try c.decodeIfPresent(WidthUnit.self,     forKey: .unit)
+                self = .width(operator: op, value: val, unit: unit)
+            case "orientation":
+                let value = try c.decode(Orientation.self, forKey: .value)
+                self = .orientation(value)
+            default:
+                throw DecodingError.dataCorruptedError(
+                    forKey: .name, in: c,
+                    debugDescription: "unknown feature name '\(name)'"
+                )
+            }
+        default:
+            throw DecodingError.dataCorruptedError(
+                forKey: .type, in: c,
+                debugDescription: "unknown query kind '\(kind)'"
+            )
+        }
+    }
+
     public func encode(to encoder: Encoder) throws {
-        var c = encoder.singleValueContainer()
-        try c.encodeNil()
+        var c = encoder.container(keyedBy: Key.self)
+        switch self {
+        case .logical(let op, let conditions):
+            try c.encode(op.rawValue, forKey: .op)
+            try c.encode(conditions,  forKey: .conditions)
+        case .not(let inner):
+            try c.encode("not", forKey: .op)
+            try c.encode(inner, forKey: .condition)
+        case .type(let kind):
+            try c.encode("type", forKey: .type)
+            try c.encode(kind,   forKey: .value)
+        case .width(let op, let val, let unit):
+            try c.encode("feature", forKey: .type)
+            try c.encode("width",   forKey: .name)
+            try c.encodeIfPresent(op,   forKey: .operator)
+            try c.encodeIfPresent(val,  forKey: .value)
+            try c.encodeIfPresent(unit, forKey: .unit)
+        case .orientation(let o):
+            try c.encode("feature",     forKey: .type)
+            try c.encode("orientation", forKey: .name)
+            try c.encode(o,             forKey: .value)
+        }
     }
 }
