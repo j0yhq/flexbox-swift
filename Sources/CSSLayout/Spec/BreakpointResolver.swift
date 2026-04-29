@@ -28,7 +28,10 @@ public enum BreakpointResolver {
         in viewport: Viewport,
         breakpoints: [Breakpoint]
     ) -> Breakpoint? {
-        return nil
+        guard let index = activeIndex(in: viewport, breakpoints: breakpoints) else {
+            return nil
+        }
+        return breakpoints[index]
     }
 
     /// Return the *index* of the active breakpoint inside `breakpoints`,
@@ -39,6 +42,31 @@ public enum BreakpointResolver {
         in viewport: Viewport,
         breakpoints: [Breakpoint]
     ) -> Int? {
-        return nil
+        // Walk in source order and remember the most-specific match
+        // seen so far. Ties are broken by replacing on equal-or-higher
+        // specificity, which gives later source-order entries the win.
+        var winnerIndex: Int? = nil
+        var winnerSpecificity: Int = -1
+
+        for (i, bp) in breakpoints.enumerated() {
+            guard matches(bp, in: viewport) else { continue }
+            let specificity = bp.conditions.count
+            if specificity >= winnerSpecificity {
+                winnerSpecificity = specificity
+                winnerIndex = i
+            }
+        }
+        return winnerIndex
+    }
+
+    // MARK: - Match check
+
+    /// True iff every condition in `breakpoint` evaluates true against
+    /// `viewport`. Empty `conditions` is vacuously true.
+    private static func matches(
+        _ breakpoint: Breakpoint,
+        in viewport: Viewport
+    ) -> Bool {
+        breakpoint.conditions.allSatisfy { $0.matches(in: viewport) }
     }
 }
