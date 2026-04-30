@@ -1,18 +1,20 @@
-// JoyDOMView — the top-level SwiftUI view that renders a `CSSPayload`.
+// JoyDOMView — the top-level SwiftUI view that renders a `Spec`.
 //
 // Data flow per `body` evaluation:
 //
-//   1. `CSSParser.parse`        ──────────► Stylesheet
-//   2. `StyleTreeBuilder.build` ──────────► [StyleNode]            (root + children)
-//   3. `ComponentResolver.resolve` ───────► ComponentResolver.Resolved
+//   1. `BreakpointResolver.active` ──────► active Breakpoint (or nil)
+//   2. `RuleBuilder.buildRules`    ──────► [StyleResolver.Rule]
+//   3. `StyleTreeBuilder.build`    ──────► [StyleNode]
+//   4. `ComponentResolver.resolve` ──────► ComponentResolver.Resolved
 //        • one AnyView per child
 //        • a per-child ComponentEvents that fans events into the root sink
-//   4. Root sink                ──────────► dispatches to `onEvent` handlers
-//   5. Diagnostics              ──────────► forwarded to `onDiagnostic` (if set)
-//   6. `FlexLayout`             ──────────► lays out children using `ItemStyle`
+//   5. Root sink                   ──────► dispatches to `onEvent` handlers
+//   6. Diagnostics                 ──────► forwarded to `onDiagnostic`
+//   7. `FlexLayout`                ──────► lays out children using `ItemStyle`
 //
-// Caller-facing knobs are `.onEvent`, `.placeholder`, `.onDiagnostic`. Each
-// returns a new `JoyDOMView` so chains compose like any SwiftUI modifier.
+// Caller-facing knobs: `.onEvent`, `.placeholder`, `.onDiagnostic`,
+// `.viewport`, `.formState`, `.bindings`. Each returns a new
+// `JoyDOMView` so chains compose like any SwiftUI modifier.
 
 import Foundation
 import SwiftUI
@@ -34,14 +36,7 @@ public struct JoyDOMView: View {
 
     // MARK: - Stored state
 
-    /// Either a joy-dom spec (the public API path) or a pre-resolved
-    /// payload (used internally by the test suite to exercise the
-    /// rendering pipeline without the spec layer in the way).
-    private enum Source {
-        case spec(Spec)
-        case payload(CSSPayload)
-    }
-    private let source: Source
+    private let spec: Spec
     private let registry: ComponentRegistry
     private let locals: [Component]
 
@@ -72,75 +67,9 @@ public struct JoyDOMView: View {
         registry: ComponentRegistry = .shared,
         @JoyDOMComponentBuilder locals: () -> [Component] = { [] }
     ) {
-        self.source = .spec(spec)
+        self.spec = spec
         self.registry = registry
         self.locals = locals()
-    }
-
-    /// Internal initialiser for tests that want to exercise the
-    /// rendering pipeline directly with a pre-baked `CSSPayload`. Not
-    /// part of the public API.
-    internal init(
-        payload: CSSPayload,
-        registry: ComponentRegistry = .shared,
-        @JoyDOMComponentBuilder locals: () -> [Component] = { [] }
-    ) {
-        self.source = .payload(payload)
-        self.registry = registry
-        self.locals = locals()
-    }
-
-    /// Internal CSS-string convenience used by integration tests.
-    internal init(
-        css: String,
-        schema: [SchemaEntry] = [],
-        registry: ComponentRegistry = .shared,
-        @JoyDOMComponentBuilder _ locals: () -> [Component] = { [] }
-    ) {
-        self.init(
-            payload: CSSPayload(css: css, schema: schema),
-            registry: registry,
-            locals: locals
-        )
-    }
-
-    /// Compute the effective `CSSPayload` for the current source. For
-    /// joy-dom specs this runs the full converter (which honors the
-    /// active breakpoint via the env viewport); for pre-baked payloads
-    /// we hand back the supplied payload unchanged.
-    private func resolvePayload() -> CSSPayload {
-        switch source {
-        case .spec(let s):
-            // Build the payload, then inject `.bindings(...)` declared
-            // FormState paths into the matching schema entries' props
-            // so the existing resolver picks them up via the same
-            // "binding"/"binding.<field>" prop convention used since
-            // Phase 3.
-            let raw = JoyDOMConverter.convert(s, viewport: storedViewport)
-            return injectBindings(into: raw)
-        case .payload(let p):
-            return p
-        }
-    }
-
-    /// Apply `bindingsByID` to each matching `SchemaEntry.props` so
-    /// `events.binding(...)` finds a path. No-op when the map is empty
-    /// or when no entry matches.
-    private func injectBindings(into payload: CSSPayload) -> CSSPayload {
-        guard !bindingsByID.isEmpty else { return payload }
-        let patched = payload.schema.map { entry -> SchemaEntry in
-            guard let path = bindingsByID[entry.id] else { return entry }
-            var props = entry.props
-            props["binding"] = path
-            return SchemaEntry(
-                id: entry.id,
-                type: entry.type,
-                classes: entry.classes,
-                parentID: entry.parentID,
-                props: props
-            )
-        }
-        return CSSPayload(css: payload.css, schema: patched)
     }
 
     // MARK: - Modifiers
@@ -234,8 +163,7 @@ public struct JoyDOMView: View {
     }
 
     public var body: some View {
-        let payload = resolvePayload()
-        let snapshot = renderSnapshot(payload: payload)
+        let snapshot = renderSnapshot()
         return FlexLayout(snapshot.rootStyle.container) {
             childrenView(snapshot.children)
         }
@@ -284,13 +212,37 @@ public struct JoyDOMView: View {
     /// Separated from `body` so test helpers can exercise the full flow by
     /// simply reading `body`, yet the resolver's factories only run once per
     /// evaluation.
-    private func renderSnapshot(payload: CSSPayload) -> ComponentResolver.Resolved {
+    private func renderSnapshot() -> ComponentResolver.Resolved {
         var diagnostics = JoyDiagnostics()
-        let stylesheet = CSSParser.parse(payload.css, diagnostics: &diagnostics)
+
+        // Pick the active breakpoint for the current viewport (if any).
+        let activeBreakpoint = storedViewport.flatMap {
+            BreakpointResolver.active(in: $0, breakpoints: spec.breakpoints)
+        }
+
+        // Build the cascade rule list and the per-node className overrides
+        // the active breakpoint declares.
+        let rules = RuleBuilder.buildRules(
+            from: spec,
+            activeBreakpoint: activeBreakpoint,
+            diagnostics: &diagnostics
+        )
+        var classNameOverrides: [String: [String]] = [:]
+        if let bp = activeBreakpoint {
+            for (id, props) in bp.nodes {
+                if let classes = props.className {
+                    classNameOverrides[id] = classes
+                }
+            }
+        }
+
+        // Walk the tree.
         let nodes = StyleTreeBuilder.build(
-            rootID: "__csslayout_root__",
-            schema: payload.schema,
-            stylesheet: stylesheet,
+            layout: spec.layout,
+            rootID: "__joydom_root__",
+            rules: rules,
+            classNameOverrides: classNameOverrides,
+            bindingsByID: bindingsByID,
             diagnostics: &diagnostics
         )
 
@@ -309,7 +261,7 @@ public struct JoyDOMView: View {
         var localsByID: [String: Component] = [:]
         localsByID.reserveCapacity(locals.count)
         for l in locals { localsByID[l.id] = l }
-        let rootID = "__csslayout_root__"
+        let rootID = "__joydom_root__"
         // Prune FormState to the binding paths the current schema
         // declares *before* handing it to the resolver. Done up front so
         // a factory that reads its binding during its initial render
