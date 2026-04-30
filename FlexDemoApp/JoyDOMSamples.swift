@@ -1,5 +1,5 @@
 // JoyDOMSamples — curated joy-dom payloads for the paste demo's
-// dropdown. Each sample is a complete, valid `JoyDOMSpec` JSON
+// dropdown. Each sample is a complete, valid `Spec` JSON
 // document so picking one drops you straight into a working render.
 //
 // Ordered roughly by complexity: Hello world (minimal) → cards

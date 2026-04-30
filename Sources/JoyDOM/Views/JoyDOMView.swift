@@ -19,7 +19,7 @@ import SwiftUI
 import FlexLayout
 import CoreGraphics
 
-/// Renders a `JoyDOMSpec` as a live SwiftUI view tree backed by `FlexLayout`.
+/// Renders a `Spec` as a live SwiftUI view tree backed by `FlexLayout`.
 ///
 /// ```swift
 /// JoyDOMView(spec: spec)
@@ -38,7 +38,7 @@ public struct JoyDOMView: View {
     /// payload (used internally by the test suite to exercise the
     /// rendering pipeline without the spec layer in the way).
     private enum Source {
-        case spec(JoyDOMSpec)
+        case spec(Spec)
         case payload(CSSPayload)
     }
     private let source: Source
@@ -61,14 +61,14 @@ public struct JoyDOMView: View {
 
     // MARK: - Initialisers
 
-    /// Render a `JoyDOMSpec`.
+    /// Render a `Spec`.
     ///
     /// - Parameters:
     ///   - spec: The joy-dom document to render.
     ///   - registry: Component factory registry. Defaults to ``ComponentRegistry/shared``.
     ///   - locals: Inline `Component("id") { … }` overrides (optional).
     public init(
-        spec: JoyDOMSpec,
+        spec: Spec,
         registry: ComponentRegistry = .shared,
         @CSSLayoutBuilder locals: () -> [Component] = { [] }
     ) {

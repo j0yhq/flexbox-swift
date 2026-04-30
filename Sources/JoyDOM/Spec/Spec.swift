@@ -28,7 +28,7 @@ import Foundation
 // MARK: - Document root (`Spec`)
 
 /// The top-level joy-dom document. Mirrors `Spec` in `DOM/spec.ts`.
-public struct JoyDOMSpec: Equatable {
+public struct Spec: Equatable {
     /// Schema version. Always `1` in the current spec.
     public var version: Int
     /// Document-level style rules, keyed by selector (`#id`, `.class`, `type`).
@@ -356,7 +356,7 @@ public enum Orientation: String, Equatable {
 // MARK: - Codable
 
 // Swift can synthesize `Codable` for types whose fields are all themselves
-// `Codable`. For pure structs (`JoyDOMSpec`, `Node`, `NodeProps`, `Style`,
+// `Codable`. For pure structs (`Spec`, `Node`, `NodeProps`, `Style`,
 // `Length`, `Breakpoint`) and `String`-raw enums (`Position`, `Display`,
 // `Overflow`, `FlexDirection`, `JustifyContent`, `AlignItems`, `FlexWrap`,
 // `LogicalOp`, `MediaTypeKind`, `WidthOperator`, `WidthUnit`,
@@ -370,7 +370,7 @@ public enum Orientation: String, Equatable {
 // round-trip tests fail observably; Unit 1's GREEN replaces them with
 // implementations matching `DOM/spec.ts`.
 
-extension JoyDOMSpec: Codable {}
+extension Spec: Codable {}
 extension Node: Codable {}
 extension NodeProps: Codable {}
 extension Style: Codable {}

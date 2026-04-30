@@ -1,4 +1,4 @@
-// JoyDOMPasteDemo — paste a `JoyDOMSpec` JSON payload, see it render
+// JoyDOMPasteDemo — paste a `Spec` JSON payload, see it render
 // live. The joy-dom equivalent of the deleted CSSPasteDemo.
 //
 // The demo registers default primitives (`div`, `p`, `primitive_*`)
@@ -61,7 +61,7 @@ struct JoyDOMPasteDemo: View {
             Text("Paste joy-dom JSON → Preview")
                 .font(.title2.weight(.semibold))
             Text(
-                "Drop a JoyDOMSpec JSON payload here and see it render live. "
+                "Drop a Spec JSON payload here and see it render live. "
                 + "Default factories cover div, p, primitive_string/number/null, "
                 + "and a few conventional widgets (button, input, card). "
                 + "Drag the slider to test breakpoints."
@@ -107,7 +107,7 @@ struct JoyDOMPasteDemo: View {
                 // built-in placeholder, so we render Text under it and
                 // hide it once the user types anything.
                 if jsonText.isEmpty {
-                    Text("Paste a JoyDOMSpec JSON or click Reset to sample…")
+                    Text("Paste a Spec JSON or click Reset to sample…")
                         .font(.system(.caption, design: .monospaced))
                         .foregroundStyle(.tertiary)
                         .padding(.top, 16)
@@ -201,7 +201,7 @@ struct JoyDOMPasteDemo: View {
     }
 
     @ViewBuilder
-    private func renderPane(spec: JoyDOMSpec?, viewport: Viewport) -> some View {
+    private func renderPane(spec: Spec?, viewport: Viewport) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text("Preview")
                 .font(.caption.weight(.semibold))
@@ -244,12 +244,12 @@ struct JoyDOMPasteDemo: View {
 
     // MARK: - Decode pipeline
 
-    /// Decode the current `jsonText` into a `JoyDOMSpec`. Side-effects:
+    /// Decode the current `jsonText` into a `Spec`. Side-effects:
     /// updates `decodeError` so the error pane can surface the message.
-    private var decodedSpec: JoyDOMSpec? {
+    private var decodedSpec: Spec? {
         let data = Data(jsonText.utf8)
         do {
-            let spec = try JSONDecoder().decode(JoyDOMSpec.self, from: data)
+            let spec = try JSONDecoder().decode(Spec.self, from: data)
             DispatchQueue.main.async { self.decodeError = nil }
             return spec
         } catch {

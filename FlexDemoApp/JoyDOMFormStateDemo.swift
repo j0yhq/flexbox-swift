@@ -2,7 +2,7 @@
 // added in Tier 4 Phase C1.
 //
 // A two-field signup form where:
-//   • The schema is a `JoyDOMSpec` — the public API exposed to the
+//   • The schema is a `Spec` — the public API exposed to the
 //     joyfill server / authoring tool.
 //   • Field bindings to FormState are declared at the SwiftUI surface
 //     via `.bindings([node_id: form_state_path])`. Joy-dom payloads
@@ -126,8 +126,8 @@ struct JoyDOMFormStateDemo: View {
 
     // MARK: - Spec
 
-    private var spec: JoyDOMSpec {
-        JoyDOMSpec(
+    private var spec: Spec {
+        Spec(
             style: [
                 "#root": Style(
                     flexDirection: .column,

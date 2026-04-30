@@ -1,4 +1,4 @@
-// JoyDOMConverter — turns a `JoyDOMSpec` (Unit 1) into the
+// JoyDOMConverter — turns a `Spec` (Unit 1) into the
 // `CSSPayload` JoyDOMView's resolver already consumes.
 //
 // The converter is the boundary between joy-dom's structured-object
@@ -26,12 +26,12 @@
 
 import Foundation
 
-/// Pure-function converter from `JoyDOMSpec` to `CSSPayload`.
+/// Pure-function converter from `Spec` to `CSSPayload`.
 internal enum JoyDOMConverter {
 
     // MARK: - Public API
 
-    /// Convert a `JoyDOMSpec` into the `CSSPayload` JoyDOMView's
+    /// Convert a `Spec` into the `CSSPayload` JoyDOMView's
     /// resolver consumes, applying the active breakpoint (if any) for
     /// `viewport`.
     ///
@@ -42,7 +42,7 @@ internal enum JoyDOMConverter {
     /// Per-node breakpoint overrides also REPLACE `className` on the
     /// affected `SchemaEntry` so class selectors re-match against the
     /// breakpoint-effective class list.
-    internal static func convert(_ spec: JoyDOMSpec, viewport: Viewport?) -> CSSPayload {
+    internal static func convert(_ spec: Spec, viewport: Viewport?) -> CSSPayload {
         let activeBreakpoint = viewport.flatMap {
             BreakpointResolver.active(in: $0, breakpoints: spec.breakpoints)
         }
@@ -91,9 +91,9 @@ internal enum JoyDOMConverter {
         )
     }
 
-    /// Convert a `JoyDOMSpec` into the `CSSPayload` JoyDOMView's
+    /// Convert a `Spec` into the `CSSPayload` JoyDOMView's
     /// resolver consumes.
-    internal static func convert(_ spec: JoyDOMSpec) -> CSSPayload {
+    internal static func convert(_ spec: Spec) -> CSSPayload {
         return convert(spec, viewport: nil)
     }
 

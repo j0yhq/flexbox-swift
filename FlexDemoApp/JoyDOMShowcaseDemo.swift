@@ -1,9 +1,9 @@
 // JoyDOMShowcaseDemo — Tier 3 end-to-end demo.
 //
-// Renders a `JoyDOMSpec` (Josh's joyfill/.joy DOM spec) through every
+// Renders a `Spec` (Josh's joyfill/.joy DOM spec) through every
 // piece of plumbing JoyDOMView's Tier 3 added:
 //
-//   • Spec types       (Unit 1)  — JoyDOMSpec / Node / NodeProps / Style
+//   • Spec types       (Unit 1)  — Spec / Node / NodeProps / Style
 //   • Style serializer (Unit 2)  — Style → CSS text the parser accepts
 //   • Tree flattener   (Unit 3)  — Node tree → SchemaEntry array
 //   • Inline styles    (Unit 4)  — props.style → `#id { ... }` rules
@@ -71,7 +71,7 @@ struct JoyDOMShowcaseDemo: View {
             Text("joy-dom Showcase")
                 .font(.title2.weight(.semibold))
             Text(
-                "A JoyDOMSpec rendered through every Tier 3 piece — "
+                "A Spec rendered through every Tier 3 piece — "
                 + "tree flattening, inline styles, breakpoint cascade, "
                 + "default primitives, UiAction events. Drag the slider "
                 + "to step through breakpoint transitions."
@@ -184,8 +184,8 @@ struct JoyDOMShowcaseDemo: View {
 
     // MARK: - Spec — the joy-dom payload this demo renders
 
-    private var spec: JoyDOMSpec {
-        JoyDOMSpec(
+    private var spec: Spec {
+        Spec(
             // Document-level styles — the default rendering. The
             // wide-bp and narrow-bp re-style #row to switch between
             // row and column flow, which is the responsive flip.
