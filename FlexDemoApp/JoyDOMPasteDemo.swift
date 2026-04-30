@@ -151,11 +151,45 @@ struct JoyDOMPasteDemo: View {
             DispatchQueue.main.async { self.decodeError = nil }
             return spec
         } catch {
+            let friendly = friendlyMessage(for: error)
             DispatchQueue.main.async {
-                self.decodeError = String(describing: error)
+                self.decodeError = friendly
             }
             return nil
         }
+    }
+
+    /// Reformat a `DecodingError` (or any error) into a single-line
+    /// human-readable message. Covers the four `DecodingError` cases
+    /// plus a final fallback to `localizedDescription`.
+    private func friendlyMessage(for error: Error) -> String {
+        switch error {
+        case let DecodingError.dataCorrupted(ctx):
+            // The path of an underlying `NSError` JSON-syntax message
+            // is the most useful bit for fixing typos.
+            if let nsErr = ctx.underlyingError as NSError?,
+               let msg = nsErr.userInfo["NSDebugDescription"] as? String {
+                return "Invalid JSON: \(msg)"
+            }
+            return "Invalid JSON: \(ctx.debugDescription)"
+
+        case let DecodingError.keyNotFound(key, ctx):
+            return "Missing required key '\(key.stringValue)' at \(formatPath(ctx.codingPath))"
+
+        case let DecodingError.typeMismatch(type, ctx):
+            return "Wrong type at \(formatPath(ctx.codingPath)): expected \(type), \(ctx.debugDescription)"
+
+        case let DecodingError.valueNotFound(type, ctx):
+            return "Null value at \(formatPath(ctx.codingPath)), but \(type) expected"
+
+        default:
+            return error.localizedDescription
+        }
+    }
+
+    private func formatPath(_ path: [CodingKey]) -> String {
+        guard !path.isEmpty else { return "<root>" }
+        return path.map { $0.stringValue }.joined(separator: ".")
     }
 
     // MARK: - Registry
