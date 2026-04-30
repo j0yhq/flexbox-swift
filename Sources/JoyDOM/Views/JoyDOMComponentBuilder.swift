@@ -1,4 +1,4 @@
-// CSSLayoutBuilder — the result builder backing `JoyDOMView`'s locals block.
+// JoyDOMComponentBuilder — the result builder backing `JoyDOMView`'s locals block.
 //
 // Converts a sequence of `Component(...)` calls into the `[Component]`
 // array consumed by `ComponentResolver`. Supports conditionals
@@ -21,7 +21,7 @@ import Foundation
 /// }
 /// ```
 @resultBuilder
-public enum CSSLayoutBuilder {
+public enum JoyDOMComponentBuilder {
     public static func buildBlock(_ parts: [Component]...) -> [Component] {
         parts.flatMap { $0 }
     }

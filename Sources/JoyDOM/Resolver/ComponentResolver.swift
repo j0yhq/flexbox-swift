@@ -16,7 +16,7 @@ import FlexLayout
 
 /// The source the resolver chose for a given node.
 public enum Resolution: Equatable {
-    /// Matched by id in the `CSSLayoutBuilder` locals block.
+    /// Matched by id in the `JoyDOMComponentBuilder` locals block.
     case local
     /// Matched by type in the ``ComponentRegistry``.
     case registry
@@ -83,7 +83,7 @@ public enum ComponentResolver {
     /// - Parameters:
     ///   - nodes: The `StyleTreeBuilder` output. The first node is always
     ///     treated as root.
-    ///   - locals: Inline component overrides from the `CSSLayoutBuilder`
+    ///   - locals: Inline component overrides from the `JoyDOMComponentBuilder`
     ///     trailing closure.
     ///   - registry: The active component registry.
     ///   - placeholder: Factory invoked for unresolved nodes (unknown id or

@@ -1,8 +1,8 @@
-// JoyDOMSwiftEmitter — turns a `JoyDOMSpec` value (decoded from JSON
+// JoyDOMSwiftEmitter — turns a `Spec` value (decoded from JSON
 // in the paste demo) back into the equivalent Swift literal. Useful
 // for embedding a payload directly in test fixtures or demo code:
 //
-//   let spec = JoyDOMSpec(
+//   let spec = Spec(
 //       version: 1,
 //       style: [ "#root": Style(flexDirection: .column) ],
 //       …
@@ -17,15 +17,15 @@ import JoyDOM
 
 enum JoyDOMSwiftEmitter {
 
-    static func emit(_ spec: JoyDOMSpec) -> String {
+    static func emit(_ spec: Spec) -> String {
         return emit(spec, indent: "")
     }
 
     // MARK: - Top-level
 
-    private static func emit(_ spec: JoyDOMSpec, indent: String) -> String {
+    private static func emit(_ spec: Spec, indent: String) -> String {
         let next = indent + "    "
-        var out = "JoyDOMSpec(\n"
+        var out = "Spec(\n"
         out += "\(next)version: \(spec.version),\n"
         out += "\(next)style: \(emitSelectorMap(spec.style, indent: next)),\n"
         out += "\(next)breakpoints: \(emitArray(spec.breakpoints, indent: next, emit: emitBreakpoint)),\n"

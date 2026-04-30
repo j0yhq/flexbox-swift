@@ -1,7 +1,7 @@
 import XCTest
 @testable import JoyDOM
 
-/// Unit 1 — `JoyDOMSpec` and its child types are the Swift mirror of the
+/// Unit 1 — `Spec` and its child types are the Swift mirror of the
 /// `joy-dom` JSON spec defined in `joyfill/.joy#33` (`DOM/spec.ts`).
 ///
 /// These tests assert that every shape in `Sources/JoyDOMView/Spec/JoyDOM.swift`
@@ -326,7 +326,7 @@ final class JoyDOMTests: XCTestCase {
     // MARK: - Full document
 
     func testFullSpecRoundTrip() throws {
-        let spec = JoyDOMSpec(
+        let spec = Spec(
             version: 1,
             style: ["#root": Style(flexDirection: .column)],
             breakpoints: [
@@ -351,12 +351,12 @@ final class JoyDOMTests: XCTestCase {
 
     func testMalformedJSONThrows() {
         let bad = #"{"version":1,"style":{},"breakpoints":[],"layout":"oops"}"#
-        XCTAssertThrowsError(try decode(JoyDOMSpec.self, from: bad))
+        XCTAssertThrowsError(try decode(Spec.self, from: bad))
     }
 
     func testMissingRequiredLayoutThrows() {
         let bad = #"{"version":1,"style":{},"breakpoints":[]}"#
-        XCTAssertThrowsError(try decode(JoyDOMSpec.self, from: bad))
+        XCTAssertThrowsError(try decode(Spec.self, from: bad))
     }
 
     func testInvalidEnumValueThrows() {

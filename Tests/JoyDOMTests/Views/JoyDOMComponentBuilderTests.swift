@@ -2,7 +2,7 @@ import XCTest
 import SwiftUI
 @testable import JoyDOM
 
-/// Unit (j) — `Component` and `CSSLayoutBuilder`.
+/// Unit (j) — `Component` and `JoyDOMComponentBuilder`.
 ///
 /// The result builder converts a trailing-closure of `Component(...)` calls
 /// into the `[Component]` array consumed by the `JoyDOMView` view. These
@@ -90,7 +90,7 @@ final class CSSLayoutBuilderTests: XCTestCase {
     /// Invokes the result builder under test. Wraps the annotation so tests
     /// stay focused on input/output shape.
     private func buildComponents(
-        @CSSLayoutBuilder _ body: () -> [Component]
+        @JoyDOMComponentBuilder _ body: () -> [Component]
     ) -> [Component] {
         body()
     }

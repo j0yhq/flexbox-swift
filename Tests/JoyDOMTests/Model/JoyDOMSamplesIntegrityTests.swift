@@ -2,7 +2,7 @@ import XCTest
 @testable import JoyDOM
 
 /// Defensive guard: every sample in the paste demo's dropdown must
-/// decode cleanly into a `JoyDOMSpec`. Future additions can't slip in
+/// decode cleanly into a `Spec`. Future additions can't slip in
 /// missing required keys (`style`, `breakpoints`, etc.) without
 /// failing this suite.
 ///
@@ -26,7 +26,7 @@ final class JoyDOMSamplesIntegrityTests: XCTestCase {
     ) {
         let data = Data(json.utf8)
         do {
-            let spec = try JSONDecoder().decode(JoyDOMSpec.self, from: data)
+            let spec = try JSONDecoder().decode(Spec.self, from: data)
             XCTAssertEqual(spec.version, 1, "\(label): version must be 1",
                            file: file, line: line)
         } catch {
@@ -210,7 +210,7 @@ final class JoyDOMSamplesIntegrityTests: XCTestCase {
 
     // MARK: - Required-key sanity
 
-    /// A `JoyDOMSpec` JSON missing `style` or `breakpoints` must throw —
+    /// A `Spec` JSON missing `style` or `breakpoints` must throw —
     /// pinning the contract every sample has to honor.
     func testMissingStyleFailsToDecode() {
         let bad = #"""
@@ -221,7 +221,7 @@ final class JoyDOMSamplesIntegrityTests: XCTestCase {
         }
         """#
         XCTAssertThrowsError(
-            try JSONDecoder().decode(JoyDOMSpec.self, from: Data(bad.utf8))
+            try JSONDecoder().decode(Spec.self, from: Data(bad.utf8))
         )
     }
 
@@ -234,7 +234,7 @@ final class JoyDOMSamplesIntegrityTests: XCTestCase {
         }
         """#
         XCTAssertThrowsError(
-            try JSONDecoder().decode(JoyDOMSpec.self, from: Data(bad.utf8))
+            try JSONDecoder().decode(Spec.self, from: Data(bad.utf8))
         )
     }
 }

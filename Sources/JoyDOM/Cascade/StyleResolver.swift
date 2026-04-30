@@ -1,19 +1,23 @@
 // StyleResolver — applies cascade rules to a single node.
 //
 // Given a node's `id` (and optional `schemaType`, which maps to an element
-// selector), collect every matching rule from the stylesheet, sort by
-// (specificity ascending, sourceOrder ascending), then apply declarations
-// in order. Later declarations overwrite earlier ones — this is the CSS
-// cascade in its simplest form (no inline styles, no !important, no
-// inheritance; all Phase 2+).
+// selector), collect every matching rule from the rule list, sort by
+// (specificity ascending, sourceOrder ascending), then apply each rule's
+// `Style` field-by-field. Later applications overwrite earlier ones —
+// this is the CSS cascade in its simplest form (no `!important`, no
+// inheritance).
 //
-// Phase 1 matches `SimpleSelector`:
-//   •  `.id("x")`      ↔ node.id == "x"
-//   •  `.element("t")` ↔ node.schemaType == "t"
-//   •  `.class(_)`     ↔ never matches (classes not yet modeled on nodes)
+// Tier 5 rewrote this to consume `Style` (the joy-dom typed object)
+// directly. The old CSS-string pipeline (Stylesheet → Declaration → switch
+// on property name → CSSValueParsers) was deleted; the resolver now reads
+// fields straight off `Style` and writes them into `ComputedStyle`. No
+// string parsing happens in cascade-application anymore.
 //
-// The class case is included so the type-system compiles, and so Phase 2 can
-// wire classes through without changing this file's signature.
+// What survives from the pre-Tier-5 resolver:
+//   • Selector matching (`matches`, `matchPreceding`, `matchesCompound`)
+//     — all the combinator + sibling logic kept verbatim.
+//   • `NodeRef` — the (id, schemaType, classes) triple used by the
+//     selector matcher for ancestors and preceding siblings.
 
 import Foundation
 import FlexLayout
@@ -23,9 +27,11 @@ import CoreGraphics
 /// Resolves computed style for a single node.
 public enum StyleResolver {
 
+    // MARK: - Public types
+
     /// A minimal ancestor-ref used by the combinator matcher. Constructed by
-    /// `StyleTreeBuilder` from each schema entry; exposed publicly so tests
-    /// can exercise the resolver in isolation.
+    /// `StyleTreeBuilder` from each tree node; exposed publicly so tests can
+    /// exercise the resolver in isolation.
     public struct NodeRef: Equatable {
         public let id: String
         public let schemaType: String?
@@ -38,36 +44,64 @@ public enum StyleResolver {
         }
     }
 
+    /// One pre-computed cascade rule: a parsed selector pointing at a
+    /// `Style` value, with the specificity + source-order pair used to
+    /// break ties. `StyleTreeBuilder` produces these from the
+    /// document-level `Spec.style`, the active `Breakpoint.style`, plus
+    /// any per-node inline `Node.props.style` rules.
+    public struct Rule: Equatable {
+        public let selector: ComplexSelector
+        public let style: Style
+        public let specificity: Specificity
+        public let sourceOrder: Int
+
+        public init(
+            selector: ComplexSelector,
+            style: Style,
+            specificity: Specificity,
+            sourceOrder: Int
+        ) {
+            self.selector = selector
+            self.style = style
+            self.specificity = specificity
+            self.sourceOrder = sourceOrder
+        }
+    }
+
+    // MARK: - Resolve
+
     /// Produce the fully computed style for a node.
     ///
     /// - Parameters:
     ///   - id: The node id (matches `#id` selectors).
-    ///   - schemaType: The registered component type, if any (matches element
-    ///     selectors like `button`).
+    ///   - schemaType: The registered component type, if any (matches
+    ///     element selectors like `button`).
     ///   - classes: The node's CSS class names (matches `.name` selectors).
-    ///     Defaults to empty so pre-Phase-2 callers keep compiling.
-    ///   - ancestors: The node's ancestor chain, innermost parent first and
-    ///     the outermost ancestor last. Used to resolve descendant / child
-    ///     combinators. Defaults to empty (flat schema).
-    ///   - stylesheet: The parsed CSS to cascade over.
-    ///   - diagnostics: Accumulator for invalid-value warnings.
-    /// - Returns: The resolved ``ComputedStyle`` (defaults for unmatched nodes).
+    ///   - ancestors: Ancestor chain, innermost first. Used for descendant
+    ///     and child combinators.
+    ///   - precedingSiblings: Preceding-sibling chain in source order
+    ///     (oldest first). Used for adjacent (`+`) and general (`~`)
+    ///     sibling combinators.
+    ///   - rules: Pre-built rule list (selector + Style + specificity +
+    ///     sourceOrder) the cascade walks over.
+    ///   - diagnostics: Accumulator for invalid-value warnings (kept for
+    ///     parity with the old API; almost nothing in the new path emits
+    ///     one because Style is already typed).
+    /// - Returns: The resolved ``ComputedStyle`` (defaults for unmatched
+    ///   nodes).
     public static func resolve(
         id: String,
         schemaType: String?,
         classes: [String] = [],
         ancestors: [NodeRef] = [],
         precedingSiblings: [NodeRef] = [],
-        stylesheet: Stylesheet,
+        rules: [Rule],
         diagnostics: inout JoyDiagnostics
     ) -> ComputedStyle {
         let subject = NodeRef(id: id, schemaType: schemaType, classes: classes)
 
-        // 1. Select matching rules. A complex selector matches iff its subject
-        // compound matches the node AND every preceding compound can be
-        // satisfied by the ancestor chain (descendant / child combinators)
-        // or the preceding-sibling chain (adjacent / general sibling).
-        let matched = stylesheet.rules.filter { rule in
+        // 1. Filter to matching rules.
+        let matched = rules.filter { rule in
             matches(
                 rule.selector,
                 subject: subject,
@@ -76,37 +110,24 @@ public enum StyleResolver {
             )
         }
 
-        // 2. Sort by (specificity asc, sourceOrder asc). "Later wins" on ties.
+        // 2. Sort by (specificity asc, sourceOrder asc). Later wins on ties.
         let sorted = matched.sorted { a, b in
             if a.specificity != b.specificity { return a.specificity < b.specificity }
             return a.sourceOrder < b.sourceOrder
         }
 
-        // 3. Apply each rule's declarations.
-        var style = ComputedStyle()
+        // 3. Apply each matching rule's Style field-by-field.
+        var computed = ComputedStyle()
         for rule in sorted {
-            for decl in rule.declarations {
-                apply(decl, to: &style, diagnostics: &diagnostics)
-            }
+            apply(rule.style, to: &computed, diagnostics: &diagnostics)
         }
-        return style
+        return computed
     }
 
-    // MARK: - Selector matching
+    // MARK: - Selector matching (unchanged from pre-Tier-5)
 
     /// Full complex-selector match: subject compound against the node plus
     /// every preceding compound against the ancestor chain per its combinator.
-    ///
-    /// Scans compounds right-to-left (subject first) with backtracking for
-    /// descendant combinators. Greedy matching is NOT sufficient — consider
-    /// `#form > .row input` against an ancestor chain `[inner.row, cell,
-    /// outer.row, form]`: picking the innermost `.row` greedily fails the
-    /// `#form >` child check, even though choosing `outer.row` succeeds.
-    ///
-    /// For each preceding compound:
-    ///   • `.child` — the very next ancestor must match; one shot, no choice.
-    ///   • `.descendant` — try each candidate ancestor in turn; recurse on
-    ///     the remainder. First success wins.
     private static func matches(
         _ complex: ComplexSelector,
         subject: NodeRef,
@@ -126,19 +147,6 @@ public enum StyleResolver {
     }
 
     /// Recursive backtracking helper for preceding compounds.
-    ///
-    /// State carried through the recursion:
-    ///   • `partIndex` — compound left to satisfy (decreases towards 0).
-    ///   • `ancestorCursor` — next ancestor index up the chain to consider
-    ///     (increases as descendant / child combinators consume the chain).
-    ///   • `siblingUpperBound` — strict upper bound on the sibling index
-    ///     we may match next. Decreases as `+` / `~` consume preceding
-    ///     siblings in source order, ensuring a later combinator can never
-    ///     re-match an already-claimed sibling.
-    ///
-    /// A sibling-matched compound stays at the SAME ancestor depth (siblings
-    /// share a parent), so `ancestorCursor` is unchanged when a sibling
-    /// combinator fires; only `siblingUpperBound` moves.
     private static func matchPreceding(
         complex: ComplexSelector,
         partIndex: Int,
@@ -184,7 +192,6 @@ public enum StyleResolver {
             return false
 
         case .adjacentSibling:
-            // The IMMEDIATELY preceding sibling — index `siblingUpperBound - 1`.
             let idx = siblingUpperBound - 1
             guard idx >= 0,
                   matchesCompound(compound, node: precedingSiblings[idx])
@@ -199,9 +206,6 @@ public enum StyleResolver {
             )
 
         case .generalSibling:
-            // Try each preceding sibling strictly before `siblingUpperBound`,
-            // newest first (so a tighter match wins when both `~` and `+`
-            // would have applied).
             var i = siblingUpperBound - 1
             while i >= 0 {
                 if matchesCompound(compound, node: precedingSiblings[i]),
@@ -235,308 +239,160 @@ public enum StyleResolver {
         }
     }
 
-    // MARK: - Declaration application
+    // MARK: - Style application
 
-    // Dispatch table for one declaration. Invalid values are reported via
-    // `.invalidValue(property:value:)` and the target field is left at its
-    // prior value (which is the CSS initial value for a fresh ComputedStyle).
+    /// Apply a joy-dom `Style` to `computed`, field-by-field. Translation
+    /// is direct: each enum case maps to its FlexLayout counterpart, each
+    /// `Length` resolves to the appropriate FlexLayout dimension type
+    /// (px → CGFloat / .points, % → .fraction).
     private static func apply(
-        _ decl: Declaration,
-        to style: inout ComputedStyle,
+        _ s: Style,
+        to computed: inout ComputedStyle,
         diagnostics: inout JoyDiagnostics
     ) {
-        switch decl.property {
-
-        // MARK: Container
-        case "display":
-            // `display: none` is parsed here (not in `parseDisplay`) because
-            // FlexDisplay has no `.none` case — we flag it on ComputedStyle
-            // and let the resolver filter the node's whole subtree out.
-            let raw = decl.value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-            if raw == "none" {
-                style.isDisplayNone = true
-            } else if let v = CSSValueParsers.parseDisplay(decl.value) {
-                style.display = v
-                style.isDisplayNone = false
-            } else {
-                diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value)))
+        // Display — joy-dom's enum doesn't include `none`, so we don't
+        // touch `isDisplayNone` here. (None can't be expressed in Style
+        // today; future spec rev would add it.)
+        if let v = s.display {
+            switch v {
+            case .flex:        computed.display = .flex
+            case .block:       computed.display = .block
+            case .inlineBlock: computed.display = .inline   // FlexDisplay has no inlineBlock; treat as inline
             }
+            computed.isDisplayNone = false
+        }
 
-        case "visibility":
-            // Only `visible` / `hidden` are modelled. `collapse` has no
-            // meaningful flex mapping (it targets table-rows in CSS 2.1)
-            // and anything else is garbage — both get `.invalidValue` so
-            // the prior cascaded value is preserved.
-            switch decl.value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() {
-            case "visible": style.isVisibilityHidden = false
-            case "hidden":  style.isVisibilityHidden = true
-            default:
-                diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value)))
+        // Container
+
+        if let v = s.flexDirection {
+            switch v {
+            case .row:    computed.container.direction = .row
+            case .column: computed.container.direction = .column
             }
+        }
 
-        case "flex-direction":
-            if let v = CSSValueParsers.parseFlexDirection(decl.value) {
-                style.container.direction = v
-            } else {
-                diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value)))
+        if let v = s.flexWrap {
+            switch v {
+            case .nowrap: computed.container.wrap = .nowrap
+            case .wrap:   computed.container.wrap = .wrap
             }
+        }
 
-        case "flex-wrap":
-            if let v = CSSValueParsers.parseFlexWrap(decl.value) {
-                style.container.wrap = v
-            } else {
-                diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value)))
+        if let v = s.justifyContent {
+            switch v {
+            case .flexStart:    computed.container.justifyContent = .flexStart
+            case .flexEnd:      computed.container.justifyContent = .flexEnd
+            case .center:       computed.container.justifyContent = .center
+            case .spaceBetween: computed.container.justifyContent = .spaceBetween
+            case .spaceAround:  computed.container.justifyContent = .spaceAround
             }
+        }
 
-        case "justify-content":
-            if let v = CSSValueParsers.parseJustifyContent(decl.value) {
-                style.container.justifyContent = v
-            } else {
-                diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value)))
+        if let v = s.alignItems {
+            switch v {
+            case .flexStart: computed.container.alignItems = .flexStart
+            case .flexEnd:   computed.container.alignItems = .flexEnd
+            case .center:    computed.container.alignItems = .center
             }
+        }
 
-        case "align-items":
-            if let v = CSSValueParsers.parseAlignItems(decl.value) {
-                style.container.alignItems = v
-            } else {
-                diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value)))
+        if let v = s.gap {
+            switch v {
+            case .uniform(let l):
+                computed.container.gap = lengthToPx(l)
+            case .axes(let column, let row):
+                computed.container.rowGap    = lengthToPx(row)
+                computed.container.columnGap = lengthToPx(column)
             }
+        }
 
-        case "align-content":
-            if let v = CSSValueParsers.parseAlignContent(decl.value) {
-                style.container.alignContent = v
-            } else {
-                diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value)))
+        if let v = s.padding {
+            switch v {
+            case .uniform(let l):
+                let n = lengthToPx(l)
+                computed.container.padding = EdgeInsets(top: n, leading: n, bottom: n, trailing: n)
+            case .sides(let t, let r, let b, let l):
+                computed.container.padding = EdgeInsets(
+                    top: lengthToPx(t),
+                    leading: lengthToPx(l),
+                    bottom: lengthToPx(b),
+                    trailing: lengthToPx(r)
+                )
             }
+        }
 
-        case "gap":
-            applyGap(decl.value, to: &style.container, diagnostics: &diagnostics)
-
-        case "row-gap":
-            if let n = CSSValueParsers.parsePx(decl.value) {
-                style.container.rowGap = n
-            } else {
-                diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value)))
+        if let v = s.overflow {
+            // Overflow applies to both container and item contexts. The
+            // flex engine reads from the item key when set, so we write
+            // to both; the effective value is the same either way.
+            let mapped: FlexOverflow
+            switch v {
+            case .visible: mapped = .visible
+            case .hidden:  mapped = .hidden
+            case .clip:    mapped = .clip
+            case .scroll:  mapped = .scroll
+            case .auto:    mapped = .auto
             }
+            computed.container.overflow = mapped
+            computed.item.overflow      = mapped
+        }
 
-        case "column-gap":
-            if let n = CSSValueParsers.parsePx(decl.value) {
-                style.container.columnGap = n
-            } else {
-                diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value)))
+        // Item
+
+        if let v = s.flexGrow   { computed.item.grow   = CGFloat(v) }
+        if let v = s.flexShrink { computed.item.shrink = CGFloat(v) }
+
+        if let v = s.flexBasis {
+            computed.item.basis = lengthToFlexBasis(v)
+        }
+
+        if let v = s.order { computed.item.order = v }
+
+        if let v = s.width  { computed.item.width  = lengthToFlexSize(v) }
+        if let v = s.height { computed.item.height = lengthToFlexSize(v) }
+
+        if let v = s.zIndex { computed.item.zIndex = v }
+
+        if let v = s.position {
+            switch v {
+            case .absolute: computed.item.position = .absolute
+            case .relative: computed.item.position = .relative
             }
+        }
 
-        case "padding":
-            applyPaddingShorthand(decl.value, to: &style.container, diagnostics: &diagnostics)
+        if let v = s.top    { computed.item.top      = lengthToPx(v) }
+        if let v = s.bottom { computed.item.bottom   = lengthToPx(v) }
+        if let v = s.left   { computed.item.leading  = lengthToPx(v) }
+        if let v = s.right  { computed.item.trailing = lengthToPx(v) }
 
-        case "padding-top":
-            if let n = CSSValueParsers.parsePx(decl.value) { style.container.padding.top = n }
-            else { diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value))) }
-        case "padding-bottom":
-            if let n = CSSValueParsers.parsePx(decl.value) { style.container.padding.bottom = n }
-            else { diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value))) }
-        case "padding-left":
-            if let n = CSSValueParsers.parsePx(decl.value) { style.container.padding.leading = n }
-            else { diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value))) }
-        case "padding-right":
-            if let n = CSSValueParsers.parsePx(decl.value) { style.container.padding.trailing = n }
-            else { diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value))) }
+        // `_ = diagnostics` — kept in the signature for symmetry / future
+        // spec rev. Today every Style field is typed and can't yield an
+        // invalid-value warning at this layer.
+        _ = diagnostics
+    }
 
-        case "overflow":
-            // `overflow` applies to both container and item contexts. The
-            // flex engine reads from the item key when set, so we write to
-            // both; the effective value is the same either way.
-            if let v = CSSValueParsers.parseOverflow(decl.value) {
-                style.container.overflow = v
-                style.item.overflow = v
-            } else {
-                diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value)))
-            }
+    // MARK: - Length helpers
 
-        // MARK: Item shorthand
-        case "flex":
-            applyFlexShorthand(decl.value, to: &style.item, diagnostics: &diagnostics)
+    /// `Length` → CGFloat. Non-px units fall back to the raw value
+    /// (treated as points), matching the Tier-3 serializer's behavior.
+    /// Production payloads use only `px` for non-percentage fields.
+    private static func lengthToPx(_ l: Length) -> CGFloat {
+        CGFloat(l.value)
+    }
 
-        case "flex-grow":
-            if let n = parseDouble(decl.value) { style.item.grow = CGFloat(n) }
-            else { diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value))) }
-
-        case "flex-shrink":
-            if let n = parseDouble(decl.value) { style.item.shrink = CGFloat(n) }
-            else { diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value))) }
-
-        case "flex-basis":
-            if let v = CSSValueParsers.parseFlexBasis(decl.value) {
-                style.item.basis = v
-            } else {
-                diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value)))
-            }
-
-        case "align-self":
-            if let v = CSSValueParsers.parseAlignSelf(decl.value) {
-                style.item.alignSelf = v
-            } else {
-                diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value)))
-            }
-
-        case "order":
-            if let n = Int(decl.value.trimmingCharacters(in: .whitespaces)) {
-                style.item.order = n
-            } else {
-                diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value)))
-            }
-
-        case "width":
-            if let v = CSSValueParsers.parseFlexSize(decl.value) {
-                style.item.width = v
-            } else {
-                diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value)))
-            }
-        case "height":
-            if let v = CSSValueParsers.parseFlexSize(decl.value) {
-                style.item.height = v
-            } else {
-                diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value)))
-            }
-
-        case "z-index":
-            if let n = Int(decl.value.trimmingCharacters(in: .whitespaces)) {
-                style.item.zIndex = n
-            } else {
-                diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value)))
-            }
-
-        case "position":
-            if let v = CSSValueParsers.parsePosition(decl.value) {
-                style.item.position = v
-            } else {
-                diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value)))
-            }
-
-        case "top":
-            if let n = CSSValueParsers.parsePx(decl.value) { style.item.top = n }
-            else { diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value))) }
-        case "bottom":
-            if let n = CSSValueParsers.parsePx(decl.value) { style.item.bottom = n }
-            else { diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value))) }
-        case "left":
-            if let n = CSSValueParsers.parsePx(decl.value) { style.item.leading = n }
-            else { diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value))) }
-        case "right":
-            if let n = CSSValueParsers.parsePx(decl.value) { style.item.trailing = n }
-            else { diagnostics.warn(.init(.invalidValue(property: decl.property, value: decl.value))) }
-
-        default:
-            // `DeclarationParser` already drops unsupported properties, so we
-            // should never reach this branch. Fall through silently to keep
-            // the resolver tolerant of future allow-list expansions.
-            break
+    /// `Length` → `FlexBasis`. `px` → `.points(n)`; `%` → `.fraction(n / 100)`.
+    private static func lengthToFlexBasis(_ l: Length) -> FlexBasis {
+        switch l.unit {
+        case "%": return .fraction(CGFloat(l.value) / 100)
+        default:  return .points(CGFloat(l.value))
         }
     }
 
-    // MARK: - Value helpers
-
-    private static func parseDouble(_ s: String) -> Double? {
-        Double(s.trimmingCharacters(in: .whitespaces))
-    }
-
-    private static func applyGap(
-        _ value: String,
-        to c: inout FlexContainerConfig,
-        diagnostics: inout JoyDiagnostics
-    ) {
-        let parts = value
-            .components(separatedBy: .whitespaces)
-            .filter { !$0.isEmpty }
-        switch parts.count {
-        case 2:
-            if let r = CSSValueParsers.parsePx(parts[0]),
-               let col = CSSValueParsers.parsePx(parts[1]) {
-                c.rowGap = r
-                c.columnGap = col
-            } else {
-                diagnostics.warn(.init(.invalidValue(property: "gap", value: value)))
-            }
-        case 1:
-            if let n = CSSValueParsers.parsePx(value) {
-                c.gap = n
-            } else {
-                diagnostics.warn(.init(.invalidValue(property: "gap", value: value)))
-            }
-        default:
-            diagnostics.warn(.init(.invalidValue(property: "gap", value: value)))
-        }
-    }
-
-    private static func applyPaddingShorthand(
-        _ value: String,
-        to c: inout FlexContainerConfig,
-        diagnostics: inout JoyDiagnostics
-    ) {
-        let parts = value
-            .components(separatedBy: .whitespaces)
-            .filter { !$0.isEmpty }
-            .compactMap { CSSValueParsers.parsePx($0) }
-        // The `.compactMap` drops unparseable tokens; if the count doesn't
-        // match the CSS 1/2/3/4 shorthand forms, we leave padding untouched
-        // and emit a diagnostic.
-        switch parts.count {
-        case 1:
-            c.padding = EdgeInsets(top: parts[0], leading: parts[0], bottom: parts[0], trailing: parts[0])
-        case 2:
-            c.padding = EdgeInsets(top: parts[0], leading: parts[1], bottom: parts[0], trailing: parts[1])
-        case 3:
-            c.padding = EdgeInsets(top: parts[0], leading: parts[1], bottom: parts[2], trailing: parts[1])
-        case 4:
-            c.padding = EdgeInsets(top: parts[0], leading: parts[3], bottom: parts[2], trailing: parts[1])
-        default:
-            diagnostics.warn(.init(.invalidValue(property: "padding", value: value)))
-        }
-    }
-
-    private static func applyFlexShorthand(
-        _ value: String,
-        to item: inout ItemStyle,
-        diagnostics: inout JoyDiagnostics
-    ) {
-        let trimmed = value.trimmingCharacters(in: .whitespaces).lowercased()
-        switch trimmed {
-        case "auto":    item.grow = 1; item.shrink = 1; item.basis = .auto; return
-        case "none":    item.grow = 0; item.shrink = 0; item.basis = .auto; return
-        case "initial": item.grow = 0; item.shrink = 1; item.basis = .auto; return
-        default: break
-        }
-
-        let parts = trimmed.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
-        switch parts.count {
-        case 1:
-            if let n = Double(parts[0]) {
-                item.grow = CGFloat(n)
-                item.shrink = 1
-                item.basis = .points(0)
-            } else if let b = CSSValueParsers.parseFlexBasis(parts[0]) {
-                item.basis = b
-            } else {
-                diagnostics.warn(.init(.invalidValue(property: "flex", value: value)))
-            }
-        case 2:
-            if let g = Double(parts[0]), let s = Double(parts[1]) {
-                item.grow = CGFloat(g)
-                item.shrink = CGFloat(s)
-            } else {
-                diagnostics.warn(.init(.invalidValue(property: "flex", value: value)))
-            }
-        case 3...:
-            if let g = Double(parts[0]), let s = Double(parts[1]),
-               let b = CSSValueParsers.parseFlexBasis(parts[2]) {
-                item.grow = CGFloat(g)
-                item.shrink = CGFloat(s)
-                item.basis = b
-            } else {
-                diagnostics.warn(.init(.invalidValue(property: "flex", value: value)))
-            }
-        default:
-            diagnostics.warn(.init(.invalidValue(property: "flex", value: value)))
+    /// `Length` → `FlexSize`. Same axis mapping as `lengthToFlexBasis`.
+    private static func lengthToFlexSize(_ l: Length) -> FlexSize {
+        switch l.unit {
+        case "%": return .fraction(CGFloat(l.value) / 100)
+        default:  return .points(CGFloat(l.value))
         }
     }
 }
