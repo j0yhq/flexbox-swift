@@ -22,8 +22,8 @@ final class JoyDOMBreakpointApplicationTests: XCTestCase {
 
     // MARK: - Fixtures
 
-    private func twoBreakpointSpec() -> JoyDOMSpec {
-        JoyDOMSpec(
+    private func twoBreakpointSpec() -> Spec {
+        Spec(
             style: ["#root": Style(flexDirection: .column)],
             breakpoints: [
                 Breakpoint(
@@ -104,7 +104,7 @@ final class JoyDOMBreakpointApplicationTests: XCTestCase {
         // Cascade order: base `#sidebar { padding: 8px; }` first,
         // breakpoint `#sidebar { display: block; }` second — so
         // padding survives, display added.
-        let spec = JoyDOMSpec(
+        let spec = Spec(
             breakpoints: [
                 Breakpoint(
                     conditions: [],   // always active
@@ -132,7 +132,7 @@ final class JoyDOMBreakpointApplicationTests: XCTestCase {
     // MARK: - Per-node className override replaces SchemaEntry classes
 
     func testBreakpointClassNameOverrideReplacesSchemaClasses() {
-        let spec = JoyDOMSpec(
+        let spec = Spec(
             breakpoints: [
                 Breakpoint(
                     conditions: [],   // always active
@@ -151,7 +151,7 @@ final class JoyDOMBreakpointApplicationTests: XCTestCase {
     }
 
     func testBreakpointWithoutClassNameLeavesSchemaClassesUntouched() {
-        let spec = JoyDOMSpec(
+        let spec = Spec(
             breakpoints: [
                 Breakpoint(
                     conditions: [],

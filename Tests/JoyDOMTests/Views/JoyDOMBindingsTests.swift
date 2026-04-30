@@ -37,7 +37,7 @@ final class CSSLayoutBindingsTests: XCTestCase {
         let probe = BindingProbe()
         let registry = registerProbe(probe)
 
-        let spec = JoyDOMSpec(layout: Node(
+        let spec = Spec(layout: Node(
             type: "div",
             props: NodeProps(id: "root"),
             children: [.node(Node(type: "probe", props: NodeProps(id: "name-field")))]
@@ -63,7 +63,7 @@ final class CSSLayoutBindingsTests: XCTestCase {
         let probe = BindingProbe()
         let registry = registerProbe(probe)
 
-        let spec = JoyDOMSpec(layout: Node(
+        let spec = Spec(layout: Node(
             type: "div",
             props: NodeProps(id: "root"),
             children: [.node(Node(type: "probe", props: NodeProps(id: "name-field")))]
@@ -103,7 +103,7 @@ final class CSSLayoutBindingsTests: XCTestCase {
             return .custom { EmptyView() }
         }
 
-        let spec = JoyDOMSpec(layout: Node(
+        let spec = Spec(layout: Node(
             type: "div",
             props: NodeProps(id: "root"),
             children: [
@@ -134,7 +134,7 @@ final class CSSLayoutBindingsTests: XCTestCase {
             return .custom { EmptyView() }
         }
 
-        let spec = JoyDOMSpec(layout: Node(type: "div", props: NodeProps(id: "root"), children: [
+        let spec = Spec(layout: Node(type: "div", props: NodeProps(id: "root"), children: [
             .node(Node(type: "probe-a", props: NodeProps(id: "field-a"))),
             .node(Node(type: "probe-b", props: NodeProps(id: "field-b"))),
         ]))
@@ -155,7 +155,7 @@ final class CSSLayoutBindingsTests: XCTestCase {
         let probe = BindingProbe()
         let registry = registerProbe(probe)
 
-        let spec = JoyDOMSpec(layout: Node(type: "div", props: NodeProps(id: "root"), children: [
+        let spec = Spec(layout: Node(type: "div", props: NodeProps(id: "root"), children: [
             .node(Node(type: "probe", props: NodeProps(id: "field")))
         ]))
 
@@ -175,7 +175,7 @@ final class CSSLayoutBindingsTests: XCTestCase {
         let probe = BindingProbe()
         let registry = registerProbe(probe)
 
-        let spec = JoyDOMSpec(layout: Node(type: "div", props: NodeProps(id: "root"), children: [
+        let spec = Spec(layout: Node(type: "div", props: NodeProps(id: "root"), children: [
             .node(Node(type: "probe", props: NodeProps(id: "field")))
         ]))
 
