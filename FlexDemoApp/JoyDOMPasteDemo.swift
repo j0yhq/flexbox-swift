@@ -10,6 +10,13 @@
 import SwiftUI
 import JoyDOM
 
+#if canImport(AppKit)
+import AppKit
+#endif
+#if canImport(UIKit)
+import UIKit
+#endif
+
 struct JoyDOMPasteDemo: View {
 
     // MARK: - Owned state
@@ -17,6 +24,9 @@ struct JoyDOMPasteDemo: View {
     @State private var jsonText: String = JoyDOMPasteDemo.sampleJSON
     @State private var decodeError: String? = nil
     @State private var simulatedWidth: CGFloat = 600
+    /// One-shot toast message ("JSON formatted", "Copied as Swift") so
+    /// button taps give visible feedback instead of feeling silent.
+    @State private var toast: String? = nil
 
     // MARK: - Body
 
@@ -60,11 +70,25 @@ struct JoyDOMPasteDemo: View {
 
     private var editorPane: some View {
         VStack(alignment: .leading, spacing: 6) {
-            HStack {
+            HStack(spacing: 8) {
                 Text("JSON payload")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
+                if let toast = toast {
+                    Text(toast)
+                        .font(.caption)
+                        .foregroundStyle(.green)
+                        .transition(.opacity)
+                }
                 Spacer()
+                Button("Format") { formatJSON() }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    .disabled(decodeError != nil || jsonText.isEmpty)
+                Button("Copy as Swift") { copyAsSwift() }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    .disabled(decodedSpec == nil)
                 Button("Reset to sample") {
                     jsonText = JoyDOMPasteDemo.sampleJSON
                 }
@@ -72,17 +96,73 @@ struct JoyDOMPasteDemo: View {
                 .controlSize(.small)
             }
 
-            TextEditor(text: $jsonText)
-                .font(.system(.caption, design: .monospaced))
-                .frame(minHeight: 220)
-                .padding(8)
-                .background(Color(white: 0.97))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .strokeBorder(Color.gray.opacity(0.25))
-                )
+            ZStack(alignment: .topLeading) {
+                // Placeholder beneath the editor — TextEditor has no
+                // built-in placeholder, so we render Text under it and
+                // hide it once the user types anything.
+                if jsonText.isEmpty {
+                    Text("Paste a JoyDOMSpec JSON or click Reset to sample…")
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundStyle(.tertiary)
+                        .padding(.top, 16)
+                        .padding(.leading, 12)
+                        .allowsHitTesting(false)
+                }
+                TextEditor(text: $jsonText)
+                    .font(.system(.caption, design: .monospaced))
+                    .scrollContentBackground(.hidden)
+                    .frame(minHeight: 220)
+                    .padding(8)
+            }
+            .background(Color(white: 0.97))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .strokeBorder(Color.gray.opacity(0.25))
+            )
         }
+    }
+
+    // MARK: - Button actions
+
+    /// Pretty-print the current JSON in place. Silently no-ops on
+    /// invalid input — the error pane already surfaces what's wrong.
+    private func formatJSON() {
+        guard let data = jsonText.data(using: .utf8),
+              let object = try? JSONSerialization.jsonObject(with: data, options: [.fragmentsAllowed]),
+              let pretty = try? JSONSerialization.data(
+                  withJSONObject: object,
+                  options: [.prettyPrinted, .sortedKeys]
+              ),
+              let str = String(data: pretty, encoding: .utf8)
+        else { return }
+        jsonText = str
+        flashToast("JSON formatted")
+    }
+
+    /// Emit the current spec as a Swift literal and copy to the
+    /// system clipboard. Disabled when the JSON doesn't decode.
+    private func copyAsSwift() {
+        guard let spec = decodedSpec else { return }
+        let swift = JoyDOMSwiftEmitter.emit(spec)
+        copyToClipboard(swift)
+        flashToast("Copied as Swift")
+    }
+
+    private func flashToast(_ message: String) {
+        withAnimation { toast = message }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            withAnimation { toast = nil }
+        }
+    }
+
+    private func copyToClipboard(_ s: String) {
+        #if canImport(AppKit)
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(s, forType: .string)
+        #elseif canImport(UIKit)
+        UIPasteboard.general.string = s
+        #endif
     }
 
     private var widthSlider: some View {
