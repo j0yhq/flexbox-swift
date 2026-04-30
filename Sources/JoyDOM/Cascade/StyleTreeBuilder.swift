@@ -112,8 +112,14 @@ internal enum StyleTreeBuilder {
     ) {
         let id          = resolveID(node: node, path: path)
         let schemaType  = node.type
-        // Per-node breakpoint className override wins; otherwise use the
-        // node's own className.
+        // Per-node breakpoint className override REPLACES the base
+        // className (does NOT merge). Matches Josh's `spec.ts`:
+        // `Breakpoint.nodes[id]` carries `Partial<NodeProps>`, and a
+        // supplied `className` array overrides the base array
+        // entirely. To merge instead, the spec would need a separate
+        // "addedClasses" field. Pinned by
+        // `testBreakpointClassNameReplacesBase` in
+        // `JoyDOMViewIntegrationTests`.
         let classes     = classNameOverrides[id] ?? (node.props?.className ?? [])
 
         // Preceding siblings under this parent — already-emitted refs.
@@ -252,17 +258,29 @@ internal enum StyleTreeBuilder {
     // MARK: - Identity
 
     /// Author-supplied `props.id` wins; otherwise a deterministic
-    /// position-based fallback. Synthetic ids start with `_n_` so they're
-    /// visibly synthetic to anyone reading the tree.
+    /// position-based fallback.
+    ///
+    /// Synthetic ids carry a `__joydom_anon_` prefix so they're visibly
+    /// generated and unlikely to collide with author-supplied ids. They
+    /// can still appear in `StyleNode.id`, event `sourceID`, and debug
+    /// logs — that's by design (the resolver needs a stable identity
+    /// for every node, even unaddressable ones). What they DON'T do:
+    /// participate in the cascade as `#id` selector targets, because
+    /// `RuleBuilder.appendInlineRules` skips nodes without an
+    /// author-supplied `props.id`. So a hostile selector
+    /// `#__joydom_anon_0_1` would only match if the author somehow
+    /// wrote that exact id elsewhere, which the prefix makes extremely
+    /// unlikely.
     private static func resolveID(node: Node, path: [Int]) -> String {
         if let explicit = node.props?.id { return explicit }
         return syntheticID(for: path)
     }
 
-    /// `[]` → unused (root has its own id); `[0]` → `_n_0`; `[0, 1]` → `_n_0_1`.
+    /// `[]` → unused (root has its own id); `[0]` → `__joydom_anon_0`;
+    /// `[0, 1]` → `__joydom_anon_0_1`.
     private static func syntheticID(for path: [Int]) -> String {
-        guard !path.isEmpty else { return "_n_" }
-        return "_n_" + path.map(String.init).joined(separator: "_")
+        guard !path.isEmpty else { return "__joydom_anon_" }
+        return "__joydom_anon_" + path.map(String.init).joined(separator: "_")
     }
 
     // MARK: - Number formatting
