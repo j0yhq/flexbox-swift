@@ -43,6 +43,8 @@ enum JoyDOMSamples {
         json: #"""
         {
           "version": 1,
+          "style": {},
+          "breakpoints": [],
           "layout": {
             "type": "p",
             "props": { "id": "greeting" },
@@ -209,6 +211,7 @@ enum JoyDOMSamples {
             "#title": { "height": { "value": 36, "unit": "px" } },
             "#byline": { "height": { "value": 20, "unit": "px" } }
           },
+          "breakpoints": [],
           "layout": {
             "type": "div",
             "props": { "id": "article" },
