@@ -1,151 +1,278 @@
-// StyleTreeBuilder — produces a flat list of `StyleNode`s ready for rendering.
+// StyleTreeBuilder — walks a joy-dom `Node` tree and produces the flat
+// `[StyleNode]` array `ComponentResolver` consumes.
 //
-// Tree shape:
-//   [root]                ← id = `rootID` (default "root"), schemaType = nil
-//   ├── schema[i] …       ← entries with `parentID == nil` (or a missing id)
-//   │   ├── schema[k] …   ← entries whose `parentID` points to an earlier entry
-//   │   └── …
-//   └── schema[j] …
+// Tier 5 rewrite: this used to consume `[SchemaEntry]` (the flat schema
+// from `SchemaFlattener`) plus a parsed `Stylesheet`. After the joy-dom-
+// native refactor it walks the `Node` tree directly and resolves against
+// a pre-built `[StyleResolver.Rule]` list, dropping the flat-array
+// intermediate entirely.
 //
-// The returned array is still flat and preserves schema insertion order so the
-// caller's `ForEach` loop renders children in the order the author declared
-// them. Parent-child relationships are captured in `StyleNode.parentID` and
-// used by the resolver for descendant / child combinator matching.
+// Tree shape produced:
+//   [root]                ← id = `rootID`, schemaType = nil
+//   ├── layout            ← the document's top-level Node
+//   │   ├── layout.children[0]
+//   │   │   ├── …
+//   │   │   └── …
+//   │   └── layout.children[1]
+//   └── …
+//
+// Each `Node` becomes one `StyleNode`. Primitive children (string /
+// number / null) become `StyleNode`s typed `primitive_string` etc. with
+// the value stringified into props. The returned array is flat and
+// preserves render order so the parent flex layout iterates children
+// in author-declared order.
+//
+// IDs are author-supplied (`Node.props.id`) when present; otherwise we
+// synthesize a deterministic position-based id (`_n_0_1`). Synthetic
+// ids never enter the rule-matching `id` index — only addressable
+// nodes (with author ids) match `#id` selectors. This is the
+// synthetic-id-leak fix that motivated the tree-native refactor.
 
 import Foundation
 
-/// Builds the flat style tree consumed by `ComponentResolver`.
 internal enum StyleTreeBuilder {
 
-    /// Construct a node list for rendering.
+    /// Walk `layout` and produce the flat node list for rendering.
     ///
     /// - Parameters:
-    ///   - rootID: The id used for the implicit root container. `#<rootID>`
-    ///     selectors in the stylesheet apply to it.
-    ///   - schema: Schema entries in render order. Each becomes one child of
-    ///     its declared parent (or of the root when `parentID` is nil or
-    ///     dangling).
-    ///   - stylesheet: The parsed CSS to cascade over.
-    ///   - diagnostics: Forwarded to `StyleResolver` for invalid-value warnings.
-    /// - Returns: `[root] + children`, always at least one node.
+    ///   - layout: The document's root `Node` (`Spec.layout`).
+    ///   - rootID: The id used for the implicit container above `layout`.
+    ///     `#<rootID>` selectors apply to it. Conventionally
+    ///     `__joydom_root__` to avoid colliding with author ids.
+    ///   - rules: Pre-built rule list — typically `RuleBuilder.buildRules(...)`
+    ///     output, which absorbs `Spec.style`, the active breakpoint's
+    ///     `style` and `nodes[id].style`, and any per-node `props.style`.
+    ///   - diagnostics: Forwarded to `StyleResolver`.
+    /// - Returns: `[root] + descendants` in render order, always at least
+    ///   one node.
     internal static func build(
+        layout: Node,
         rootID: String,
-        schema: [SchemaEntry],
-        stylesheet: Stylesheet,
+        rules: [StyleResolver.Rule],
+        classNameOverrides: [String: [String]] = [:],
+        bindingsByID: [String: String] = [:],
         diagnostics: inout JoyDiagnostics
     ) -> [StyleNode] {
-        // Index schema entries by id for parent lookup. First-wins on
-        // duplicates (matches the render-order invariant — later copies would
-        // be silently shadowed by earlier parent-chain lookups otherwise) and
-        // emits one diagnostic per duplicated id so authors notice.
-        var byID: [String: SchemaEntry] = [:]
-        var seen: Set<String> = []
-        for entry in schema {
-            if seen.insert(entry.id).inserted {
-                byID[entry.id] = entry
-            } else {
-                diagnostics.warn(.init(.duplicateSchemaID(entry.id)))
-            }
-        }
+        var output: [StyleNode] = []
+        var ancestorChain: [StyleResolver.NodeRef] = []
+        var siblingsByParent: [String: [StyleResolver.NodeRef]] = [:]
 
-        /// Resolve an entry's effective parent id. Missing `parentID` or one
-        /// that doesn't point at another entry both fall back to root — this
-        /// keeps the tree connected regardless of schema authoring errors.
-        func effectiveParentID(_ entry: SchemaEntry) -> String {
-            if let pid = entry.parentID, byID[pid] != nil { return pid }
-            return rootID
-        }
-
-        /// All schema entries that share `entry`'s effective parent and
-        /// appear earlier in render order. The resolver uses this to
-        /// match sibling combinators (`+`, `~`). Listed in source order
-        /// (oldest first), so the immediately preceding sibling is the
-        /// last element.
-        ///
-        /// Indexes the schema once per call — fine for the small node
-        /// counts joy-dom payloads carry, and keeps the implementation
-        /// straightforward. If profiling ever shows this dominates,
-        /// caching by parent-id is a small follow-up.
-        func precedingSiblings(of entry: SchemaEntry) -> [StyleResolver.NodeRef] {
-            let myParent = effectiveParentID(entry)
-            var siblings: [StyleResolver.NodeRef] = []
-            for other in schema {
-                if other.id == entry.id { break }            // stop at the subject itself
-                if effectiveParentID(other) == myParent {
-                    siblings.append(StyleResolver.NodeRef(
-                        id: other.id,
-                        schemaType: other.type,
-                        classes: other.classes
-                    ))
-                }
-            }
-            return siblings
-        }
-
-        /// Walk parentID pointers outwards (not including root) and collect
-        /// each ancestor as a `NodeRef` for the resolver. `innermost first,
-        /// outermost last`, matching the resolver's contract.
-        func ancestorChain(of entry: SchemaEntry) -> [StyleResolver.NodeRef] {
-            var chain: [StyleResolver.NodeRef] = []
-            var currentID = effectiveParentID(entry)
-            var visited: Set<String> = [entry.id]      // guard against cycles
-            while currentID != rootID, let parent = byID[currentID] {
-                if !visited.insert(parent.id).inserted { break }
-                chain.append(StyleResolver.NodeRef(
-                    id: parent.id,
-                    schemaType: parent.type,
-                    classes: parent.classes
-                ))
-                currentID = effectiveParentID(parent)
-            }
-            return chain
-        }
-
-        var nodes: [StyleNode] = []
-
-        // Root first. Its `schemaType` is nil so element selectors never match.
+        // Root first. No ancestors, no siblings.
         let rootStyle = StyleResolver.resolve(
             id: rootID,
             schemaType: nil,
             classes: [],
             ancestors: [],
-            stylesheet: stylesheet,
+            precedingSiblings: [],
+            rules: rules,
             diagnostics: &diagnostics
         )
-        nodes.append(StyleNode(
+        output.append(StyleNode(
             id: rootID,
             parentID: nil,
             schemaType: nil,
             classes: [],
             computedStyle: rootStyle
         ))
+        siblingsByParent[rootID] = []
 
-        // Children in schema insertion order, deduplicated by id so a
-        // duplicate schema entry doesn't produce two StyleNodes with the
-        // same id (which would break `parentByID` and event bubbling).
-        var emitted: Set<String> = []
-        for entry in schema where emitted.insert(entry.id).inserted {
-            let ancestors = ancestorChain(of: entry)
-            let siblings  = precedingSiblings(of: entry)
-            let style = StyleResolver.resolve(
-                id: entry.id,
-                schemaType: entry.type,
-                classes: entry.classes,
-                ancestors: ancestors,
-                precedingSiblings: siblings,
-                stylesheet: stylesheet,
-                diagnostics: &diagnostics
-            )
-            nodes.append(StyleNode(
-                id: entry.id,
-                parentID: effectiveParentID(entry),
-                schemaType: entry.type,
-                classes: entry.classes,
-                props: entry.props,
-                computedStyle: style
-            ))
+        // Walk the tree.
+        emit(
+            node: layout,
+            parentID: rootID,
+            path: [],
+            ancestorChain: &ancestorChain,
+            siblingsByParent: &siblingsByParent,
+            rules: rules,
+            classNameOverrides: classNameOverrides,
+            bindingsByID: bindingsByID,
+            output: &output,
+            diagnostics: &diagnostics
+        )
+
+        return output
+    }
+
+    // MARK: - Recursion
+
+    /// Visit `node`, resolve its style, append to `output`, then recurse
+    /// into children. `ancestorChain` is mutated in/out around the
+    /// recursion so each subtree sees the right ancestors.
+    private static func emit(
+        node: Node,
+        parentID: String,
+        path: [Int],
+        ancestorChain: inout [StyleResolver.NodeRef],
+        siblingsByParent: inout [String: [StyleResolver.NodeRef]],
+        rules: [StyleResolver.Rule],
+        classNameOverrides: [String: [String]],
+        bindingsByID: [String: String],
+        output: inout [StyleNode],
+        diagnostics: inout JoyDiagnostics
+    ) {
+        let id          = resolveID(node: node, path: path)
+        let schemaType  = node.type
+        // Per-node breakpoint className override wins; otherwise use the
+        // node's own className.
+        let classes     = classNameOverrides[id] ?? (node.props?.className ?? [])
+
+        // Preceding siblings under this parent — already-emitted refs.
+        let precedingSiblings = siblingsByParent[parentID] ?? []
+
+        let computed = StyleResolver.resolve(
+            id: id,
+            schemaType: schemaType,
+            classes: classes,
+            ancestors: ancestorChain,
+            precedingSiblings: precedingSiblings,
+            rules: rules,
+            diagnostics: &diagnostics
+        )
+
+        // Bake the FormState binding path into props if `.bindings(_:)`
+        // declared one for this node id. The resolver looks here for
+        // `binding`/`binding.<field>` keys to wire up Binding<String>.
+        var props: [String: String] = [:]
+        if let path = bindingsByID[id] {
+            props["binding"] = path
+        }
+        output.append(StyleNode(
+            id: id,
+            parentID: parentID,
+            schemaType: schemaType,
+            classes: classes,
+            props: props,
+            computedStyle: computed
+        ))
+
+        // Register myself as a sibling of future descendants of my parent.
+        siblingsByParent[parentID, default: []].append(StyleResolver.NodeRef(
+            id: id,
+            schemaType: schemaType,
+            classes: classes
+        ))
+
+        // Recurse into Node children. Primitives are leaf StyleNodes —
+        // they get a synthetic id and a primitive_<kind> schemaType so
+        // factories registered via DefaultPrimitives can render them.
+        guard let children = node.children, !children.isEmpty else { return }
+
+        // Push myself onto the ancestor chain for descendants.
+        ancestorChain.insert(StyleResolver.NodeRef(
+            id: id,
+            schemaType: schemaType,
+            classes: classes
+        ), at: 0)
+        // Reset siblings tracking for this new parent scope.
+        siblingsByParent[id] = []
+
+        for (index, child) in children.enumerated() {
+            let childPath = path + [index]
+            switch child {
+            case .node(let childNode):
+                emit(
+                    node: childNode,
+                    parentID: id,
+                    path: childPath,
+                    ancestorChain: &ancestorChain,
+                    siblingsByParent: &siblingsByParent,
+                    rules: rules,
+                    classNameOverrides: classNameOverrides,
+                    bindingsByID: bindingsByID,
+                    output: &output,
+                    diagnostics: &diagnostics
+                )
+            case .primitive(let value):
+                emitPrimitive(
+                    value: value,
+                    parentID: id,
+                    path: childPath,
+                    ancestorChain: ancestorChain,
+                    siblingsByParent: &siblingsByParent,
+                    rules: rules,
+                    output: &output,
+                    diagnostics: &diagnostics
+                )
+            }
         }
 
-        return nodes
+        // Pop ancestor.
+        ancestorChain.removeFirst()
+    }
+
+    /// Primitive children (string / number / null) become leaf nodes
+    /// with a synthetic id and a `primitive_<kind>` type so the registered
+    /// factories can render them.
+    private static func emitPrimitive(
+        value: PrimitiveValue,
+        parentID: String,
+        path: [Int],
+        ancestorChain: [StyleResolver.NodeRef],
+        siblingsByParent: inout [String: [StyleResolver.NodeRef]],
+        rules: [StyleResolver.Rule],
+        output: inout [StyleNode],
+        diagnostics: inout JoyDiagnostics
+    ) {
+        let id = syntheticID(for: path)
+        let (schemaType, props): (String, [String: String]) = {
+            switch value {
+            case .string(let s): return ("primitive_string", ["value": s])
+            case .number(let n): return ("primitive_number", ["value": formatNumber(n)])
+            case .null:          return ("primitive_null",   [:])
+            }
+        }()
+
+        let precedingSiblings = siblingsByParent[parentID] ?? []
+        let computed = StyleResolver.resolve(
+            id: id,
+            schemaType: schemaType,
+            classes: [],
+            ancestors: ancestorChain,
+            precedingSiblings: precedingSiblings,
+            rules: rules,
+            diagnostics: &diagnostics
+        )
+
+        output.append(StyleNode(
+            id: id,
+            parentID: parentID,
+            schemaType: schemaType,
+            classes: [],
+            props: props,
+            computedStyle: computed
+        ))
+
+        siblingsByParent[parentID, default: []].append(StyleResolver.NodeRef(
+            id: id,
+            schemaType: schemaType,
+            classes: []
+        ))
+    }
+
+    // MARK: - Identity
+
+    /// Author-supplied `props.id` wins; otherwise a deterministic
+    /// position-based fallback. Synthetic ids start with `_n_` so they're
+    /// visibly synthetic to anyone reading the tree.
+    private static func resolveID(node: Node, path: [Int]) -> String {
+        if let explicit = node.props?.id { return explicit }
+        return syntheticID(for: path)
+    }
+
+    /// `[]` → unused (root has its own id); `[0]` → `_n_0`; `[0, 1]` → `_n_0_1`.
+    private static func syntheticID(for path: [Int]) -> String {
+        guard !path.isEmpty else { return "_n_" }
+        return "_n_" + path.map(String.init).joined(separator: "_")
+    }
+
+    // MARK: - Number formatting
+
+    /// Match `StyleSerializer`'s prior behavior: drop trailing `.0` for
+    /// integer-valued doubles so primitive numbers round-trip cleanly.
+    private static func formatNumber(_ value: Double) -> String {
+        if value.truncatingRemainder(dividingBy: 1) == 0 {
+            return String(Int(value))
+        }
+        return String(value)
     }
 }
