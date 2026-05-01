@@ -69,7 +69,7 @@ struct JoyDOMFormStateDemo: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .frame(width: 110, alignment: .leading)
-            Slider(value: $simulatedWidth, in: 320...1200, step: 1)
+            Slider(value: $simulatedWidth, in: 0...1400, step: 1)
             Text("\(Int(simulatedWidth))px")
                 .font(.system(.caption, design: .monospaced))
                 .frame(width: 70, alignment: .trailing)
