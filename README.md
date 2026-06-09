@@ -312,4 +312,4 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) before
 
 ## License
 
-[MIT](LICENSE) © 2026 Joyfill
+[MIT](LICENSE) © 2026 J0y, Inc.
