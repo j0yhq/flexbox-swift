@@ -238,7 +238,7 @@ enum JoyDOMSamples {
               {
                 "type": "p",
                 "props": { "id": "byline" },
-                "children": ["By the joyfill team · April 2026"]
+                "children": ["By the J0y team · April 2026"]
               },
               {
                 "type": "p",
@@ -630,7 +630,7 @@ enum JoyDOMSamples {
                 "type": "div",
                 "props": { "id": "footer" },
                 "children": [
-                  { "type": "p", "props": { "id": "copyright" }, "children": ["© 2026 joyfill"] },
+                  { "type": "p", "props": { "id": "copyright" }, "children": ["© 2026 J0y, Inc."] },
                   {
                     "type": "div",
                     "props": { "id": "footer-nav" },
