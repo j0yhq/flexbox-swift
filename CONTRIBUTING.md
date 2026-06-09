@@ -11,13 +11,13 @@ swift build
 swift test
 ```
 
-All 103 tests should pass before you open a PR.
+The full test suite (`swift test`) should pass before you open a PR.
 
 ## Project structure
 
 ```
 Sources/FlexLayout/
-├── FlexEngine.swift       Pure flex algorithm — no SwiftUI dependency
+├── FlexEngine.swift       Pure flex algorithm — no view hierarchy required
 ├── FlexLayout.swift       SwiftUI Layout adapter
 ├── FlexTypes.swift        Public enums and FlexContainerConfig
 ├── FlexModifiers.swift    .flexItem(...) and .flexOverflow(...) view extensions
@@ -26,11 +26,8 @@ Sources/FlexLayout/
 └── FlexLayout.docc/       DocC documentation catalog
 
 Tests/
-├── FlexLayoutTests/
-│   ├── FlexGeometryTests.swift   63 geometry tests via FlexEngine.solve
-│   └── FlexLayoutTests.swift     7 algorithm unit tests
-└── FlexDemoAppTests/
-    └── CSSParserTests.swift      33 CSS parser tests
+├── FlexLayoutTests/   Engine and geometry tests — FlexEngine.solve, margins, min/max, cross-size
+└── JoyDOMTests/       JoyDOM renderer suite — cascade, parser, and property-coverage snapshots
 ```
 
 ## Guidelines
@@ -48,7 +45,7 @@ Tests/
 
 ### Writing tests
 
-Geometry tests use `FlexEngine.solve` directly — no SwiftUI needed:
+Geometry tests call `FlexEngine.solve` directly — no view hierarchy or host app needed:
 
 ```swift
 func testMyFeature() {
@@ -69,12 +66,12 @@ Use `accuracy: 0.5` for all `CGFloat` assertions to handle sub-point rounding.
 
 - Match the existing Swift style (4-space indent, aligned colons in declarations)
 - Every public type and method needs a DocC doc-comment with at least one code example
-- Keep `FlexEngine` free of SwiftUI imports — it must remain pure Swift
+- Keep `FlexEngine` free of *view-hierarchy* dependencies (no `View`, no `LayoutSubview`) — it operates on value types like `ProposedViewSize` and `CGSize`, so it stays testable without rendering
 
 ### Running the demo app
 
 ```bash
-open FlexLayoutDemo.xcworkspace
+open Package.swift
 ```
 
 Select the `FlexDemoApp` scheme and run on any iOS 16+ simulator.
@@ -83,7 +80,7 @@ Select the `FlexDemoApp` scheme and run on any iOS 16+ simulator.
 
 1. Fork the repo and create a branch: `git checkout -b feat/my-feature`
 2. Make your changes with tests
-3. Confirm `swift test` passes: 103+ tests, 0 failures
+3. Confirm `swift test` passes with 0 failures
 4. Open a PR against `main` — fill in the PR template
 
 ## Reporting bugs
