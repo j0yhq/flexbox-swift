@@ -5,8 +5,8 @@ Thank you for your interest in contributing! This document explains how to get s
 ## Development setup
 
 ```bash
-git clone https://github.com/joyfill/flex-layout.git
-cd flex-layout
+git clone https://github.com/j0yhq/flexbox-swift.git
+cd flexbox-swift
 swift build
 swift test
 ```

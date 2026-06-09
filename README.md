@@ -32,7 +32,7 @@ struct ContentView: View {
 
 - **Complete CSS parity** — `flex-direction`, `flex-wrap`, `justify-content`, `align-items`, `align-content`, `align-self`, `flex-grow`, `flex-shrink`, `flex-basis`, `gap`, `row-gap`, `column-gap`, `padding`, `overflow`, `position: absolute`, `z-index`, `order`, `width`, `height`.
 - **SwiftUI native** — conforms to the `Layout` protocol; works with `AnyLayout` switching, animations, and all SwiftUI modifiers. No `UIViewRepresentable`, no web view, no bridge.
-- **Testable pure engine** — `FlexEngine` is decoupled from SwiftUI, so every layout phase can be asserted in plain `XCTest` without a host app or view hierarchy.
+- **Testable engine** — `FlexEngine` runs the algorithm without a view hierarchy, so every phase is assertable in plain `XCTest` (no host app, no rendering).
 - **Spec-compliant** — the algorithm follows the CSS Flexbox spec §9 in 10 annotated phases.
 - **Documented** — full DocC API reference with a Getting Started guide and a CSS property reference.
 - **Tested** — comprehensive test coverage across geometry, the CSS parser, and the algorithm.
@@ -207,7 +207,7 @@ Full reference: [CSS Property Reference](Sources/FlexLayout/FlexLayout.docc/Arti
 
 ## Testing layouts
 
-`FlexEngine` is fully decoupled from SwiftUI. Write geometry tests with exact `CGRect` assertions — no host app or view hierarchy needed:
+`FlexEngine` needs no view hierarchy. Write geometry tests with exact `CGRect` assertions — no host app or rendering required:
 
 ```swift
 import XCTest
@@ -263,7 +263,7 @@ xcrun docc preview Sources/FlexLayout/FlexLayout.docc \
 ```
 FlexBox (View)
   └── FlexLayout (Layout protocol — SwiftUI adapter)
-        └── FlexEngine (pure algorithm — no SwiftUI dependency)
+        └── FlexEngine (pure algorithm — no view hierarchy required)
               ├── FlexItemInput    (per-item inputs with measure closure)
               ├── ComputedFlexLine (per-line resolved data)
               └── FlexSolution     (final frames + proposals)
@@ -296,11 +296,11 @@ The [`Samples/`](Samples/) directory contains 12 real-world CSS layouts that ren
 
 ## FAQ
 
-**Does this work with UIKit?** FlexLayout targets SwiftUI specifically — it conforms to the SwiftUI `Layout` protocol. For UIKit, the established options are [Yoga](https://github.com/facebook/yoga) and [FlexLayout](https://github.com/layoutBox/FlexLayout). FlexLayout (this library) brings the same flexbox model natively to SwiftUI.
+**Does this work with UIKit?** This library targets SwiftUI specifically — it conforms to the SwiftUI `Layout` protocol. For UIKit, the established options are [Yoga](https://github.com/facebook/yoga) and [layoutBox/FlexLayout](https://github.com/layoutBox/FlexLayout) (a separate, similarly named UIKit library). FlexLayout brings the same flexbox model natively to SwiftUI.
 
 **How is this different from `HStack` and `VStack`?** Stacks place items along one axis but don't wrap, don't support `flex-grow`/`flex-shrink` ratios, and have no `align-content` or `order`. FlexLayout implements the full CSS flexbox model, including wrapping and per-item grow/shrink/basis.
 
-**Is there a layout engine I can use without SwiftUI?** Yes. `FlexEngine` is pure Swift with no SwiftUI dependency — usable for testing or any context where you need flexbox geometry without a view hierarchy.
+**Can I run the layout engine without building views?** Yes. `FlexEngine` runs the full flex algorithm with no view hierarchy and no host app — call `FlexEngine.solve(...)` and assert the resulting frames directly in `XCTest`. (It still links SwiftUI for `ProposedViewSize`/`CGSize`, so it needs a SwiftUI-capable platform — iOS 16+/macOS 13+ — but no rendering, no `View`, no UI.)
 
 ---
 

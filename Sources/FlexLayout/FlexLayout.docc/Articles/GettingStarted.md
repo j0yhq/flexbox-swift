@@ -10,7 +10,7 @@ Add the package to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/joyfill/flex-layout.git", from: "1.0.0"),
+    .package(url: "https://github.com/j0yhq/flexbox-swift.git", from: "1.0.0"),
 ],
 targets: [
     .target(name: "MyApp", dependencies: ["FlexLayout"]),
