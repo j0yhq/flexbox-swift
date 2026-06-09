@@ -35,7 +35,7 @@ struct ContentView: View {
 - **Testable pure engine** — `FlexEngine` is decoupled from SwiftUI, so every layout phase can be asserted in plain `XCTest` without a host app or view hierarchy.
 - **Spec-compliant** — the algorithm follows the CSS Flexbox spec §9 in 10 annotated phases.
 - **Documented** — full DocC API reference with a Getting Started guide and a CSS property reference.
-- **Tested** — 103 passing tests covering geometry, the CSS parser, and the algorithm.
+- **Tested** — comprehensive test coverage across geometry, the CSS parser, and the algorithm.
 
 ---
 
@@ -248,7 +248,7 @@ swift build --target FlexLayout \
 # 2. Launch the DocC preview server
 xcrun docc preview Sources/FlexLayout/FlexLayout.docc \
   --fallback-display-name FlexLayout \
-  --fallback-bundle-identifier com.joyfill.FlexLayout \
+  --fallback-bundle-identifier com.j0y.FlexLayout \
   --fallback-bundle-version 1.0.0 \
   --additional-symbol-graph-dir /tmp/flex-symbols \
   --port 8080
