@@ -1,22 +1,41 @@
 # FlexLayout
 
-[![CI](https://github.com/joyfill/flex-layout/actions/workflows/ci.yml/badge.svg)](https://github.com/joyfill/flex-layout/actions/workflows/ci.yml)
+[![CI](https://github.com/j0yhq/flexbox-swift/actions/workflows/ci.yml/badge.svg)](https://github.com/j0yhq/flexbox-swift/actions/workflows/ci.yml)
 [![Swift 5.9+](https://img.shields.io/badge/Swift-5.9%2B-orange.svg)](https://swift.org)
 [![Platforms](https://img.shields.io/badge/platforms-iOS%2016%20%7C%20macOS%2013%20%7C%20tvOS%2016%20%7C%20watchOS%209-lightgrey.svg)](https://developer.apple.com/swift/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![SPM](https://img.shields.io/badge/SwiftPM-compatible-brightgreen.svg)](https://swift.org/package-manager/)
 
-A full-featured CSS Flexbox layout engine for SwiftUI — every major flex property, spec-compliant algorithm, independently unit-testable.
+A full-featured CSS Flexbox layout engine for SwiftUI. Lay out views with the flex properties you already know from the web — `flex-direction`, `justify-content`, `align-items`, `flex-grow`, `gap` — backed by a spec-compliant algorithm and a pure engine you can unit-test without a view hierarchy.
+
+SwiftUI has stacks (`HStack`, `VStack`, `ZStack`) but no real flexbox: no wrapping, no `flex-grow`/`flex-shrink`, no `align-content`, no `order`. UIKit developers reached for Yoga or FlexLayout to fill that gap. FlexLayout is the SwiftUI-native answer — it conforms to the SwiftUI `Layout` protocol, so it composes with animations, `AnyLayout` switching, and every SwiftUI modifier.
+
+```swift
+import SwiftUI
+import FlexLayout
+
+struct ContentView: View {
+    var body: some View {
+        // Three equal-width columns (CSS "flex: 1" pattern)
+        FlexBox(direction: .row, gap: 12) {
+            Text("Column A").flexItem(flex: 1)
+            Text("Column B").flexItem(flex: 1)
+            Text("Column C").flexItem(flex: 1)
+        }
+    }
+}
+```
 
 ---
 
-## Features
+## Why FlexLayout
 
-- **Complete CSS parity** — `flex-direction`, `flex-wrap`, `justify-content`, `align-items`, `align-content`, `align-self`, `flex-grow`, `flex-shrink`, `flex-basis`, `gap`, `row-gap`, `column-gap`, `padding`, `overflow`, `position: absolute`, `z-index`, `order`, `width`, `height`
-- **SwiftUI native** — conforms to the `Layout` protocol; works with `AnyLayout` switching, animations, and all SwiftUI modifiers
-- **Testable pure engine** — `FlexEngine` is decoupled from SwiftUI so every layout phase can be asserted in plain `XCTest` without a view hierarchy
-- **DocC API reference** — full documentation with code examples, a Getting Started guide, and a CSS property reference
-- **103 passing tests** — geometry tests, CSS parser tests, and algorithm unit tests
+- **Complete CSS parity** — `flex-direction`, `flex-wrap`, `justify-content`, `align-items`, `align-content`, `align-self`, `flex-grow`, `flex-shrink`, `flex-basis`, `gap`, `row-gap`, `column-gap`, `padding`, `overflow`, `position: absolute`, `z-index`, `order`, `width`, `height`.
+- **SwiftUI native** — conforms to the `Layout` protocol; works with `AnyLayout` switching, animations, and all SwiftUI modifiers. No `UIViewRepresentable`, no web view, no bridge.
+- **Testable pure engine** — `FlexEngine` is decoupled from SwiftUI, so every layout phase can be asserted in plain `XCTest` without a host app or view hierarchy.
+- **Spec-compliant** — the algorithm follows the CSS Flexbox spec §9 in 10 annotated phases.
+- **Documented** — full DocC API reference with a Getting Started guide and a CSS property reference.
+- **Tested** — 103 passing tests covering geometry, the CSS parser, and the algorithm.
 
 ---
 
@@ -35,17 +54,17 @@ A full-featured CSS Flexbox layout engine for SwiftUI — every major flex prope
 
 ### Swift Package Manager
 
-Add the package in Xcode via **File → Add Package Dependencies** and enter:
+Add the package in Xcode via **File → Add Package Dependencies** and enter the repository URL:
 
 ```
-https://github.com/joyfill/flex-layout
+https://github.com/j0yhq/flexbox-swift
 ```
 
 Or add it to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/joyfill/flex-layout.git", from: "1.0.0"),
+    .package(url: "https://github.com/j0yhq/flexbox-swift.git", from: "1.0.0"),
 ],
 targets: [
     .target(name: "MyApp", dependencies: ["FlexLayout"]),
@@ -256,7 +275,7 @@ The algorithm follows the CSS Flexbox spec §9 in 10 annotated phases. See [`Fle
 
 ## Samples
 
-The [`Samples/`](Samples/) directory contains 12 real-world CSS layouts that can be rendered directly through the CSS parser:
+The [`Samples/`](Samples/) directory contains 12 real-world CSS layouts that render directly through the CSS parser:
 
 | File | Layout |
 |---|---|
@@ -272,6 +291,16 @@ The [`Samples/`](Samples/) directory contains 12 real-world CSS layouts that can
 | `10-ecommerce-product.css` | Product detail page |
 | `11-settings-page.css` | Settings list |
 | `12-overflow-scroll.css` | Horizontal scrolling tabs |
+
+---
+
+## FAQ
+
+**Does this work with UIKit?** FlexLayout targets SwiftUI specifically — it conforms to the SwiftUI `Layout` protocol. For UIKit, the established options are [Yoga](https://github.com/facebook/yoga) and [FlexLayout](https://github.com/layoutBox/FlexLayout). FlexLayout (this library) brings the same flexbox model natively to SwiftUI.
+
+**How is this different from `HStack` and `VStack`?** Stacks place items along one axis but don't wrap, don't support `flex-grow`/`flex-shrink` ratios, and have no `align-content` or `order`. FlexLayout implements the full CSS flexbox model, including wrapping and per-item grow/shrink/basis.
+
+**Is there a layout engine I can use without SwiftUI?** Yes. `FlexEngine` is pure Swift with no SwiftUI dependency — usable for testing or any context where you need flexbox geometry without a view hierarchy.
 
 ---
 
