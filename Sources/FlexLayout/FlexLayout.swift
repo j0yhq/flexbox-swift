@@ -39,7 +39,7 @@ import SwiftUI
 /// > Note: `placeSubviews` always recomputes rather than relying solely on the cache,
 /// because the bounds passed there can have a larger cross-axis size than the value
 /// returned by `sizeThatFits` (flex containers act as block boxes in cross axis).
-public struct FlexLayout: Layout {
+public struct FlexLayoutContainer: Layout {
 
     /// The complete set of flex container properties for this layout.
     public var config: FlexContainerConfig

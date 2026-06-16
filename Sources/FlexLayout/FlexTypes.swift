@@ -5,7 +5,7 @@ import SwiftUI
 /// Controls how content that overflows a flex container is rendered.
 ///
 /// Maps directly to the CSS `overflow` property. Apply at the container level via
-/// ``FlexBox`` or ``FlexLayout``, or at the item level via ``FlexItemModifier``.
+/// ``FlexBox`` or ``FlexLayoutContainer``, or at the item level via ``FlexItemModifier``.
 ///
 /// ```swift
 /// // Clip overflowing cards without a scrollbar
@@ -352,7 +352,7 @@ public enum FlexBasis: Equatable {
 
 /// All flex-container properties bundled into one equatable value.
 ///
-/// `FlexContainerConfig` is the single source of truth passed to ``FlexLayout``
+/// `FlexContainerConfig` is the single source of truth passed to ``FlexLayoutContainer``
 /// and ``FlexBox``. Every property mirrors its CSS counterpart.
 ///
 /// ## Usage
