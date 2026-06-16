@@ -3,7 +3,7 @@ import SwiftUI
 // MARK: - FlexItemModifier
 
 /// A `ViewModifier` that attaches all CSS flex item properties to a view
-/// as `LayoutValueKey` values so they can be read by ``FlexLayout`` at layout time.
+/// as `LayoutValueKey` values so they can be read by ``FlexLayoutContainer`` at layout time.
 ///
 /// You almost never need to create `FlexItemModifier` directly. Use the
 /// `.flexItem(...)` extension on `View` instead.
@@ -64,7 +64,7 @@ public extension View {
 
     /// Attaches CSS flex item properties to this view.
     ///
-    /// Call `.flexItem(...)` on any child of a ``FlexBox`` or ``FlexLayout`` to
+    /// Call `.flexItem(...)` on any child of a ``FlexBox`` or ``FlexLayoutContainer`` to
     /// control how that individual item is sized and placed. All parameters are
     /// optional and default to their CSS initial values, so you only need to supply
     /// the properties you want to customise.

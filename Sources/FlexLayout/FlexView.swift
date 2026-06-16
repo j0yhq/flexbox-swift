@@ -3,7 +3,7 @@ import SwiftUI
 /// A SwiftUI view that arranges its children using the CSS Flexbox layout model.
 ///
 /// `FlexBox` is the primary public API of the `FlexLayout` package. It wraps
-/// ``FlexLayout`` in a `@ViewBuilder`-based `View` and exposes all container
+/// ``FlexLayoutContainer`` in a `@ViewBuilder`-based `View` and exposes all container
 /// properties as labelled initialiser parameters — mirroring the CSS API.
 ///
 /// ## Basic usage
@@ -110,14 +110,14 @@ public struct FlexBox<Content: View>: View {
         self.content = content()
     }
 
-    /// The view's body: a ``FlexLayout`` wrapped with the container's overflow modifier.
+    /// The view's body: a ``FlexLayoutContainer`` wrapped with the container's overflow modifier.
     ///
     /// The overflow behaviour is applied at the container level via
     /// ``FlexOverflowModifier`` so the `ScrollView` (if any) correctly encloses
     /// all children.
     @ViewBuilder
     public var body: some View {
-        let layout = FlexLayout(config) { content }
+        let layout = FlexLayoutContainer(config) { content }
         layout.flexOverflow(config.overflow)
     }
 }

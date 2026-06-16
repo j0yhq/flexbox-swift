@@ -5,7 +5,7 @@ import SwiftUI
 /// A pure-value description of one flex item, fully decoupled from SwiftUI's `LayoutSubview`.
 ///
 /// `FlexItemInput` is the bridge between the SwiftUI view hierarchy and the pure
-/// ``FlexEngine`` algorithm. ``FlexLayout`` converts each `Subviews.Element` into a
+/// ``FlexEngine`` algorithm. ``FlexLayoutContainer`` converts each `Subviews.Element` into a
 /// `FlexItemInput` (via `makeInputs(from:)`), then passes the array to `FlexEngine`.
 ///
 /// ## Why the `measure` closure?
@@ -274,7 +274,7 @@ public struct FlexItemInput {
 ///
 /// All coordinates are relative to the container origin `(0, 0)`. When placing views
 /// inside a `CGRect` with a non-zero origin, add `bounds.minX` / `bounds.minY` to
-/// each frame as ``FlexLayout`` does in `placeSubviews`.
+/// each frame as ``FlexLayoutContainer`` does in `placeSubviews`.
 public struct FlexSolution {
     /// Frame of each item, indexed by **input order** (not visual/order-property order).
     ///
@@ -405,7 +405,7 @@ struct ComputedFlexLine {
 ///                            solve  ──▶  FlexSolution  { frames, proposals, containerSize }
 /// ```
 ///
-/// ``FlexLayout`` (the SwiftUI `Layout`) converts its `Subviews` into
+/// ``FlexLayoutContainer`` (the SwiftUI `Layout`) converts its `Subviews` into
 /// `[FlexItemInput]` and then delegates to this engine:
 ///
 /// ```swift
@@ -435,7 +435,7 @@ public enum FlexEngine {
 
     /// Runs the full flex layout algorithm and returns concrete frames for every item.
     ///
-    /// This is the primary API for unit tests and the method called by ``FlexLayout``
+    /// This is the primary API for unit tests and the method called by ``FlexLayoutContainer``
     /// in `placeSubviews`.
     ///
     /// - Parameters:
@@ -573,7 +573,7 @@ public enum FlexEngine {
 
     /// Runs the core flex algorithm and returns the container size plus resolved lines.
     ///
-    /// Called by both ``solve(config:inputs:proposal:)`` and ``FlexLayout``'s
+    /// Called by both ``solve(config:inputs:proposal:)`` and ``FlexLayoutContainer``'s
     /// `sizeThatFits` (where only the container size is needed for the first pass).
     ///
     /// - Parameters:
